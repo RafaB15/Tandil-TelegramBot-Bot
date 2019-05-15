@@ -1,0 +1,92 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.telegram.org/bot715612264:AAFBsDf4j3R-88LEpM9mHVt0uwvkhTmwMJ8/getUpdates
+    body:
+      encoding: UTF-8
+      string: offset=0&timeout=20
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx/1.12.2
+      Date:
+      - Mon, 13 May 2019 21:29:58 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '396'
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Allow-Methods:
+      - GET, POST, OPTIONS
+      Access-Control-Expose-Headers:
+      - Content-Length,Content-Type,Date,Server,Connection
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+    body:
+      encoding: UTF-8
+      string: |-
+        {"ok":true,"result":[{"update_id":693981718,
+        "message":{"message_id":11,"from":{"id":141733544,"is_bot":false,"first_name":"Emilio","last_name":"Gutter","username":"egutter","language_code":"en"},"chat":{"id":141733544,"first_name":"Emilio","last_name":"Gutter","username":"egutter","type":"private"},"date":1557782998,"text":"/start","entities":[{"offset":0,"length":6,"type":"bot_command"}]}}]}
+    http_version: 
+  recorded_at: Mon, 13 May 2019 21:27:24 GMT
+- request:
+    method: post
+    uri: https://api.telegram.org/bot715612264:AAFBsDf4j3R-88LEpM9mHVt0uwvkhTmwMJ8/sendMessage
+    body:
+      encoding: UTF-8
+      string: chat_id=141733544&text=Hello%2C+Emilio
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx/1.12.2
+      Date:
+      - Mon, 13 May 2019 21:29:59 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '285'
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Allow-Methods:
+      - GET, POST, OPTIONS
+      Access-Control-Expose-Headers:
+      - Content-Length,Content-Type,Date,Server,Connection
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+    body:
+      encoding: UTF-8
+      string: '{"ok":true,"result":{"message_id":12,"from":{"id":715612264,"is_bot":true,"first_name":"fiuba-memo2-prueba","username":"fiuba_memo2_bot"},"chat":{"id":141733544,"first_name":"Emilio","last_name":"Gutter","username":"egutter","type":"private"},"date":1557782999,"text":"Hello,
+        Emilio"}}'
+    http_version: 
+  recorded_at: Mon, 13 May 2019 21:27:26 GMT
+recorded_with: VCR 4.0.0
