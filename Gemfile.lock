@@ -147,6 +147,7 @@ DEPENDENCIES
   guard-rspec
   rake
   rspec
+  rspec-core
   rubocop
   rubocop-rspec
   simplecov
