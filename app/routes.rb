@@ -1,17 +1,32 @@
 require File.dirname(__FILE__) + '/../lib/routing'
+require File.dirname(__FILE__) + '/tv/series'
 
 class Routes
   include Routing
 
-  on '/start' do |bot, message|
-    bot.api.send_message(chat_id: message.chat.id, text: "Hello, #{message.from.first_name}")
+  on_message '/start' do |bot, message|
+    bot.api.send_message(chat_id: message.chat.id, text: "Hola, #{message.from.first_name}")
   end
 
-  on '/stop' do |bot, message|
-    bot.api.send_message(chat_id: message.chat.id, text: "Goodbye, #{message.from.first_name}")
+  on_message '/stop' do |bot, message|
+    bot.api.send_message(chat_id: message.chat.id, text: "Chau, #{message.from.username}")
+  end
+
+  on_message '/tv' do |bot, message|
+    kb = Tv::Series.all.map do |tv_serie|
+      Telegram::Bot::Types::InlineKeyboardButton.new(text: tv_serie.name, callback_data: tv_serie.id.to_s)
+    end
+    markup = Telegram::Bot::Types::InlineKeyboardMarkup.new(inline_keyboard: kb)
+
+    bot.api.send_message(chat_id: message.chat.id, text: 'Quien se queda con el trono?', reply_markup: markup)
+  end
+
+  on_response_to 'Quien se queda con el trono?' do |bot, message|
+    response = Tv::Series.handle_response message.data
+    bot.api.send_message(chat_id: message.message.chat.id, text: response)
   end
 
   default do |bot, message|
-    bot.api.send_message(chat_id: message.chat.id, text: "Uh? I don't understand")
+    bot.api.send_message(chat_id: message.chat.id, text: 'Uh? No te entiendo! Me repetis la pregunta?')
   end
 end

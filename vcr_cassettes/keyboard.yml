@@ -1,0 +1,92 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.telegram.org/bot715612264:AAFBsDf4j3R-88LEpM9mHVt0uwvkhTmwMJ8/getUpdates
+    body:
+      encoding: UTF-8
+      string: offset=0&timeout=20
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx/1.12.2
+      Date:
+      - Sun, 19 May 2019 20:20:37 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '393'
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Allow-Methods:
+      - GET, POST, OPTIONS
+      Access-Control-Expose-Headers:
+      - Content-Length,Content-Type,Date,Server,Connection
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+    body:
+      encoding: UTF-8
+      string: |-
+        {"ok":true,"result":[{"update_id":693981770,
+        "message":{"message_id":98,"from":{"id":141733544,"is_bot":false,"first_name":"Emilio","last_name":"Gutter","username":"egutter","language_code":"en"},"chat":{"id":141733544,"first_name":"Emilio","last_name":"Gutter","username":"egutter","type":"private"},"date":1558297231,"text":"/tv","entities":[{"offset":0,"length":3,"type":"bot_command"}]}}]}
+    http_version: 
+  recorded_at: Sun, 19 May 2019 20:17:59 GMT
+- request:
+    method: post
+    uri: https://api.telegram.org/bot715612264:AAFBsDf4j3R-88LEpM9mHVt0uwvkhTmwMJ8/sendMessage
+    body:
+      encoding: UTF-8
+      string: chat_id=141733544&reply_markup=%7B%22inline_keyboard%22%3A%5B%5B%7B%22text%22%3A%22Jon+Snow%22%2C%22callback_data%22%3A%221%22%7D%5D%2C%5B%7B%22text%22%3A%22Daenerys+Targaryen%22%2C%22callback_data%22%3A%222%22%7D%5D%2C%5B%7B%22text%22%3A%22Ned+Stark%22%2C%22callback_data%22%3A%223%22%7D%5D%5D%7D&text=Quien+se+queda+con+el+trono%3F
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx/1.12.2
+      Date:
+      - Sun, 19 May 2019 20:20:38 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '300'
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Allow-Methods:
+      - GET, POST, OPTIONS
+      Access-Control-Expose-Headers:
+      - Content-Length,Content-Type,Date,Server,Connection
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+    body:
+      encoding: UTF-8
+      string: '{"ok":true,"result":{"message_id":99,"from":{"id":715612264,"is_bot":true,"first_name":"fiuba-memo2-prueba","username":"fiuba_memo2_bot"},"chat":{"id":141733544,"first_name":"Emilio","last_name":"Gutter","username":"egutter","type":"private"},"date":1558297238,"text":"Quien
+        se queda con el trono?"}}'
+    http_version: 
+  recorded_at: Sun, 19 May 2019 20:18:00 GMT
+recorded_with: VCR 4.0.0
