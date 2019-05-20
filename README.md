@@ -25,6 +25,10 @@ Telegram Bot Example
 
 Los tests utilzan WebMock. Para testear el cliente, siempre usar `app.run_once` de lo contrario el bot se queda esperando mensajes y el test no finaliza nunca.
 
+# Llamadas a otras API por HTTP
+
+Se puede utilizar la gema incluida en el repo [Faraday](https://github.com/lostisland/faraday#faraday)
+
 # Más información
 
 Para utilizar otras funcionalidades de Telegram como los Keyboards especiales ver la doc en: https://github.com/atipugin/telegram-bot-ruby

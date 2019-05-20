@@ -6,6 +6,7 @@ ruby '2.5.1'
 gem 'rake'
 
 gem 'dotenv'
+gem 'faraday'
 gem 'telegram-bot-ruby'
 
 group :development, :test do

@@ -143,6 +143,7 @@ DEPENDENCIES
   byebug
   cucumber
   dotenv
+  faraday
   guard
   guard-rspec
   rake
