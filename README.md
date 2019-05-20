@@ -7,7 +7,7 @@ Telegram Bot Example
 * Enviarle el comando `/newbot`
 * Seguir los pasos y al final el BotFather responde con un token
 
-2. Copiar el archivo `.env.example' a `.env` y reemplazar `<YOUR_TELEGRAM_TOKEN>` con el token del paso anterior
+2. Copiar el archivo `.env.example` a `.env` y reemplazar `<YOUR_TELEGRAM_TOKEN>` con el token del paso anterior
 
 3. Correr los tests con `rake`
 
