@@ -8,8 +8,16 @@ class Routes
     bot.api.send_message(chat_id: message.chat.id, text: "Hola, #{message.from.first_name}")
   end
 
+  on_message_pattern /\/say_hi (?<name>.*)/ do |bot, message, args|
+    bot.api.send_message(chat_id: message.chat.id, text: "Hola, #{args['name']}")
+  end
+
   on_message '/stop' do |bot, message|
     bot.api.send_message(chat_id: message.chat.id, text: "Chau, #{message.from.username}")
+  end
+
+  on_message '/time' do |bot, message|
+    bot.api.send_message(chat_id: message.chat.id, text: "La hora es, #{Time.now}")
   end
 
   on_message '/tv' do |bot, message|
