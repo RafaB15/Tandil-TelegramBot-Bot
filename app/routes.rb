@@ -8,7 +8,7 @@ class Routes
     bot.api.send_message(chat_id: message.chat.id, text: "Hola, #{message.from.first_name}")
   end
 
-  on_message_pattern /\/say_hi (?<name>.*)/ do |bot, message, args|
+  on_message_pattern %r{/say_hi (?<name>.*)} do |bot, message, args|
     bot.api.send_message(chat_id: message.chat.id, text: "Hola, #{args['name']}")
   end
 

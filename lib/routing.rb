@@ -30,7 +30,6 @@ module Routing
     else
       (handler || default_handler(message)).call(bot, message)
     end
-
   end
 
   module ClazzMethods
@@ -67,10 +66,10 @@ module Routing
     regex, handler = Routing.regex_message_handlers.find do |regex, _block|
       message_text =~ regex
     end
-    if handler
-      matches = message_text.match(regex)
-      [handler, matches.named_captures]
-    end
+    return unless handler
+
+    matches = message_text.match(regex)
+    [handler, matches.named_captures]
   end
 
   def default_handler(message)
