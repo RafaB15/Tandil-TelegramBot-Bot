@@ -48,6 +48,17 @@ def stub_send_keyboard_message(token, message_text)
 end
 
 describe 'BotClient' do
+  it 'should get a /say_hi message and respond with Hola Emilio' do
+    token = 'fake_token'
+
+    stub_get_updates(token, '/say_hi Emilio')
+    stub_send_message(token, 'Hola, Emilio')
+
+    app = BotClient.new(token)
+
+    app.run_once
+  end
+
   it 'should get a /start message and respond with Hola' do
     token = 'fake_token'
 
