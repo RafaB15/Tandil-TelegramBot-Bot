@@ -29,6 +29,20 @@ class Routes
     bot.api.send_message(chat_id: message.chat.id, text: 'Quien se queda con el trono?', reply_markup: markup)
   end
 
+  on_message '/busqueda_centro' do |bot, message|
+    kb = [
+        Telegram::Bot::Types::KeyboardButton.new(text: 'Compartime tu ubicacion', request_location: true)
+    ]
+    markup = Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: kb)
+    bot.api.send_message(chat_id: message.chat.id, text: 'Busqueda por ubicacion', reply_markup: markup)
+  end
+
+  on_location_response do |bot, message|
+    response = "Ubicacion es Lat:#{message.location.latitude} - Long:#{message.location.longitude}"
+    puts response
+    bot.api.send_message(chat_id: message.chat.id, text: response)
+  end
+
   on_response_to 'Quien se queda con el trono?' do |bot, message|
     response = Tv::Series.handle_response message.data
     bot.api.send_message(chat_id: message.message.chat.id, text: response)
