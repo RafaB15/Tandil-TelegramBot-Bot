@@ -31,7 +31,7 @@ class Routes
 
   on_message '/busqueda_centro' do |bot, message|
     kb = [
-        Telegram::Bot::Types::KeyboardButton.new(text: 'Compartime tu ubicacion', request_location: true)
+      Telegram::Bot::Types::KeyboardButton.new(text: 'Compartime tu ubicacion', request_location: true)
     ]
     markup = Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: kb)
     bot.api.send_message(chat_id: message.chat.id, text: 'Busqueda por ubicacion', reply_markup: markup)
