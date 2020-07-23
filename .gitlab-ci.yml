@@ -1,9 +1,9 @@
-image: ruby:2.5.1
+image: ruby:2.5.7
 before_script:
-  - apt-get update -qq && apt-get install -y -qq libpq-dev cmake
+  - apt-g --no-riet update -qq && apt-get install -y -qq libpq-dev cmake
   - ruby -v
   - which ruby
-  - gem install bundler --no-ri --no-rdoc
+  - gem install bundler --no-document
   - bundle install --without staging production
 stages:
   - build
