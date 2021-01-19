@@ -29,8 +29,12 @@ Los tests utilzan WebMock. Para testear el cliente, siempre usar `app.run_once` 
 
 Se puede utilizar la gema incluida en el repo [Faraday](https://github.com/lostisland/faraday#faraday)
 
+# Correr con docker en modo produccion
+
+docker-compose -f docker-compose.prod.yml up --build
+
+
+--env-file ./.env
 # Más información
 
 Para utilizar otras funcionalidades de Telegram como los Keyboards especiales ver la doc en: https://github.com/atipugin/telegram-bot-ruby
-
- 
