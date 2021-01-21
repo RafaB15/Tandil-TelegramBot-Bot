@@ -1,14 +1,34 @@
 image: ruby:2.5.7
-before_script:
-  - apt-g --no-riet update -qq && apt-get install -y -qq libpq-dev cmake
-  - ruby -v
-  - which ruby
-  - gem install bundler --no-document
-  - bundle install --without staging production
+
+services:
+  - docker:dind
+
+variables:
+  REGISTRY_URL: registry.gitlab.com/fiuba-memo2/ejemplos
+
 stages:
   - build
+  - package
 
-job_build:
+build_job:
   stage: build
   script:
+    - gem install bundler --no-document
+    - bundle install --without staging production
     - RACK_ENV=test bundle exec rake
+
+package_job:
+  stage: package
+  image: docker:stable
+  before_script:
+    - echo $CI_REGISTRY_USER
+    - echo $CI_REGISTRY_PASSWORD
+    - echo $CI_REGISTRY
+    - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+  script:
+    - VERSION=$(cat VERSION.txt)
+    - echo $VERSION
+    - docker build -f Dockerfile.prod --build-arg GIT_COMMIT=$CI_COMMIT_SHORT_SHA -t $REGISTRY_URL/$APP_NAME:$VERSION .
+    - docker tag $REGISTRY_URL/$APP_NAME:$VERSION $REGISTRY_URL/$APP_NAME:latest
+    - docker push $REGISTRY_URL/$APP_NAME:$VERSION
+    - docker push $REGISTRY_URL/$APP_NAME:latest
