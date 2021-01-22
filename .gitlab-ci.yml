@@ -1,3 +1,6 @@
+services:
+  - docker:dind
+
 image: ruby:2.5.7
 
 services:
@@ -16,14 +19,15 @@ build_job:
     - gem install bundler --no-document
     - bundle install --without staging production
     - RACK_ENV=test bundle exec rake
+    - bundle exec rake version > VERSION.txt
+  artifacts:
+    paths:
+      - VERSION.txt
 
 package_job:
   stage: package
   image: docker:stable
   before_script:
-    - echo $CI_REGISTRY_USER
-    - echo $CI_REGISTRY_PASSWORD
-    - echo $CI_REGISTRY
     - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
   script:
     - VERSION=$(cat VERSION.txt)
