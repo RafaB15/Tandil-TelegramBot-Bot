@@ -1,6 +1,3 @@
-services:
-  - docker:dind
-
 image: ruby:2.5.7
 
 services:
@@ -8,6 +5,7 @@ services:
 
 variables:
   REGISTRY_URL: registry.gitlab.com/fiuba-memo2/ejemplos
+  APP_NAME: telegram-bot-example
 
 stages:
   - build
