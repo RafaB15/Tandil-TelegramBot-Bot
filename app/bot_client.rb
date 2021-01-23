@@ -12,7 +12,11 @@ class BotClient
     @logger.info "Starting bot version:#{Version.current}"
     @logger.info "token is #{@token}"
     run_client do |bot|
-      bot.listen { |message| handle_message(message, bot) }
+      begin
+        bot.listen { |message| handle_message(message, bot) }
+      rescue => e
+        @logger.fatal e.message
+      end
     end
   end
 
