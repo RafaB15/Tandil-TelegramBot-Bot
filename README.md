@@ -31,10 +31,7 @@ Se puede utilizar la gema incluida en el repo [Faraday](https://github.com/losti
 
 # Correr con docker en modo produccion
 
-docker-compose -f docker-compose.prod.yml up --build
-
-
---env-file ./.env
+docker-compose -f docker-compose.prod.yml --env-file ./.env up --build
 
 
 # Logging
