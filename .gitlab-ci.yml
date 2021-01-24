@@ -45,3 +45,6 @@ deploy_job:
     - VERSION=$(cat VERSION.txt)
     - cat ${KUBECONFIG} > $HOME/.kube/config
     - kubectl -n ${KUBE_NAMESPACE} set image deployment/telegrambot telegrambot=$REGISTRY_URL/$APP_NAME:$VERSION
+
+  only:
+    - tags

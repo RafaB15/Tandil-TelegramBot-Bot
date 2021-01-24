@@ -2,7 +2,8 @@ FROM ruby:2.5.7
 ARG GIT_COMMIT=undefined
 RUN mkdir /app
 WORKDIR /app
-RUN useradd -m appuser
+RUN groupadd -r -g 1001 appuser
+RUN useradd -m -r -u 1001 -g appuser appuser
 COPY Gemfile /app
 COPY Gemfile.lock /app
 RUN gem install bundler
