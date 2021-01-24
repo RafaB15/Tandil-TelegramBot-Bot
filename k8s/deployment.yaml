@@ -16,7 +16,31 @@ spec:
     spec:
       containers:
       - name: telegrambot
-        image: nicopaez/telegrambot:0.0.1
+        image: registry.gitlab.com/fiuba-memo2/ejemplos/telegram-bot-example:0.0.1
         envFrom:
           - secretRef:
               name: botsecret
+          - configMapRef:
+              name: botconfig
+         volumeMounts:
+           - name: logs-data
+             mountPath: /data
+      - name: logger
+        image: sumologic/collector:latest-file
+        envFrom:
+          - secretRef:
+              name: botsecret
+          - configMapRef:
+              name: botconfig
+         volumeMounts:
+           - name: logs-data
+             mountPath: /data
+           - name: config-data
+             mountPath: /config
+      volumes:
+        - name: logs-data
+          emptyDir: {}
+        - name: config-data
+          items:
+            - key: "loggerconfig"
+              path: "sumo-sources.json"

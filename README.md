@@ -23,7 +23,7 @@ Telegram Bot Example
 
 # Testing
 
-Los tests utilzan WebMock. Para testear el cliente, siempre usar `app.run_once` de lo contrario el bot se queda esperando mensajes y el test no finaliza nunca.
+Los tests utilizan WebMock. Para testear el cliente, siempre usar `app.run_once` de lo contrario el bot se queda esperando mensajes y el test no finaliza nunca.
 
 # Llamadas a otras API por HTTP
 

@@ -8,7 +8,7 @@
       "multilineProcessingEnabled": false,
       "automaticDateParsing": true,
       "forceTimeZone": false,
-      "category": "collector-container"
+      "category": "bot-collector-container"
     }
 	]
 }

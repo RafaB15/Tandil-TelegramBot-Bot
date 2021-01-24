@@ -2,7 +2,7 @@ require 'telegram/bot'
 require File.dirname(__FILE__) + '/../app/routes'
 
 class BotClient
-  def initialize(token = ENV['TELEGRAM_TOKEN'], log_level=ENV['LOG_LEVEL'])
+  def initialize(token = ENV['TELEGRAM_TOKEN'], log_level = ENV['LOG_LEVEL'])
     @token = token
     @logger = Logger.new(STDOUT)
     @logger.level = log_level.to_i
@@ -12,11 +12,9 @@ class BotClient
     @logger.info "Starting bot version:#{Version.current}"
     @logger.info "token is #{@token}"
     run_client do |bot|
-      begin
-        bot.listen { |message| handle_message(message, bot) }
-      rescue => e
-        @logger.fatal e.message
-      end
+      bot.listen { |message| handle_message(message, bot) }
+    rescue StandardError => e
+      @logger.fatal e.message
     end
   end
 

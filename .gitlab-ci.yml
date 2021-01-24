@@ -6,7 +6,7 @@ services:
 variables:
   REGISTRY_URL: registry.gitlab.com/fiuba-memo2/ejemplos
   APP_NAME: telegram-bot-example
-  KUBE_NAMESPACE:
+  KUBE_NAMESPACE: zaraza
 
 stages:
   - build
@@ -44,4 +44,4 @@ deploy_job:
   script:
     - VERSION=$(cat VERSION.txt)
     - cat ${KUBECONFIG} > $HOME/.kube/config
-    - kubectl -n ${KUBE_NAMESPACE} set image deployment/jobvacancy webapp=registry.gitlab.com/fiuba-memo2/jobvacancy:$VERSION
+    - kubectl -n ${KUBE_NAMESPACE} set image deployment/telegrambot telegrambot=$REGISTRY_URL/$APP_NAME:$VERSION
