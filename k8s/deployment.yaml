@@ -56,9 +56,6 @@ spec:
       volumes:
         - name: logs-data
           emptyDir: {}
-          #hostPath:
-          #  path: /data/logs
-          #  type: DirectoryOrCreate
         - name: config-data
           configMap:
             name: "botconfig"
