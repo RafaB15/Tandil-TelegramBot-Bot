@@ -1,0 +1,14 @@
+version: '3'
+services:
+
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: "/bin/sh"
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    volumes:
+        - .:/app
+    environment:
+        RACK_ENV: "development"
