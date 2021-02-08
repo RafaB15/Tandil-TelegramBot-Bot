@@ -61,5 +61,4 @@ deploy_prod_job:
     - kubectl -n ${KUBE_NAMESPACE} set image deployment/telegrambot telegrambot=$REGISTRY_URL/$APP_NAME:$VERSION
   only:
     - tags
-  when:
-    - manual
+  when: manual
