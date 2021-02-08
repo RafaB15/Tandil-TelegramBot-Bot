@@ -11,7 +11,8 @@ variables:
 stages:
   - build
   - package
-  - deploy
+  - deploy_test
+  - deploy_prod
 
 build_job:
   stage: build
@@ -39,13 +40,26 @@ package_job:
   only:
     - tags
 
-deploy_job:
-  stage: deploy
+deploy_test_job:
+  stage: deploy_test
   image: nicopaez/kubectl:1.17.5
-  environment: development
+  environment: test
   script:
     - VERSION=$(cat VERSION.txt)
     - cat ${KUBECONFIG} > $HOME/.kube/config
     - kubectl -n ${KUBE_NAMESPACE} set image deployment/telegrambot telegrambot=$REGISTRY_URL/$APP_NAME:$VERSION
   only:
     - tags
+
+deploy_prod_job:
+  stage: deploy_prod
+  image: nicopaez/kubectl:1.17.5
+  environment: production
+  script:
+    - VERSION=$(cat VERSION.txt)
+    - cat ${KUBECONFIG} > $HOME/.kube/config
+    - kubectl -n ${KUBE_NAMESPACE} set image deployment/telegrambot telegrambot=$REGISTRY_URL/$APP_NAME:$VERSION
+  only:
+    - tags
+  when:
+    - manual
