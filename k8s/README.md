@@ -12,8 +12,8 @@ kubectl apply -f deployment.yaml
 ```
 
 
-Otros comando útiles
-====================
+Otros comandos útiles
+=====================
 
 ```
 # sync minikube and host clocks
