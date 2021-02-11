@@ -16,7 +16,7 @@ data:
           "multilineProcessingEnabled": false,
           "automaticDateParsing": true,
           "forceTimeZone": false,
-          "category": "bot-collector-container"
+          "category": "prod/bot"
         }
     	]
     }
