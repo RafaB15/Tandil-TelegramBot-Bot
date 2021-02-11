@@ -1,0 +1,15 @@
+FROM ruby:2.5.7
+ARG GIT_COMMIT=undefined
+RUN mkdir /app
+WORKDIR /app
+RUN groupadd -r -g 1001 appuser
+RUN useradd -m -r -u 1001 -g appuser appuser
+COPY Gemfile /app
+COPY Gemfile.lock /app
+RUN gem install bundler
+RUN bundler install
+COPY . /app
+LABEL GIT_COMMIT=$GIT_COMMIT
+RUN chown -R appuser:appuser /app
+USER appuser
+CMD ["/app/start_app.sh"]

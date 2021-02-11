@@ -1,14 +1,66 @@
 image: ruby:2.5.7
-before_script:
-  - apt-g --no-riet update -qq && apt-get install -y -qq libpq-dev cmake
-  - ruby -v
-  - which ruby
-  - gem install bundler --no-document
-  - bundle install --without staging production
+
+services:
+  - docker:dind
+
+variables:
+  REGISTRY_URL: registry.gitlab.com/fiuba-memo2/ejemplos
+  APP_NAME: telegram-bot-example
+  KUBE_NAMESPACE: docentes
+
 stages:
   - build
+  - package
+  - deploy_test
+  - deploy_prod
 
-job_build:
+build_job:
   stage: build
   script:
+    - gem install bundler --no-document
+    - bundle install --without staging production
     - RACK_ENV=test bundle exec rake
+    - bundle exec rake version > VERSION.txt
+  artifacts:
+    paths:
+      - VERSION.txt
+
+package_job:
+  stage: package
+  image: docker:stable
+  before_script:
+    - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+  script:
+    - VERSION=$(cat VERSION.txt)
+    - echo $VERSION
+    - docker build -f Dockerfile.prod --build-arg GIT_COMMIT=$CI_COMMIT_SHORT_SHA -t $REGISTRY_URL/$APP_NAME:$VERSION .
+    - docker tag $REGISTRY_URL/$APP_NAME:$VERSION $REGISTRY_URL/$APP_NAME:latest
+    - docker push $REGISTRY_URL/$APP_NAME:$VERSION
+    - docker push $REGISTRY_URL/$APP_NAME:latest
+  only:
+    - tags
+
+deploy_test_job:
+  stage: deploy_test
+  image: nicopaez/kubectl:1.17.5
+  environment: test
+  script:
+    - VERSION=$(cat VERSION.txt)
+    - cat ${KUBECONFIG} > $HOME/.kube/config
+    - kubectl -n ${KUBE_NAMESPACE} apply -f k8s/test.configmap.yaml
+    - kubectl -n ${KUBE_NAMESPACE} set image deployment/telegrambot telegrambot=$REGISTRY_URL/$APP_NAME:$VERSION
+  only:
+    - tags
+
+deploy_prod_job:
+  stage: deploy_prod
+  image: nicopaez/kubectl:1.17.5
+  environment: prod
+  script:
+    - VERSION=$(cat VERSION.txt)
+    - cat ${KUBECONFIG} > $HOME/.kube/config
+    - kubectl -n ${KUBE_NAMESPACE} apply -f k8s/prod.configmap.yaml
+    - kubectl -n ${KUBE_NAMESPACE} set image deployment/telegrambot telegrambot=$REGISTRY_URL/$APP_NAME:$VERSION
+  only:
+    - tags
+  when: manual

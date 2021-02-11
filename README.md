@@ -23,14 +23,28 @@ Telegram Bot Example
 
 # Testing
 
-Los tests utilzan WebMock. Para testear el cliente, siempre usar `app.run_once` de lo contrario el bot se queda esperando mensajes y el test no finaliza nunca.
+Los tests utilizan WebMock. Para testear el cliente, siempre usar `app.run_once` de lo contrario el bot se queda esperando mensajes y el test no finaliza nunca.
 
 # Llamadas a otras API por HTTP
 
 Se puede utilizar la gema incluida en el repo [Faraday](https://github.com/lostisland/faraday#faraday)
 
+# Correr con docker en modo produccion
+
+docker-compose -f docker-compose.prod.yml --env-file ./.env up --build
+
+
+# Logging
+
+La aplicación utiliza el logger estándar de Ruby.
+El log level se especifica en la la configuracion con un número:
+
+* DEBUG = 0
+* INFO = 1
+* WARN = 2
+* ERROR = 3
+* FATAL = 4
+
 # Más información
 
 Para utilizar otras funcionalidades de Telegram como los Keyboards especiales ver la doc en: https://github.com/atipugin/telegram-bot-ruby
-
- 

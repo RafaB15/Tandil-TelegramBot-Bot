@@ -1,5 +1,6 @@
-require File.dirname(__FILE__) + '/../lib/routing'
-require File.dirname(__FILE__) + '/tv/series'
+require "#{File.dirname(__FILE__)}/../lib/routing"
+require "#{File.dirname(__FILE__)}/../lib/version"
+require "#{File.dirname(__FILE__)}/tv/series"
 
 class Routes
   include Routing
@@ -46,6 +47,10 @@ class Routes
   on_response_to 'Quien se queda con el trono?' do |bot, message|
     response = Tv::Series.handle_response message.data
     bot.api.send_message(chat_id: message.message.chat.id, text: response)
+  end
+
+  on_message '/version' do |bot, message|
+    bot.api.send_message(chat_id: message.chat.id, text: Version.current)
   end
 
   default do |bot, message|

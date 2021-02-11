@@ -3,7 +3,7 @@ require 'web_mock'
 # Uncomment to use VCR
 # require 'vcr_helper'
 
-require File.dirname(__FILE__) + '/../app/bot_client'
+require "#{File.dirname(__FILE__)}/../app/bot_client"
 
 def stub_get_updates(token, message_text)
   body = { "ok": true, "result": [{ "update_id": 693_981_718,
@@ -76,6 +76,17 @@ def stub_send_keyboard_message(token, message_text)
 end
 
 describe 'BotClient' do
+  it 'should get a /version message and respond with current version' do
+    token = 'fake_token'
+
+    stub_get_updates(token, '/version')
+    stub_send_message(token, Version.current)
+
+    app = BotClient.new(token)
+
+    app.run_once
+  end
+
   it 'should get a /say_hi message and respond with Hola Emilio' do
     token = 'fake_token'
 
