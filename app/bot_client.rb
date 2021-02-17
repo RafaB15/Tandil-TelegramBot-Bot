@@ -7,6 +7,9 @@ class BotClient
     @token = token
     SemanticLogger.default_level = log_level.to_sym
     SemanticLogger.add_appender(
+      io: $stdout
+    )
+    SemanticLogger.add_appender(
       appender: :http,
       url: log_url
     )
