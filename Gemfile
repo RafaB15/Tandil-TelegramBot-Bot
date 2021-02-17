@@ -7,6 +7,7 @@ gem 'rake'
 
 gem 'dotenv'
 gem 'faraday'
+gem 'semantic_logger'
 gem 'telegram-bot-ruby'
 
 group :development, :test do
