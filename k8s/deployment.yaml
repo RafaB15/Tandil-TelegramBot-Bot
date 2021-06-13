@@ -14,51 +14,11 @@ spec:
       labels:
         app: telegrambot
     spec:
-      #initContainers:
-      #- name: take-data-dir-ownership
-      #  image: registry.gitlab.com/fiuba-memo2/ejemplos/telegram-bot-example:0.0.5
-        # Give `grafana` user (id 472) permissions a mounted volume
-        # https://github.com/grafana/grafana-docker/blob/master/Dockerfile
-      #  command:
-      #  - chown
-      #  - -R
-      #  - appuser:appuser
-      #  - /data/logs
-      #  volumeMounts:
-      #  - name: logs-data
-      #    mountPath: /data/logs
-      #securityContext:
-      #  runAsUser: 1001
-      #  fsGroup: 1001
       containers:
       - name: telegrambot
-        image: registry.gitlab.com/fiuba-memo2/ejemplos/telegram-bot-example:0.0.5
+        image: registry.gitlab.com/fiuba-memo2/ejemplos/telegram-bot-example:0.0.8
         envFrom:
           - secretRef:
               name: botsecret
           - configMapRef:
               name: botconfig
-        volumeMounts:
-          - name: logs-data
-            mountPath: /data/logs
-      - name: logger
-        image: sumologic/collector:latest-file
-        envFrom:
-          - secretRef:
-              name: botsecret
-          - configMapRef:
-              name: botconfig
-        volumeMounts:
-          - name: logs-data
-            mountPath: /data/logs
-          - name: config-data
-            mountPath: /config
-      volumes:
-        - name: logs-data
-          emptyDir: {}
-        - name: config-data
-          configMap:
-            name: "botconfig"
-            items:
-            - key: "sumo-sources.json"
-              path: "sumo-sources.json"

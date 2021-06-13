@@ -3,20 +3,4 @@ kind: ConfigMap
 metadata:
   name: botconfig
 data:
-  LOG_LEVEL: "1"
-  SUMO_SOURCES_JSON: "/config/sumo-sources.json"
-  sumo-sources.json: |
-    {
-      "api.version": "v1",
-      "sources": [
-        {
-          "sourceType" : "LocalFile",
-          "name": "bot",
-          "pathExpression": "/data/logs/*.log",
-          "multilineProcessingEnabled": false,
-          "automaticDateParsing": true,
-          "forceTimeZone": false,
-          "category": "test/bot"
-        }
-    	]
-    }
+  LOG_LEVEL: "debug"

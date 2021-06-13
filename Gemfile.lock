@@ -14,6 +14,7 @@ GEM
     coderay (1.1.2)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
+    concurrent-ruby (1.1.8)
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
     cucumber (3.1.2)
@@ -112,6 +113,8 @@ GEM
     ruby-progressbar (1.10.0)
     ruby_dep (1.5.0)
     safe_yaml (1.0.5)
+    semantic_logger (4.7.4)
+      concurrent-ruby (~> 1.0)
     shellany (0.0.1)
     simplecov (0.16.1)
       docile (~> 1.1)
@@ -151,6 +154,7 @@ DEPENDENCIES
   rspec-core
   rubocop
   rubocop-rspec
+  semantic_logger
   simplecov
   telegram-bot-ruby
   vcr

@@ -1,11 +1,19 @@
 require 'telegram/bot'
 require File.dirname(__FILE__) + '/../app/routes'
+require 'semantic_logger'
 
 class BotClient
-  def initialize(token = ENV['TELEGRAM_TOKEN'], log_level = ENV['LOG_LEVEL'])
+  def initialize(token = ENV['TELEGRAM_TOKEN'], log_level = ENV['LOG_LEVEL'] || 'error', log_url = ENV['LOG_URL'] || 'http://fake.url')
     @token = token
-    @logger = Logger.new(STDOUT)
-    @logger.level = log_level.to_i
+    SemanticLogger.default_level = log_level.to_sym
+    SemanticLogger.add_appender(
+      io: $stdout
+    )
+    SemanticLogger.add_appender(
+      appender: :http,
+      url: log_url
+    )
+    @logger = SemanticLogger['BotClient']
   end
 
   def start
