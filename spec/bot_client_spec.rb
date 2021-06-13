@@ -5,7 +5,7 @@ require 'web_mock'
 
 require "#{File.dirname(__FILE__)}/../app/bot_client"
 
-def stub_get_updates(token, message_text)
+def when_i_send_text(token, message_text)
   body = { "ok": true, "result": [{ "update_id": 693_981_718,
                                     "message": { "message_id": 11,
                                                  "from": { "id": 141_733_544, "is_bot": false, "first_name": 'Emilio', "last_name": 'Gutter', "username": 'egutter', "language_code": 'en' },
@@ -17,7 +17,7 @@ def stub_get_updates(token, message_text)
     .to_return(body: body.to_json, status: 200, headers: { 'Content-Length' => 3 })
 end
 
-def stub_get_inline_keyboard_updates(token, message_text, inline_selection)
+def when_i_send_keyboard_updates(token, message_text, inline_selection)
   body = {
     "ok": true, "result": [{
       "update_id": 866_033_907,
@@ -45,7 +45,7 @@ def stub_get_inline_keyboard_updates(token, message_text, inline_selection)
     .to_return(body: body.to_json, status: 200, headers: { 'Content-Length' => 3 })
 end
 
-def stub_send_message(token, message_text)
+def then_i_get_text(token, message_text)
   body = { "ok": true,
            "result": { "message_id": 12,
                        "from": { "id": 715_612_264, "is_bot": true, "first_name": 'fiuba-memo2-prueba', "username": 'fiuba_memo2_bot' },
@@ -59,7 +59,7 @@ def stub_send_message(token, message_text)
     .to_return(status: 200, body: body.to_json, headers: {})
 end
 
-def stub_send_keyboard_message(token, message_text)
+def then_i_get_keyboard_message(token, message_text)
   body = { "ok": true,
            "result": { "message_id": 12,
                        "from": { "id": 715_612_264, "is_bot": true, "first_name": 'fiuba-memo2-prueba', "username": 'fiuba_memo2_bot' },
@@ -79,8 +79,8 @@ describe 'BotClient' do
   it 'should get a /version message and respond with current version' do
     token = 'fake_token'
 
-    stub_get_updates(token, '/version')
-    stub_send_message(token, Version.current)
+    when_i_send_text(token, '/version')
+    then_i_get_text(token, Version.current)
 
     app = BotClient.new(token)
 
@@ -90,8 +90,8 @@ describe 'BotClient' do
   it 'should get a /say_hi message and respond with Hola Emilio' do
     token = 'fake_token'
 
-    stub_get_updates(token, '/say_hi Emilio')
-    stub_send_message(token, 'Hola, Emilio')
+    when_i_send_text(token, '/say_hi Emilio')
+    then_i_get_text(token, 'Hola, Emilio')
 
     app = BotClient.new(token)
 
@@ -101,8 +101,8 @@ describe 'BotClient' do
   it 'should get a /start message and respond with Hola' do
     token = 'fake_token'
 
-    stub_get_updates(token, '/start')
-    stub_send_message(token, 'Hola, Emilio')
+    when_i_send_text(token, '/start')
+    then_i_get_text(token, 'Hola, Emilio')
 
     app = BotClient.new(token)
 
@@ -112,8 +112,8 @@ describe 'BotClient' do
   it 'should get a /stop message and respond with Chau' do
     token = 'fake_token'
 
-    stub_get_updates(token, '/stop')
-    stub_send_message(token, 'Chau, egutter')
+    when_i_send_text(token, '/stop')
+    then_i_get_text(token, 'Chau, egutter')
 
     app = BotClient.new(token)
 
@@ -123,8 +123,8 @@ describe 'BotClient' do
   it 'should get a /tv message and respond with an inline keyboard' do
     token = 'fake_token'
 
-    stub_get_updates(token, '/tv')
-    stub_send_keyboard_message(token, 'Quien se queda con el trono?')
+    when_i_send_text(token, '/tv')
+    then_i_get_keyboard_message(token, 'Quien se queda con el trono?')
 
     app = BotClient.new(token)
 
@@ -134,8 +134,8 @@ describe 'BotClient' do
   it 'should get a "Quien se queda con el trono?" message and respond with' do
     token = 'fake_token'
 
-    stub_get_inline_keyboard_updates(token, 'Quien se queda con el trono?', 2)
-    stub_send_message(token, 'A mi también me encantan los dragones!')
+    when_i_send_keyboard_updates(token, 'Quien se queda con el trono?', 2)
+    then_i_get_text(token, 'A mi también me encantan los dragones!')
 
     app = BotClient.new(token)
 
@@ -145,8 +145,8 @@ describe 'BotClient' do
   it 'should get an unknown message message and respond with Do not understand' do
     token = 'fake_token'
 
-    stub_get_updates(token, '/unknown')
-    stub_send_message(token, 'Uh? No te entiendo! Me repetis la pregunta?')
+    when_i_send_text(token, '/unknown')
+    then_i_get_text(token, 'Uh? No te entiendo! Me repetis la pregunta?')
 
     app = BotClient.new(token)
 
