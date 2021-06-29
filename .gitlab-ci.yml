@@ -47,8 +47,8 @@ deploy_test_job:
   script:
     - VERSION=$(cat VERSION.txt)
     - cp ${KUBECONFIG} $HOME/.kube/config
-    - kubectl -n ${KUBE_NAMESPACE_PREFIX}-${ENVIRONMENT} apply -f k8s/test.configmap.yaml
-    - kubectl -n ${KUBE_NAMESPACE_PREFIX}-${ENVIRONMENT} set image deployment/telegrambot telegrambot=$REGISTRY_URL/$APP_NAME:$VERSION
+    - kubectl -n ${KUBE_NAMESPACE_PREFIX}-${CI_ENVIRONMENT_NAME} apply -f k8s/test.configmap.yaml
+    - kubectl -n ${KUBE_NAMESPACE_PREFIX}-${CI_ENVIRONMENT_NAME} set image deployment/telegrambot telegrambot=$REGISTRY_URL/$APP_NAME:$VERSION
   only:
     - tags
 
@@ -59,8 +59,8 @@ deploy_prod_job:
   script:
     - VERSION=$(cat VERSION.txt)
     - cp ${KUBECONFIG} $HOME/.kube/config
-    - kubectl -n ${KUBE_NAMESPACE_PREFIX}-${ENVIRONMENT} apply -f k8s/prod.configmap.yaml
-    - kubectl -n ${KUBE_NAMESPACE_PREFIX}-${ENVIRONMENT} set image deployment/telegrambot telegrambot=$REGISTRY_URL/$APP_NAME:$VERSION
+    - kubectl -n ${KUBE_NAMESPACE_PREFIX}-${CI_ENVIRONMENT_NAME} apply -f k8s/prod.configmap.yaml
+    - kubectl -n ${KUBE_NAMESPACE_PREFIX}-${CI_ENVIRONMENT_NAME} set image deployment/telegrambot telegrambot=$REGISTRY_URL/$APP_NAME:$VERSION
   only:
     - tags
   when: manual
