@@ -6,7 +6,7 @@ services:
 variables:
   REGISTRY_URL: registry.gitlab.com/fiuba-memo2/ejemplos
   APP_NAME: telegram-bot-example
-  KUBE_NAMESPACE: docentes
+  KUBE_NAMESPACE_PREFIX: docentes
 
 stages:
   - build
@@ -46,9 +46,9 @@ deploy_test_job:
   environment: test
   script:
     - VERSION=$(cat VERSION.txt)
-    - cat ${KUBECONFIG} > $HOME/.kube/config
-    - kubectl -n ${KUBE_NAMESPACE} apply -f k8s/test.configmap.yaml
-    - kubectl -n ${KUBE_NAMESPACE} set image deployment/telegrambot telegrambot=$REGISTRY_URL/$APP_NAME:$VERSION
+    - cp ${KUBECONFIG} $HOME/.kube/config
+    - kubectl -n ${KUBE_NAMESPACE_PREFIX}-${ENVIRONMENT} apply -f k8s/test.configmap.yaml
+    - kubectl -n ${KUBE_NAMESPACE_PREFIX}-${ENVIRONMENT} set image deployment/telegrambot telegrambot=$REGISTRY_URL/$APP_NAME:$VERSION
   only:
     - tags
 
@@ -58,9 +58,9 @@ deploy_prod_job:
   environment: prod
   script:
     - VERSION=$(cat VERSION.txt)
-    - cat ${KUBECONFIG} > $HOME/.kube/config
-    - kubectl -n ${KUBE_NAMESPACE} apply -f k8s/prod.configmap.yaml
-    - kubectl -n ${KUBE_NAMESPACE} set image deployment/telegrambot telegrambot=$REGISTRY_URL/$APP_NAME:$VERSION
+    - cp ${KUBECONFIG} $HOME/.kube/config
+    - kubectl -n ${KUBE_NAMESPACE_PREFIX}-${ENVIRONMENT} apply -f k8s/prod.configmap.yaml
+    - kubectl -n ${KUBE_NAMESPACE_PREFIX}-${ENVIRONMENT} set image deployment/telegrambot telegrambot=$REGISTRY_URL/$APP_NAME:$VERSION
   only:
     - tags
   when: manual
