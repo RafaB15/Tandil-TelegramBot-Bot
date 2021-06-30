@@ -7,15 +7,5 @@ services:
       dockerfile: Dockerfile.prod
     environment:
         TELEGRAM_TOKEN: "${TELEGRAM_TOKEN}"
-        LOG_LEVEL: 1
-    volumes:
-      - .:/data
-
-  logger:
-    image: sumologic/collector:latest-file
-    environment:
-      SUMO_ACCESS_ID: "${SUMO_ACCESS_ID}"
-      SUMO_ACCESS_KEY: "${SUMO_ACCESS_KEY}"
-      SUMO_SOURCES_JSON: /data/sumo-sources.json
-    volumes:
-      - .:/data
+        LOG_LEVEL: "${LOG_LEVEL}"
+        LOG_URL: "${LOG_URL}"
