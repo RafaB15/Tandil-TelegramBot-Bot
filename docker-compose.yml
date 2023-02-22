@@ -12,3 +12,8 @@ services:
         - .:/app
     environment:
         RACK_ENV: "development"
+
+networks:
+  default:
+    name: localdev
+    external: true
