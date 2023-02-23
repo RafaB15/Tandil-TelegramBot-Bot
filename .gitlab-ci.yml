@@ -17,7 +17,7 @@ stages:
 build_job:
   stage: build
   script:
-    - gem install bundler --no-document
+    - gem install bundler -v 2.3.26 --no-document
     - bundle install --without staging production
     - RACK_ENV=test bundle exec rake
     - bundle exec rake version > VERSION.txt
