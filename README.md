@@ -9,7 +9,7 @@ Telegram Bot Example
 
 2. Copiar el archivo `.env.example` a `.env` y reemplazar `<YOUR_TELEGRAM_TOKEN>` con el token del paso anterior
 
-3. Correr los tests con `rake`
+3. Correr los tests con `bundle exec rake`
 
 4. Levantar la app localmente con `ruby app.rb`
 

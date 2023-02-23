@@ -22,9 +22,9 @@ class Routes
   end
 
   on_message '/tv' do |bot, message|
-    kb = Tv::Series.all.map do |tv_serie|
+    kb = [Tv::Series.all.map do |tv_serie|
       Telegram::Bot::Types::InlineKeyboardButton.new(text: tv_serie.name, callback_data: tv_serie.id.to_s)
-    end
+    end]
     markup = Telegram::Bot::Types::InlineKeyboardMarkup.new(inline_keyboard: kb)
 
     bot.api.send_message(chat_id: message.chat.id, text: 'Quien se queda con el trono?', reply_markup: markup)
