@@ -10,3 +10,4 @@
 *.log
 secret.yaml
 reports
+.byebug_history
