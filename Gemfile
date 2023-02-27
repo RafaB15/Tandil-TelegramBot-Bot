@@ -11,9 +11,10 @@ gem 'semantic_logger'
 gem 'telegram-bot-ruby'
 
 group :development, :test do
+  gem 'byebug'
   gem 'cucumber'
   gem 'rspec'
-  gem 'rspec-core'
+  gem 'rspec_junit_formatter'
   gem 'rubocop', require: false
   gem 'rubocop-rspec', require: false
   gem 'simplecov'
@@ -22,7 +23,6 @@ group :development, :test do
 end
 
 group :development do
-  gem 'byebug'
   gem 'guard'
   gem 'guard-rspec'
 end
