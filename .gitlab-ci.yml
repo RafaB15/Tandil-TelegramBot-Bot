@@ -24,6 +24,10 @@ build_job:
   artifacts:
     paths:
       - VERSION.txt
+      - reports/
+    reports:
+      junit: reports/spec/rspec.xml
+
 
 package_job:
   stage: package
