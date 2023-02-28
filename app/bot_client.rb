@@ -1,5 +1,5 @@
 require 'telegram/bot'
-require File.dirname(__FILE__) + '/../app/routes'
+require "#{File.dirname(__FILE__)}/../app/routes"
 require 'semantic_logger'
 
 class BotClient
@@ -9,10 +9,12 @@ class BotClient
     SemanticLogger.add_appender(
       io: $stdout
     )
-    SemanticLogger.add_appender(
-      appender: :http,
-      url: log_url
-    )
+    unless log_url.nil? || log_url.empty?
+      SemanticLogger.add_appender(
+        appender: :http,
+        url: log_url
+      )
+    end
     @logger = SemanticLogger['BotClient']
   end
 

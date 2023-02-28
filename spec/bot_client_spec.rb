@@ -69,8 +69,8 @@ def then_i_get_keyboard_message(token, message_text)
   stub_request(:post, "https://api.telegram.org/bot#{token}/sendMessage")
     .with(
       body: { 'chat_id' => '141733544',
-              'reply_markup' => '{"inline_keyboard":[[{"text":"Jon Snow","callback_data":"1"}],[{"text":"Daenerys Targaryen","callback_data":"2"}],[{"text":"Ned Stark","callback_data":"3"}]]}',
-              'text' => message_text }
+              'reply_markup' => '{"inline_keyboard":[[{"text":"Jon Snow","callback_data":"1"},{"text":"Daenerys Targaryen","callback_data":"2"},{"text":"Ned Stark","callback_data":"3"}]]}',
+              'text' => 'Quien se queda con el trono?' }
     )
     .to_return(status: 200, body: body.to_json, headers: {})
 end
@@ -134,7 +134,7 @@ describe 'BotClient' do
   it 'should get a "Quien se queda con el trono?" message and respond with' do
     token = 'fake_token'
 
-    when_i_send_keyboard_updates(token, 'Quien se queda con el trono?', 2)
+    when_i_send_keyboard_updates(token, 'Quien se queda con el trono?', '2')
     then_i_get_text(token, 'A mi también me encantan los dragones!')
 
     app = BotClient.new(token)

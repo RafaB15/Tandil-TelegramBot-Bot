@@ -1,4 +1,4 @@
-FROM ruby:2.5.7
+FROM ruby:3.1.2
 ARG GIT_COMMIT=undefined
 RUN mkdir /app
 WORKDIR /app
