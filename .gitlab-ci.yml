@@ -16,7 +16,8 @@ stages:
   - deploy_test
   - deploy_prod
 
-sonarcloud-check_job:
+sonarcloud-check:
+  stage: build
   image:
     name: sonarsource/sonar-scanner-cli:latest
     entrypoint: [""]
