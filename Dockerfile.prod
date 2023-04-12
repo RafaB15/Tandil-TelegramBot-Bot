@@ -1,5 +1,6 @@
 FROM ruby:3.1.2
 ARG GIT_COMMIT=undefined
+ARG VERSION=undefined
 RUN mkdir /app
 WORKDIR /app
 RUN groupadd -r -g 1001 appuser
@@ -7,9 +8,10 @@ RUN useradd -m -r -u 1001 -g appuser appuser
 COPY Gemfile /app
 COPY Gemfile.lock /app
 RUN gem install bundler
-RUN bundler install
+RUN bundler install --without test development
 COPY . /app
 LABEL GIT_COMMIT=$GIT_COMMIT
+LABEL VERSION=$VERSION
 RUN chown -R appuser:appuser /app
 USER appuser
 CMD ["/app/start_app.sh"]

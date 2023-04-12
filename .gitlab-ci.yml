@@ -51,7 +51,7 @@ package_job:
   script:
     - VERSION=$(cat VERSION.txt)
     - echo $VERSION
-    - docker build -f Dockerfile.prod --build-arg GIT_COMMIT=$CI_COMMIT_SHORT_SHA -t $REGISTRY_URL/$APP_NAME:$VERSION .
+    - docker build -f Dockerfile.prod --build-arg VERSION=$VERSION --build-arg GIT_COMMIT=$CI_COMMIT_SHORT_SHA -t $REGISTRY_URL/$APP_NAME:$VERSION .
     - docker tag $REGISTRY_URL/$APP_NAME:$VERSION $REGISTRY_URL/$APP_NAME:latest
     - docker push $REGISTRY_URL/$APP_NAME:$VERSION
     - docker push $REGISTRY_URL/$APP_NAME:latest

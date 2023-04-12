@@ -1,13 +1,18 @@
 require: rubocop-rspec
 
+AllCops:
+  NewCops: disable
+  SuggestExtensions: false
+  Exclude:
+    - 'bin/**/*'
 # Avoid methods longer than 30 lines of code
-MethodLength:
+Metrics/MethodLength:
   Max: 30
 Metrics/BlockLength:
-  ExcludedMethods: ['controllers', 'describe', 'context']
-Metrics/LineLength:
+  AllowedMethods: ['controllers', 'describe', 'context']
+Layout/LineLength:
   Max: 200
-  IgnoredPatterns: ['(When|Given|Then)', '(get|post|put)']
+  AllowedPatterns: ['(When|Given|Then)', '(get|post|put)']
 Naming/PredicateName:
   Enabled: false
 Style/FrozenStringLiteralComment:
@@ -26,3 +31,7 @@ RSpec/MessageSpies:
   EnforcedStyle: receive
 RSpec/MultipleExpectations:
   Max: 3
+Style/GuardClause:
+  Enabled: false
+
+   
