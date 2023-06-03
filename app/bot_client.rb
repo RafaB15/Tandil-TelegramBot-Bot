@@ -3,7 +3,7 @@ require "#{File.dirname(__FILE__)}/../app/routes"
 require 'semantic_logger'
 
 class BotClient
-  def initialize(token = ENV['TELEGRAM_TOKEN'], log_level = ENV['LOG_LEVEL'] || 'error', log_url = ENV['LOG_URL'] || 'http://fake.url')
+  def initialize(token = ENV['TELEGRAM_TOKEN'], log_level = ENV['LOG_LEVEL'] || 'error', log_url = ENV['LOG_URL'])
     @token = token
     SemanticLogger.default_level = log_level.to_sym
     SemanticLogger.add_appender(
