@@ -5,6 +5,7 @@ require 'semantic_logger'
 class BotClient
   def initialize(token = ENV['TELEGRAM_TOKEN'], log_level = ENV['LOG_LEVEL'] || 'error', log_url = ENV['LOG_URL'])
     @token = token
+    @username = ENV['TELEGRAM_USERNAME']
     SemanticLogger.default_level = log_level.to_sym
     SemanticLogger.add_appender(
       io: $stdout
@@ -20,6 +21,7 @@ class BotClient
 
   def start
     @logger.info "Starting bot version:#{Version.current}"
+    @logger.info "username is #{@username}"
     @logger.info "token is #{@token}"
     run_client do |bot|
       bot.listen { |message| handle_message(message, bot) }
