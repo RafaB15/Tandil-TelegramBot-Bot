@@ -13,7 +13,8 @@ class BotClient
     unless log_url.nil? || log_url.empty?
       SemanticLogger.add_appender(
         appender: :http,
-        url: log_url
+        url: log_url,
+        application: 'bot'
       )
     end
     @logger = SemanticLogger['BotClient']

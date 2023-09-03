@@ -4,3 +4,4 @@ metadata:
   name: botconfig
 data:
   LOG_LEVEL: "debug"
+  TELEGRAM_USERNAME: memo2_docentes_bot
