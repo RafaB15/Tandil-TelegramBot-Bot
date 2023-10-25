@@ -3,7 +3,7 @@ Telegram Bot Example
 
 1. Registrar un nuevo bot con el BotFather de Telegram
 
-* En Telegram https://web.telegram.org/#/im?p=@BotFather
+* En Telegram https://web.telegram.org/#/im?p=@BotFather (si la url anterior no funciona probar https://web.telegram.org/a/#93372553)
 * Enviarle el comando `/newbot`
 * Seguir los pasos y al final el BotFather responde con un token
 
