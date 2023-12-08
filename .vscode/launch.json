@@ -17,7 +17,7 @@
           "script": "${file}",
           "args": [],
           "env": {
-              "ENV": "test"
+              "APP_MODE": "test"
             },
           "askParameters": true,
           "useBundler": true
@@ -30,7 +30,7 @@
           "script": "${workspaceFolder}/${AskForProgramName}",
           "args": [],
           "env": {
-            "RACK_ENV": "test"
+            "APP_MODE": "test"
           },
           "askParameters": false, // Do not ask startup parameter any more
           "useBundler": true

@@ -10,8 +10,7 @@ services:
     volumes:
         - .:/app
     environment:
-        ENV: "test"
-
+        APP_MODE: "test"
 networks:
   default:
     name: localdev

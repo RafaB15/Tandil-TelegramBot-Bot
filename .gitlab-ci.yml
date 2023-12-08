@@ -33,7 +33,7 @@ build_job:
   script:
     - gem install bundler -v 2.3.26 --no-document
     - bundle install --without staging production
-    - ENV=test bundle exec rake build_server
+    - APP_ENV=test bundle exec rake build_server
     - bundle exec rake version > VERSION.txt
   artifacts:
     paths:
