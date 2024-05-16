@@ -1,18 +1,15 @@
 source 'https://rubygems.org'
 
-ruby '3.1.2'
-
-# Project requirements
-gem 'rake'
-
 gem 'dotenv'
 gem 'faraday'
+gem 'rake'
 gem 'semantic_logger'
 gem 'telegram-bot-ruby'
 
 group :development, :test do
   gem 'byebug'
   gem 'cucumber'
+  gem 'racc'
   gem 'rspec'
   gem 'rspec_junit_formatter'
   gem 'rubocop', require: false
