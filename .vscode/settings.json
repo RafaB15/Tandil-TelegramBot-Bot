@@ -1,0 +1,4 @@
+{
+    "rubyTestExplorer.rspecCommand": "ENV=test bundle exec rspec",
+    "rubyTestRunner.specCommand": "ENV=test bundle exec rspec"
+}
