@@ -1,0 +1,23 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+      {
+          "label": "Run App",
+          "type": "shell",
+          "command": "./start_app.sh",
+          "problemMatcher": [
+              "$nvcc"
+          ]
+      },
+      {
+          "label": "Run App: Debug Mode",
+          "type": "shell",
+          "command": "./start_app_debug_mode.sh",
+          "problemMatcher": [
+              "$nvcc"
+          ]
+      },
+  ]
+}

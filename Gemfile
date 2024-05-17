@@ -8,7 +8,6 @@ gem 'telegram-bot-ruby'
 
 group :development, :test do
   gem 'debug'
-  gem 'cucumber'
   gem 'racc'
   gem 'rspec'
   gem 'rspec_junit_formatter'
