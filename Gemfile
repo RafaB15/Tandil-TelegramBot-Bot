@@ -7,7 +7,7 @@ gem 'semantic_logger'
 gem 'telegram-bot-ruby'
 
 group :development, :test do
-  gem 'byebug'
+  gem 'debug'
   gem 'cucumber'
   gem 'racc'
   gem 'rspec'
