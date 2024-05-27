@@ -76,11 +76,11 @@ def then_i_get_keyboard_message(token, message_text)
 end
 
 describe 'BotClient' do
-  it 'should get a /version message and respond with current version' do
+  it 'should get a /version message and respond with current version and team name' do
     token = 'fake_token'
 
     when_i_send_text(token, '/version')
-    then_i_get_text(token, Version.current)
+    then_i_get_text(token, "#{Version.current}-Tandil")
 
     app = BotClient.new(token)
 

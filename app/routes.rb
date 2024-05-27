@@ -50,7 +50,7 @@ class Routes
   end
 
   on_message '/version' do |bot, message|
-    bot.api.send_message(chat_id: message.chat.id, text: Version.current)
+    bot.api.send_message(chat_id: message.chat.id, text: "#{Version.current}-Tandil")
   end
 
   default do |bot, message|
