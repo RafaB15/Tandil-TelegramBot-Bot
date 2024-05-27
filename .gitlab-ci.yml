@@ -6,15 +6,14 @@ services:
 variables:
   REGISTRY_URL: registry.gitlab.com/fiuba-memo2/ejemplos
   APP_NAME: telegram-bot-example
-  KUBE_NAMESPACE_PREFIX: docentes
   SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
   GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
+  TEAM: docentes
 
 stages:
   - build
   - package
   - deploy_test
-  - deploy_prod
 
 sonarcloud-check:
   stage: build
@@ -33,7 +32,7 @@ build_job:
   script:
     - gem install bundler -v 2.3.26 --no-document
     - bundle install --without staging production
-    - APP_ENV=test bundle exec rake build_server
+    - APP_MODE=test bundle exec rake build_server
     - bundle exec rake version > VERSION.txt
   artifacts:
     paths:
@@ -60,25 +59,13 @@ package_job:
 
 deploy_test_job:
   stage: deploy_test
-  image: nicopaez/kubectl:1.17.5
+  image: nicopaez/kubectl:1.28.0
   environment: test
   script:
     - VERSION=$(cat VERSION.txt)
     - cp ${KUBECONFIG} $HOME/.kube/config
-    - kubectl apply -f k8s/test.configmap.yaml
+    - kubectl config set-context –current –namespace=${TEAM}-${CI_ENVIRONMENT_NAME}
+    - kubectl apply -f infra/${CI_ENVIRONMENT_NAME}.configmap.yaml
     - kubectl set image deployment/telegrambot telegrambot=$REGISTRY_URL/$APP_NAME:$VERSION
   only:
     - tags
-
-deploy_prod_job:
-  stage: deploy_prod
-  image: nicopaez/kubectl:1.17.5
-  environment: prod
-  script:
-    - VERSION=$(cat VERSION.txt)
-    - cp ${KUBECONFIG} $HOME/.kube/config
-    - kubectl -n apply -f k8s/prod.configmap.yaml
-    - kubectl -n set image deployment/telegrambot telegrambot=$REGISTRY_URL/$APP_NAME:$VERSION
-  only:
-    - tags
-  when: manual
