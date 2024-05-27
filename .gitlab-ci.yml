@@ -1,31 +1,17 @@
 image: ruby:3.3.1
-
+include:
+  - template: Code-Quality.gitlab-ci.yml
 services:
   - docker:dind
 
 variables:
   REGISTRY_URL: registry.gitlab.com/fiuba-memo2/ejemplos
-  APP_NAME: telegram-bot-example
-  SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
-  GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
   TEAM: docentes
 
 stages:
   - build
   - package
   - deploy_test
-
-sonarcloud-check:
-  stage: build
-  image:
-    name: sonarsource/sonar-scanner-cli:latest
-    entrypoint: [""]
-  cache:
-    key: "${CI_JOB_NAME}"
-    paths:
-      - .sonar/cache
-  script:
-    - sonar-scanner
 
 build_job:
   stage: build
@@ -41,6 +27,10 @@ build_job:
     reports:
       junit: reports/spec/rspec.xml
 
+code_quality:
+  stage: build
+  artifacts:
+    paths: [gl-code-quality-report.json]
 
 package_job:
   stage: package
@@ -51,7 +41,7 @@ package_job:
     - VERSION=$(cat VERSION.txt)
     - echo $VERSION
     - docker build -f Dockerfile.prod --build-arg VERSION=$VERSION --build-arg GIT_COMMIT=$CI_COMMIT_SHORT_SHA -t $REGISTRY_URL/$APP_NAME:$VERSION .
-    - docker tag $REGISTRY_URL/$APP_NAME:$VERSION $REGISTRY_URL/$APP_NAME:latest
+    - docker tag $REGISTRY_URL/$APP_NAME:$VERSION $REGISTRY_URL/$CI_PROJECT_NAME:latest
     - docker push $REGISTRY_URL/$APP_NAME:$VERSION
     - docker push $REGISTRY_URL/$APP_NAME:latest
   only:
@@ -66,6 +56,6 @@ deploy_test_job:
     - cp ${KUBECONFIG} $HOME/.kube/config
     - kubectl config set-context –current –namespace=${TEAM}-${CI_ENVIRONMENT_NAME}
     - kubectl apply -f infra/${CI_ENVIRONMENT_NAME}.configmap.yaml
-    - kubectl set image deployment/telegrambot telegrambot=$REGISTRY_URL/$APP_NAME:$VERSION
+    - kubectl set image deployment/telegrambot telegrambot=$REGISTRY_URL/$CI_PROJECT_NAME:$VERSION
   only:
     - tags
