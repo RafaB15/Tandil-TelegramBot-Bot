@@ -5,3 +5,4 @@ metadata:
 data:
   LOG_LEVEL: "debug"
   TELEGRAM_USERNAME: memo2_docentes_bot
+  APP_MODE: production
