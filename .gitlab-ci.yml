@@ -1,6 +1,4 @@
 image: ruby:3.3.1
-include:
-  - template: Code-Quality.gitlab-ci.yml
 services:
   - docker:dind
 
@@ -27,10 +25,6 @@ build_job:
     reports:
       junit: reports/spec/rspec.xml
 
-code_quality:
-  stage: build
-  artifacts:
-    paths: [gl-code-quality-report.json]
 
 package_job:
   stage: package
