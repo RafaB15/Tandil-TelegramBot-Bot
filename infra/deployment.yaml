@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: memo2bot
+  name: telegrambot
   labels:
-    app: memo2bot
+    app: telegrambot
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: memo2bot
+      app: telegrambot
   template:
     metadata:
       labels:
-        app: memo2bot
+        app: telegrambot
     spec:
       containers:
       - name: telegrambot
-        image: registry.gitlab.com/fiuba-memo2/ejemplos/telegram-bot-example:0.0.16
+        image: registry.gitlab.com/fiuba-memo2/ejemplos/telegram-bot-example:0.0.17
         envFrom:
           - secretRef:
               name: botsecret
