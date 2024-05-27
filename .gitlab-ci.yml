@@ -3,8 +3,8 @@ services:
   - docker:dind
 
 variables:
-  REGISTRY_URL: registry.gitlab.com/fiuba-memo2/ejemplos
-  TEAM: docentes
+  REGISTRY_URL: registry.gitlab.com/fiuba-memo2/tp2/tandil-bot
+  TEAM: tandil
 
 stages:
   - build
@@ -34,10 +34,10 @@ package_job:
   script:
     - VERSION=$(cat VERSION.txt)
     - echo $VERSION
-    - docker build -f Dockerfile.prod --build-arg VERSION=$VERSION --build-arg GIT_COMMIT=$CI_COMMIT_SHORT_SHA -t $REGISTRY_URL/$APP_NAME:$VERSION .
-    - docker tag $REGISTRY_URL/$APP_NAME:$VERSION $REGISTRY_URL/$CI_PROJECT_NAME:latest
-    - docker push $REGISTRY_URL/$APP_NAME:$VERSION
-    - docker push $REGISTRY_URL/$APP_NAME:latest
+    - docker build -f Dockerfile.prod --build-arg VERSION=$VERSION --build-arg GIT_COMMIT=$CI_COMMIT_SHORT_SHA -t $REGISTRY_URL/$CI_PROJECT_NAME:$VERSION .
+    - docker tag $REGISTRY_URL/$CI_PROJECT_NAME:$VERSION $REGISTRY_URL/$CI_PROJECT_NAME:latest
+    - docker push $REGISTRY_URL/$CI_PROJECT_NAME:$VERSION
+    - docker push $REGISTRY_URL/$CI_PROJECT_NAME:latest
   only:
     - tags
 
@@ -48,8 +48,7 @@ deploy_test_job:
   script:
     - VERSION=$(cat VERSION.txt)
     - cp ${KUBECONFIG} $HOME/.kube/config
-    - kubectl config set-context –current –namespace=${TEAM}-${CI_ENVIRONMENT_NAME}
-    - kubectl apply -f infra/${CI_ENVIRONMENT_NAME}.configmap.yaml
-    - kubectl set image deployment/telegrambot telegrambot=$REGISTRY_URL/$CI_PROJECT_NAME:$VERSION
+    - kubectl -n ${TEAM}-${CI_ENVIRONMENT_NAME} apply -f infra/${CI_ENVIRONMENT_NAME}.configmap.yaml
+    - kubectl -n ${TEAM}-${CI_ENVIRONMENT_NAME} set image deployment/telegrambot telegrambot=$REGISTRY_URL/$CI_PROJECT_NAME:$VERSION
   only:
     - tags
