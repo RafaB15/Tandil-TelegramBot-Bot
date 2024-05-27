@@ -11,8 +11,8 @@ group :development, :test do
   gem 'racc'
   gem 'rspec'
   gem 'rspec_junit_formatter'
-  gem 'rubocop', require: false
-  gem 'rubocop-rspec', require: false
+  gem 'rubocop', '1.50.2', require: false
+  gem 'rubocop-rspec', '2.22.0', require: false
   gem 'simplecov'
   gem 'vcr'
   gem 'webmock'
