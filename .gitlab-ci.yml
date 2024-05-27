@@ -54,7 +54,7 @@ deploy_test_job:
   only:
     - tags
 
-  deploy_prod_job:
+deploy_prod_job:
   stage: deploy_prod
   image: nicopaez/kubectl:1.28.0
   environment: prod
