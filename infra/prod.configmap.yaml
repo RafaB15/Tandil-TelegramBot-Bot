@@ -6,4 +6,4 @@ data:
   LOG_LEVEL: "info"
   TELEGRAM_USERNAME: nunca_lo_usamos
   APP_MODE: production
-  APP_URL: http://restapi:8080
+  API_URL: http://restapi:8080

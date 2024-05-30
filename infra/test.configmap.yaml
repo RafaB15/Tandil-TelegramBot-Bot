@@ -6,4 +6,4 @@ data:
   LOG_LEVEL: "debug"
   TELEGRAM_USERNAME: memo2_docentes_bot
   APP_MODE: production
-  APP_URL: http://restapi:8080
+  API_URL: http://restapi:8080
