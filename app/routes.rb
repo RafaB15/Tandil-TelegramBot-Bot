@@ -1,6 +1,7 @@
 require "#{File.dirname(__FILE__)}/../lib/routing"
 require "#{File.dirname(__FILE__)}/../lib/version"
 require "#{File.dirname(__FILE__)}/tv/series"
+require "#{File.dirname(__FILE__)}/../lib/conector_api"
 
 class Routes
   include Routing
@@ -50,7 +51,9 @@ class Routes
   end
 
   on_message '/version' do |bot, message|
-    bot.api.send_message(chat_id: message.chat.id, text: "#{Version.current}-Tandil")
+    version_api = ConectorApi.new.obtener_version()
+     
+    bot.api.send_message(chat_id: message.chat.id, text: "version bot: #{Version.current}, version api: #{version_api}")
   end
 
   default do |bot, message|
