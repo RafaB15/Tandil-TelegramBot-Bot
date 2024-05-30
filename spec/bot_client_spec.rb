@@ -75,16 +75,29 @@ def then_i_get_keyboard_message(token, message_text)
     .to_return(status: 200, body: body.to_json, headers: {})
 end
 
+def stub_get_request_api
+  response = { 'version': '0.0.4' }
+
+  stub_request(:get, 'http://fake/version')
+    .with(
+      headers: {
+        'Accept' => '*/*',
+        'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+        'User-Agent' => 'Faraday v2.7.4'
+      }
+    )
+    .to_return(status: 200, body: response.to_json, headers: {})
+end
+
 describe 'BotClient' do
   it 'should get a /version message and respond with current version and team name' do
     token = 'fake_token'
+    stub_get_request_api
 
     when_i_send_text(token, '/version')
-    then_i_get_text(token, "#{Version.current}-Tandil")
+    then_i_get_text(token, "version bot: #{Version.current}, version api: 0.0.4")
 
-    app = BotClient.new(token)
-
-    app.run_once
+    BotClient.new(token).run_once
   end
 
   it 'should get a /say_hi message and respond with Hola Emilio' do

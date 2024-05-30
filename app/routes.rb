@@ -51,8 +51,8 @@ class Routes
   end
 
   on_message '/version' do |bot, message|
-    version_api = ConectorApi.new.obtener_version()
-     
+    version_api = ConectorApi.new.obtener_version
+
     bot.api.send_message(chat_id: message.chat.id, text: "version bot: #{Version.current}, version api: #{version_api}")
   end
 
