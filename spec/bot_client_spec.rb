@@ -75,6 +75,20 @@ def then_i_get_keyboard_message(token, message_text)
     .to_return(status: 200, body: body.to_json, headers: {})
 end
 
+def stub_post_request_registrar_api
+  response = { 'version': '0.0.4' }
+
+  stub_request(:get, 'http://fake/registrar')
+    .with(
+      headers: {
+        'Accept' => '*/*',
+        'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+        'User-Agent' => 'Faraday v2.7.4'
+      }
+    )
+    .to_return(status: 200, body: response.to_json, headers: {})
+end
+
 def stub_get_request_api
   response = { 'version': '0.0.4' }
 
@@ -164,5 +178,14 @@ describe 'BotClient' do
     app = BotClient.new(token)
 
     app.run_once
+  end
+
+  xit 'should get a /registrar message with new user and respond with welcome message' do
+    token = 'fake_token'
+    stub_post_request_registrar_api
+    when_i_send_text(token, '/registrar pablo@gmail.com')
+    then_i_get_text(token, 'Bienvenido, cinefilo Pablo!')
+
+    BotClient.new(token).run_once
   end
 end
