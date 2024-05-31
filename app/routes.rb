@@ -56,6 +56,10 @@ class Routes
     bot.api.send_message(chat_id: message.chat.id, text: "version bot: #{Version.current}, version api: #{version_api}")
   end
 
+  on_message_pattern %r{/registrar (?<mail>.*)} do |bot, message, _args|
+    bot.api.send_message(chat_id: message.chat.id, text: "Bienvenido, cinefilo #{message.from.first_name}!")
+  end
+
   default do |bot, message|
     bot.api.send_message(chat_id: message.chat.id, text: 'Uh? No te entiendo! Me repetis la pregunta?')
   end
