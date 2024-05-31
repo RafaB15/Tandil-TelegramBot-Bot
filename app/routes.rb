@@ -56,11 +56,15 @@ class Routes
     bot.api.send_message(chat_id: message.chat.id, text: "version bot: #{Version.current}, version api: #{version_api}")
   end
 
-  on_message_pattern %r{/registrar (?<mail>.*)} do |bot, message, _args|
-    bot.api.send_message(chat_id: message.chat.id, text: "Bienvenido, cinefilo #{message.from.first_name}!")
+  on_message_pattern %r{/registrar (?<email>.*)} do |bot, message, args|
+    is_valid_email = args['email'].match?(/\A[\w+-.]+@[a-z\d-]+(.[a-z]+)*.[a-z]+\z/i)
+
+    text = is_valid_email ? "Bienvenido, cinéfilo #{message.from.first_name}!" : 'Error, tiene que enviar un email válido'
+
+    bot.api.send_message(chat_id: message.chat.id, text:)
   end
 
   default do |bot, message|
-    bot.api.send_message(chat_id: message.chat.id, text: 'Uh? No te entiendo! Me repetis la pregunta?')
+    bot.api.send_message(chat_id: message.chat.id, text: '¿Uh? ¡No te entiendo! ¿Me repetís la pregunta?')
   end
 end

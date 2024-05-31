@@ -159,7 +159,7 @@ describe 'BotClient' do
     token = 'fake_token'
 
     when_i_send_text(token, '/unknown')
-    then_i_get_text(token, 'Uh? No te entiendo! Me repetis la pregunta?')
+    then_i_get_text(token, '¿Uh? ¡No te entiendo! ¿Me repetís la pregunta?')
 
     app = BotClient.new(token)
 
@@ -169,7 +169,15 @@ describe 'BotClient' do
   it 'should get a /registrar message with new user and respond with welcome message' do
     token = 'fake_token'
     when_i_send_text(token, '/registrar emilio@gmail.com')
-    then_i_get_text(token, 'Bienvenido, cinefilo Emilio!')
+    then_i_get_text(token, 'Bienvenido, cinéfilo Emilio!')
+
+    BotClient.new(token).run_once
+  end
+
+  it 'should get a /registrar message with invalid email and respond with invalid email message' do
+    token = 'fake_token'
+    when_i_send_text(token, '/registrar emilio')
+    then_i_get_text(token, 'Error, tiene que enviar un email válido')
 
     BotClient.new(token).run_once
   end
