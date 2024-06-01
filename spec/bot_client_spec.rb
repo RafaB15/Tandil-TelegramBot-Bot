@@ -17,6 +17,18 @@ def when_i_send_text(token, message_text)
     .to_return(body: body.to_json, status: 200, headers: { 'Content-Length' => 3 })
 end
 
+def when_i_send_text_with_telegram_id(token, message_text, telegram_id)
+  body = { "ok": true, "result": [{ "update_id": 693_981_718,
+                                    "message": { "message_id": 11,
+                                                 "from": { "id": telegram_id, "is_bot": false, "first_name": 'Emilio', "last_name": 'Gutter', "username": 'egutter', "language_code": 'en' },
+                                                 "chat": { "id": 141_733_544, "first_name": 'Emilio', "last_name": 'Gutter', "username": 'egutter', "type": 'private' },
+                                                 "date": 1_557_782_998, "text": message_text,
+                                                 "entities": [{ "offset": 0, "length": 6, "type": 'bot_command' }] } }] }
+
+  stub_request(:any, "https://api.telegram.org/bot#{token}/getUpdates")
+    .to_return(body: body.to_json, status: 200, headers: { 'Content-Length' => 3 })
+end
+
 def when_i_send_keyboard_updates(token, message_text, inline_selection)
   body = {
     "ok": true, "result": [{
@@ -89,11 +101,11 @@ def stub_get_request_api
     .to_return(status: 200, body: response.to_json, headers: {})
 end
 
-def stub_post_request_usuarios
-  response = { id: 1, email: 'emilio@gmail.com', telegram_id: 141_733_544 }
+def stub_post_request_usuario(email, telegram_id)
+  response = { id: 1, email:, telegram_id: }
   stub_request(:post, 'http://fake/usuarios')
     .with(
-      body: { 'email' => 'emilio@gmail.com', 'telegram_id' => '141733544' },
+      body: { 'email' => email, 'telegram_id' => telegram_id.to_s },
       headers: {
         'Accept' => '*/*',
         'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
@@ -183,7 +195,7 @@ describe 'BotClient' do
 
   it 'should get a /registrar message with new user and respond with welcome message' do
     token = 'fake_token'
-    stub_post_request_usuarios
+    stub_post_request_usuario('emilio@gmail.com', 141_733_544)
     when_i_send_text(token, '/registrar emilio@gmail.com')
     then_i_get_text(token, 'Bienvenido, cinéfilo Emilio!')
 
@@ -195,6 +207,25 @@ describe 'BotClient' do
     when_i_send_text(token, '/registrar emilio')
     then_i_get_text(token, 'Error, tiene que enviar un email válido')
 
+    BotClient.new(token).run_once
+  end
+
+  def stub_and_send_first_user(token)
+    stub_post_request_usuario('emilio@gmail.com', 141_733_544)
+    when_i_send_text(token, '/registrar emilio@gmail.com')
+    then_i_get_text(token, 'Bienvenido, cinéfilo Emilio!')
+  end
+
+  def stub_and_send_second_user(token)
+    stub_post_request_usuario('emiluchi@gmail.com', 1_234_556)
+    when_i_send_text_with_telegram_id(token, '/registrar emiluchi@gmail.com', 1_234_556)
+    then_i_get_text(token, 'Ha ocurrido un error debido a que su telegram ID ya se encuentra en la base de datos')
+  end
+
+  it 'debería recibir un mensaje /registrar con número de telegram repetido y responder con un mensaje de id repetido' do
+    token = 'fake_token'
+    stub_and_send_first_user(token)
+    stub_and_send_second_user(token)
     BotClient.new(token).run_once
   end
 end
