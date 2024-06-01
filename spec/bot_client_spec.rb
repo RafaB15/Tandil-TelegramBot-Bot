@@ -89,6 +89,21 @@ def stub_get_request_api
     .to_return(status: 200, body: response.to_json, headers: {})
 end
 
+def stub_post_request_usuarios
+  response = { id: 1, email: 'emilio@gmail.com', telegram_id: 141_733_544 }
+  stub_request(:post, 'http://fake/usuarios')
+    .with(
+      body: { 'email' => 'emilio@gmail.com', 'telegram_id' => '141733544' },
+      headers: {
+        'Accept' => '*/*',
+        'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+        'Content-Type' => 'application/x-www-form-urlencoded',
+        'User-Agent' => 'Faraday v2.7.4'
+      }
+    )
+    .to_return(status: 200, body: response.to_json, headers: {})
+end
+
 describe 'BotClient' do
   it 'should get a /version message and respond with current version and team name' do
     token = 'fake_token'
@@ -168,6 +183,7 @@ describe 'BotClient' do
 
   it 'should get a /registrar message with new user and respond with welcome message' do
     token = 'fake_token'
+    stub_post_request_usuarios
     when_i_send_text(token, '/registrar emilio@gmail.com')
     then_i_get_text(token, 'Bienvenido, cinéfilo Emilio!')
 

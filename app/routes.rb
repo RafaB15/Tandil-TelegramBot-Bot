@@ -57,11 +57,13 @@ class Routes
   end
 
   on_message_pattern %r{/registrar (?<email>.*)} do |bot, message, args|
-    is_valid_email = args['email'].match?(/\A[\w+-.]+@[a-z\d-]+(.[a-z]+)*.[a-z]+\z/i)
-
-    text = is_valid_email ? "Bienvenido, cinéfilo #{message.from.first_name}!" : 'Error, tiene que enviar un email válido'
-
-    bot.api.send_message(chat_id: message.chat.id, text:)
+    email_valido = args['email'].match?(/\A[\w+-.]+@[a-z\d-]+(.[a-z]+)*.[a-z]+\z/i)
+    if email_valido
+      _request_response = ConectorApi.new.crear_usuario(args['email'], message.from.id.to_i)
+      bot.api.send_message(chat_id: message.chat.id, text: "Bienvenido, cinéfilo #{message.from.first_name}!")
+    else
+      bot.api.send_message(chat_id: message.chat.id, text: 'Error, tiene que enviar un email válido')
+    end
   end
 
   default do |bot, message|
