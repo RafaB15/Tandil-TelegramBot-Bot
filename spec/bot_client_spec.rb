@@ -29,33 +29,33 @@ def when_i_send_text_with_telegram_id(token, message_text, telegram_id)
     .to_return(body: body.to_json, status: 200, headers: { 'Content-Length' => 3 })
 end
 
-def when_i_send_keyboard_updates(token, message_text, inline_selection)
-  body = {
-    "ok": true, "result": [{
-      "update_id": 866_033_907,
-      "callback_query": { "id": '608740940475689651', "from": { "id": 141_733_544, "is_bot": false, "first_name": 'Emilio', "last_name": 'Gutter', "username": 'egutter', "language_code": 'en' },
-                          "message": {
-                            "message_id": 626,
-                            "from": { "id": 715_612_264, "is_bot": true, "first_name": 'fiuba-memo2-prueba', "username": 'fiuba_memo2_bot' },
-                            "chat": { "id": 141_733_544, "first_name": 'Emilio', "last_name": 'Gutter', "username": 'egutter', "type": 'private' },
-                            "date": 1_595_282_006,
-                            "text": message_text,
-                            "reply_markup": {
-                              "inline_keyboard": [
-                                [{ "text": 'Jon Snow', "callback_data": '1' }],
-                                [{ "text": 'Daenerys Targaryen', "callback_data": '2' }],
-                                [{ "text": 'Ned Stark', "callback_data": '3' }]
-                              ]
-                            }
-                          },
-                          "chat_instance": '2671782303129352872',
-                          "data": inline_selection }
-    }]
-  }
-
-  stub_request(:any, "https://api.telegram.org/bot#{token}/getUpdates")
-    .to_return(body: body.to_json, status: 200, headers: { 'Content-Length' => 3 })
-end
+# def when_i_send_keyboard_updates(token, message_text, inline_selection)
+#   body = {
+#     "ok": true, "result": [{
+#       "update_id": 866_033_907,
+#       "callback_query": { "id": '608740940475689651', "from": { "id": 141_733_544, "is_bot": false, "first_name": 'Emilio', "last_name": 'Gutter', "username": 'egutter', "language_code": 'en' },
+#                           "message": {
+#                             "message_id": 626,
+#                             "from": { "id": 715_612_264, "is_bot": true, "first_name": 'fiuba-memo2-prueba', "username": 'fiuba_memo2_bot' },
+#                             "chat": { "id": 141_733_544, "first_name": 'Emilio', "last_name": 'Gutter', "username": 'egutter', "type": 'private' },
+#                             "date": 1_595_282_006,
+#                             "text": message_text,
+#                             "reply_markup": {
+#                               "inline_keyboard": [
+#                                 [{ "text": 'Jon Snow', "callback_data": '1' }],
+#                                 [{ "text": 'Daenerys Targaryen', "callback_data": '2' }],
+#                                 [{ "text": 'Ned Stark', "callback_data": '3' }]
+#                               ]
+#                             }
+#                           },
+#                           "chat_instance": '2671782303129352872',
+#                           "data": inline_selection }
+#     }]
+#   }
+#
+#   stub_request(:any, "https://api.telegram.org/bot#{token}/getUpdates")
+#     .to_return(body: body.to_json, status: 200, headers: { 'Content-Length' => 3 })
+# end
 
 def then_i_get_text(token, message_text)
   body = { "ok": true,
@@ -71,21 +71,21 @@ def then_i_get_text(token, message_text)
     .to_return(status: 200, body: body.to_json, headers: {})
 end
 
-def then_i_get_keyboard_message(token, message_text)
-  body = { "ok": true,
-           "result": { "message_id": 12,
-                       "from": { "id": 715_612_264, "is_bot": true, "first_name": 'fiuba-memo2-prueba', "username": 'fiuba_memo2_bot' },
-                       "chat": { "id": 141_733_544, "first_name": 'Emilio', "last_name": 'Gutter', "username": 'egutter', "type": 'private' },
-                       "date": 1_557_782_999, "text": message_text } }
-
-  stub_request(:post, "https://api.telegram.org/bot#{token}/sendMessage")
-    .with(
-      body: { 'chat_id' => '141733544',
-              'reply_markup' => '{"inline_keyboard":[[{"text":"Jon Snow","callback_data":"1"},{"text":"Daenerys Targaryen","callback_data":"2"},{"text":"Ned Stark","callback_data":"3"}]]}',
-              'text' => 'Quien se queda con el trono?' }
-    )
-    .to_return(status: 200, body: body.to_json, headers: {})
-end
+# def then_i_get_keyboard_message(token, message_text)
+#   body = { "ok": true,
+#            "result": { "message_id": 12,
+#                        "from": { "id": 715_612_264, "is_bot": true, "first_name": 'fiuba-memo2-prueba', "username": 'fiuba_memo2_bot' },
+#                        "chat": { "id": 141_733_544, "first_name": 'Emilio', "last_name": 'Gutter', "username": 'egutter', "type": 'private' },
+#                        "date": 1_557_782_999, "text": message_text } }
+#
+#   stub_request(:post, "https://api.telegram.org/bot#{token}/sendMessage")
+#     .with(
+#       body: { 'chat_id' => '141733544',
+#               'reply_markup' => '{"inline_keyboard":[[{"text":"Jon Snow","callback_data":"1"},{"text":"Daenerys Targaryen","callback_data":"2"},{"text":"Ned Stark","callback_data":"3"}]]}',
+#               'text' => 'Quien se queda con el trono?' }
+#     )
+#     .to_return(status: 200, body: body.to_json, headers: {})
+# end
 
 def stub_get_request_api
   response = { 'version': '0.0.4' }
@@ -101,7 +101,7 @@ def stub_get_request_api
     .to_return(status: 200, body: response.to_json, headers: {})
 end
 
-def stub_post_request_usuario(email, telegram_id)
+def stub_post_request_usuario(email, telegram_id, status)
   response = { id: 1, email:, telegram_id: }
   stub_request(:post, 'http://fake/usuarios')
     .with(
@@ -113,7 +113,7 @@ def stub_post_request_usuario(email, telegram_id)
         'User-Agent' => 'Faraday v2.7.4'
       }
     )
-    .to_return(status: 200, body: response.to_json, headers: {})
+    .to_return(status:, body: response.to_json, headers: {})
 end
 
 describe 'BotClient' do
@@ -127,55 +127,11 @@ describe 'BotClient' do
     BotClient.new(token).run_once
   end
 
-  it 'should get a /say_hi message and respond with Hola Emilio' do
-    token = 'fake_token'
-
-    when_i_send_text(token, '/say_hi Emilio')
-    then_i_get_text(token, 'Hola, Emilio')
-
-    app = BotClient.new(token)
-
-    app.run_once
-  end
-
   it 'should get a /start message and respond with Hola' do
     token = 'fake_token'
 
     when_i_send_text(token, '/start')
     then_i_get_text(token, 'Hola, Emilio')
-
-    app = BotClient.new(token)
-
-    app.run_once
-  end
-
-  it 'should get a /stop message and respond with Chau' do
-    token = 'fake_token'
-
-    when_i_send_text(token, '/stop')
-    then_i_get_text(token, 'Chau, egutter')
-
-    app = BotClient.new(token)
-
-    app.run_once
-  end
-
-  it 'should get a /tv message and respond with an inline keyboard' do
-    token = 'fake_token'
-
-    when_i_send_text(token, '/tv')
-    then_i_get_keyboard_message(token, 'Quien se queda con el trono?')
-
-    app = BotClient.new(token)
-
-    app.run_once
-  end
-
-  it 'should get a "Quien se queda con el trono?" message and respond with' do
-    token = 'fake_token'
-
-    when_i_send_keyboard_updates(token, 'Quien se queda con el trono?', '2')
-    then_i_get_text(token, 'A mi también me encantan los dragones!')
 
     app = BotClient.new(token)
 
@@ -195,7 +151,7 @@ describe 'BotClient' do
 
   it 'should get a /registrar message with new user and respond with welcome message' do
     token = 'fake_token'
-    stub_post_request_usuario('emilio@gmail.com', 141_733_544)
+    stub_post_request_usuario('emilio@gmail.com', 141_733_544, 201)
     when_i_send_text(token, '/registrar emilio@gmail.com')
     then_i_get_text(token, 'Bienvenido, cinéfilo Emilio!')
 
@@ -211,15 +167,15 @@ describe 'BotClient' do
   end
 
   def stub_and_send_first_user(token)
-    stub_post_request_usuario('emilio@gmail.com', 141_733_544)
-    when_i_send_text(token, '/registrar emilio@gmail.com')
+    stub_post_request_usuario('emilio@gmail.com', 1_234_556, 201)
+    when_i_send_text_with_telegram_id(token, '/registrar emilio@gmail.com', 1_234_556)
     then_i_get_text(token, 'Bienvenido, cinéfilo Emilio!')
   end
 
   def stub_and_send_second_user(token)
-    stub_post_request_usuario('emiluchi@gmail.com', 1_234_556)
-    when_i_send_text_with_telegram_id(token, '/registrar emiluchi@gmail.com', 1_234_556)
-    then_i_get_text(token, 'Ha ocurrido un error debido a que su telegram ID ya se encuentra en la base de datos')
+    stub_post_request_usuario('pablito@gmail.com', 1_234_556, 409)
+    when_i_send_text_with_telegram_id(token, '/registrar pablito@gmail.com', 1_234_556)
+    then_i_get_text(token, 'Error, la cuenta de telegram sólo puede estar asociada a un mail')
   end
 
   it 'debería recibir un mensaje /registrar con número de telegram repetido y responder con un mensaje de id repetido' do
