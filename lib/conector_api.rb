@@ -13,7 +13,7 @@ class ConectorApi
   end
 
   def crear_usuario(email, telegram_id)
-    body = { email:, telegram_id: }
+    body = { email:, telegram_id: }.to_json
     response = Faraday.post("#{@api_url}/usuarios", body)
     response.status
   end
