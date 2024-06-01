@@ -105,11 +105,11 @@ def stub_post_request_usuario(email, telegram_id)
   response = { id: 1, email:, telegram_id: }
   stub_request(:post, 'http://fake/usuarios')
     .with(
-      body: { 'email' => email, 'telegram_id' => telegram_id.to_s },
+      body: "{\"email\":\"#{email}\",\"telegram_id\":#{telegram_id}}",
       headers: {
         'Accept' => '*/*',
         'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-        'Content-Type' => 'application/x-www-form-urlencoded',
+        'Content-Type' => 'application/json',
         'User-Agent' => 'Faraday v2.7.4'
       }
     )
