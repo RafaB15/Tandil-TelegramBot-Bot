@@ -116,6 +116,23 @@ def stub_post_request_usuario(email, telegram_id, status)
     .to_return(status:, body: response.to_json, headers: {})
 end
 
+def stub_post_request_usuario_error(email, telegram_id, status, message, field)
+  response = {  error: 'Conflicto',
+                message:,
+                field: }
+  stub_request(:post, 'http://fake/usuarios')
+    .with(
+      body: "{\"email\":\"#{email}\",\"telegram_id\":#{telegram_id}}",
+      headers: {
+        'Accept' => '*/*',
+        'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+        'Content-Type' => 'application/json',
+        'User-Agent' => 'Faraday v2.7.4'
+      }
+    )
+    .to_return(status:, body: response.to_json, headers: {})
+end
+
 describe 'BotClient' do
   it 'should get a /version message and respond with current version and team name' do
     token = 'fake_token'
@@ -173,15 +190,32 @@ describe 'BotClient' do
   end
 
   def stub_and_send_second_user(token)
-    stub_post_request_usuario('pablito@gmail.com', 1_234_556, 409)
+    message = 'El telegram ID ya está asociado con una cuenta existente.'
+    field = :telegram_id
+    stub_post_request_usuario_error('pablito@gmail.com', 1_234_556, 409, message, field)
     when_i_send_text_with_telegram_id(token, '/registrar pablito@gmail.com', 1_234_556)
-    then_i_get_text(token, 'Error, la cuenta de telegram sólo puede estar asociada a un mail')
+    then_i_get_text(token, 'Error, tu usuario de telegram ya esta asociado a una cuenta existente')
   end
 
-  it 'debería recibir un mensaje /registrar con número de telegram repetido y responder con un mensaje de id repetido' do
+  def stub_and_send_third_user(token)
+    message = 'El email ya está asociado con una cuenta existente.'
+    field = :email
+    stub_post_request_usuario_error('emilio@gmail.com', 987_654_3, 409, message, field)
+    when_i_send_text_with_telegram_id(token, '/registrar emilio@gmail.com', 987_654_3)
+    then_i_get_text(token, 'Error, el email ingresado ya esta asociado a una cuenta existente')
+  end
+
+  it 'debería recibir un mensaje /registrar con número de telegram repetido y responder con un mensaje de error' do
     token = 'fake_token'
     stub_and_send_first_user(token)
     stub_and_send_second_user(token)
+    BotClient.new(token).run_once
+  end
+
+  it 'debería recibir un mensaje /registrar con un email ya registrado y responder con un error' do
+    token = 'fake_token'
+    stub_and_send_first_user(token)
+    stub_and_send_third_user(token)
     BotClient.new(token).run_once
   end
 end

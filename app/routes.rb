@@ -18,19 +18,26 @@ class Routes
   on_message_pattern %r{/registrar (?<email>.*)} do |bot, message, args|
     email_valido = args['email'].match?(/\A[\w+-.]+@[a-z\d-]+(.[a-z]+)*.[a-z]+\z/i)
     telegram_id = message.from.id.to_i
+    text = 'Error, tiene que enviar un email válido'
 
     if email_valido
-      response_status = ConectorApi.new.crear_usuario(args['email'], telegram_id)
-      if response_status == 201
-        bot.api.send_message(chat_id: message.chat.id, text: "Bienvenido, cinéfilo #{message.from.first_name}!")
-      elsif response_status == 409
-        bot.api.send_message(chat_id: message.chat.id, text: 'Error, la cuenta de telegram sólo puede estar asociada a un mail')
-      else
-        bot.api.send_message(chat_id: message.chat.id, text: 'Error de la API')
-      end
-    else
-      bot.api.send_message(chat_id: message.chat.id, text: 'Error, tiene que enviar un email válido')
+      conector_api = ConectorApi.new
+      conector_api.crear_usuario(args['email'], telegram_id)
+
+      text = if conector_api.estado == 201
+               "Bienvenido, cinéfilo #{message.from.first_name}!"
+             elsif conector_api.estado == 409
+               if conector_api.respuesta['field'] == 'telegram_id'
+                 'Error, tu usuario de telegram ya esta asociado a una cuenta existente'
+               else
+                 'Error, el email ingresado ya esta asociado a una cuenta existente'
+               end
+             else
+               'Error de la API'
+             end
     end
+
+    bot.api.send_message(chat_id: message.chat.id, text:)
   end
 
   default do |bot, message|
