@@ -14,3 +14,4 @@ reports
 .gitsecret/keys/random_seed
 !*.secret
 *.py
+*.html
