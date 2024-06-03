@@ -13,3 +13,4 @@ reports
 .byebug_history
 .gitsecret/keys/random_seed
 !*.secret
+*.py
