@@ -133,6 +133,38 @@ def stub_post_request_usuario_error(email, telegram_id, status, message, field)
     .to_return(status:, body: response.to_json, headers: {})
 end
 
+def stub_get_top_visualizaciones
+  response = [
+    {
+      "nombre_pelicula": 'Iron Man',
+      "id_pelicula": 1
+    },
+    {
+      "nombre_pelicula": 'Black Panther',
+      "id_pelicula": 2
+    },
+    {
+      "nombre_pelicula": 'Doctor Strange',
+      "id_pelicula": 3
+    }
+  ]
+  stub_request(:post, 'http://fake/visualizacion/top')
+    .with(
+      headers: {
+        'Accept' => '*/*',
+        'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+        'Content-Type' => 'application/json',
+        'User-Agent' => 'Faraday v2.7.4'
+      }
+    )
+    .to_return(status:, body: response.to_json, headers: {})
+end
+
+def then_i_get_top_visualizaciones(token)
+  text = "Las películas con más visualizaciones son:\n  1. Iron Man (1)\n 2. Black Panther (2)\n  3. Doctor Strange (3)"
+  then_i_get_text(token, text)
+end
+
 describe 'BotClient' do
   it 'should get a /version message and respond with current version and team name' do
     token = 'fake_token'
@@ -216,6 +248,14 @@ describe 'BotClient' do
     token = 'fake_token'
     stub_and_send_first_user(token)
     stub_and_send_third_user(token)
+    BotClient.new(token).run_once
+  end
+
+  xit 'debería recibir un mensaje /masvistos y devolver los contenidos más vistos de la plataforma' do
+    token = 'fake_token'
+    stub_get_top_visualizaciones
+    when_i_send_text(token, '/masvistos')
+    then_i_get_top_visualizaciones(token)
     BotClient.new(token).run_once
   end
 end
