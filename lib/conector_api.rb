@@ -24,6 +24,7 @@ class ConectorApi
   end
 
   def obtener_peliculas_mas_vistas
-    Faraday.get("#{@api_url}/visualizacion/top", 'Content-Type' => 'application/json').body
+    response = Faraday.get("#{@api_url}/visualizacion/top", 'Content-Type' => 'application/json').body
+    JSON.parse(response)
   end
 end

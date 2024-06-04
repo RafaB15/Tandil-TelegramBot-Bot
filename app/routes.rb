@@ -43,9 +43,8 @@ class Routes
   on_message '/masvistos' do |bot, message|
     top_peliculas = ConectorApi.new.obtener_peliculas_mas_vistas
     respuesta = "Las películas con más visualizaciones son:\n"
-
     top_peliculas.each_with_index do |pelicula, index|
-      respuesta += "  #{index + 1}. #{pelicula[:nombre_pelicula]} (#{pelicula[:id_pelicula]})\n"
+      respuesta += "  #{index + 1}. #{pelicula['titulo']} (#{pelicula['id']})\n"
     end
 
     bot.api.send_message(chat_id: message.chat.id, text: respuesta)

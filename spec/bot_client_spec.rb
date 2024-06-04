@@ -136,16 +136,16 @@ end
 def stub_get_top_visualizaciones
   response = [
     {
-      "nombre_pelicula": 'Iron Man',
-      "id_pelicula": 1
+      "titulo": 'Iron Man',
+      "id": 1
     },
     {
-      "nombre_pelicula": 'Black Panther',
-      "id_pelicula": 2
+      "titulo": 'Black Panther',
+      "id": 2
     },
     {
-      "nombre_pelicula": 'Doctor Strange',
-      "id_pelicula": 3
+      "titulo": 'Doctor Strange',
+      "id": 3
     }
   ]
 
@@ -157,7 +157,7 @@ def stub_get_top_visualizaciones
         'User-Agent' => 'Faraday v2.7.4'
       }
     )
-    .to_return(status: 200, body: response, headers: {})
+    .to_return(status: 200, body: response.to_json, headers: {})
 end
 
 def then_i_get_top_visualizaciones(token)
