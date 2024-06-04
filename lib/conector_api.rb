@@ -22,4 +22,8 @@ class ConectorApi
     @respuesta = JSON.parse(response.body)
     @estado = response.status
   end
+
+  def obtener_peliculas_mas_vistas
+    Faraday.get("#{@api_url}/visualizacion/top", 'Content-Type' => 'application/json').body
+  end
 end

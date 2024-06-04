@@ -148,20 +148,20 @@ def stub_get_top_visualizaciones
       "id_pelicula": 3
     }
   ]
-  stub_request(:post, 'http://fake/visualizacion/top')
+
+  stub_request(:get, 'http://fake/visualizacion/top?Content-Type=application/json')
     .with(
       headers: {
         'Accept' => '*/*',
         'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-        'Content-Type' => 'application/json',
         'User-Agent' => 'Faraday v2.7.4'
       }
     )
-    .to_return(status:, body: response.to_json, headers: {})
+    .to_return(status: 200, body: response, headers: {})
 end
 
 def then_i_get_top_visualizaciones(token)
-  text = "Las películas con más visualizaciones son:\n  1. Iron Man (1)\n 2. Black Panther (2)\n  3. Doctor Strange (3)"
+  text = "Las películas con más visualizaciones son:\n  1. Iron Man (1)\n  2. Black Panther (2)\n  3. Doctor Strange (3)\n"
   then_i_get_text(token, text)
 end
 
@@ -251,7 +251,7 @@ describe 'BotClient' do
     BotClient.new(token).run_once
   end
 
-  xit 'debería recibir un mensaje /masvistos y devolver los contenidos más vistos de la plataforma' do
+  it 'debería recibir un mensaje /masvistos y devolver los contenidos más vistos de la plataforma' do
     token = 'fake_token'
     stub_get_top_visualizaciones
     when_i_send_text(token, '/masvistos')
