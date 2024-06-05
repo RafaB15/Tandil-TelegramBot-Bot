@@ -29,34 +29,6 @@ def when_i_send_text_with_id_telegram(token, message_text, id_telegram)
     .to_return(body: body.to_json, status: 200, headers: { 'Content-Length' => 3 })
 end
 
-# def when_i_send_keyboard_updates(token, message_text, inline_selection)
-#   body = {
-#     "ok": true, "result": [{
-#       "update_id": 866_033_907,
-#       "callback_query": { "id": '608740940475689651', "from": { "id": 141_733_544, "is_bot": false, "first_name": 'Emilio', "last_name": 'Gutter', "username": 'egutter', "language_code": 'en' },
-#                           "message": {
-#                             "message_id": 626,
-#                             "from": { "id": 715_612_264, "is_bot": true, "first_name": 'fiuba-memo2-prueba', "username": 'fiuba_memo2_bot' },
-#                             "chat": { "id": 141_733_544, "first_name": 'Emilio', "last_name": 'Gutter', "username": 'egutter', "type": 'private' },
-#                             "date": 1_595_282_006,
-#                             "text": message_text,
-#                             "reply_markup": {
-#                               "inline_keyboard": [
-#                                 [{ "text": 'Jon Snow', "callback_data": '1' }],
-#                                 [{ "text": 'Daenerys Targaryen', "callback_data": '2' }],
-#                                 [{ "text": 'Ned Stark', "callback_data": '3' }]
-#                               ]
-#                             }
-#                           },
-#                           "chat_instance": '2671782303129352872',
-#                           "data": inline_selection }
-#     }]
-#   }
-#
-#   stub_request(:any, "https://api.telegram.org/bot#{token}/getUpdates")
-#     .to_return(body: body.to_json, status: 200, headers: { 'Content-Length' => 3 })
-# end
-
 def then_i_get_text(token, message_text)
   body = { "ok": true,
            "result": { "message_id": 12,
@@ -70,22 +42,6 @@ def then_i_get_text(token, message_text)
     )
     .to_return(status: 200, body: body.to_json, headers: {})
 end
-
-# def then_i_get_keyboard_message(token, message_text)
-#   body = { "ok": true,
-#            "result": { "message_id": 12,
-#                        "from": { "id": 715_612_264, "is_bot": true, "first_name": 'fiuba-memo2-prueba', "username": 'fiuba_memo2_bot' },
-#                        "chat": { "id": 141_733_544, "first_name": 'Emilio', "last_name": 'Gutter', "username": 'egutter', "type": 'private' },
-#                        "date": 1_557_782_999, "text": message_text } }
-#
-#   stub_request(:post, "https://api.telegram.org/bot#{token}/sendMessage")
-#     .with(
-#       body: { 'chat_id' => '141733544',
-#               'reply_markup' => '{"inline_keyboard":[[{"text":"Jon Snow","callback_data":"1"},{"text":"Daenerys Targaryen","callback_data":"2"},{"text":"Ned Stark","callback_data":"3"}]]}',
-#               'text' => 'Quien se queda con el trono?' }
-#     )
-#     .to_return(status: 200, body: body.to_json, headers: {})
-# end
 
 def stub_get_request_api
   response = { 'version': '0.0.4' }
@@ -194,6 +150,21 @@ def stub_post_request_calificacion(id_telegram, id_pelicula, calificacion, statu
     .to_return(status:, body: response.to_json, headers: {})
 end
 
+def stub_post_request_marcar_favorita(email, id_contenido, _status)
+  response = { id: 1, email:, id_contenido: }
+  stub_request(:post, 'http://fake/favorito')
+    .with(
+      body: "{\"email\":\"#{email}\",\"id_contenido\":#{id_contenido}}",
+      headers: {
+        'Accept' => '*/*',
+        'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+        'Content-Type' => 'application/json',
+        'User-Agent' => 'Faraday v2.7.4'
+      }
+    )
+    .to_return(status: 200, body: response.to_json, headers: {})
+end
+
 describe 'BotClient' do
   it 'should get a /version message and respond with current version and team name' do
     token = 'fake_token'
@@ -296,10 +267,19 @@ describe 'BotClient' do
     BotClient.new(token).run_once
   end
 
-  it 'debería recibir un mensaje /calificar_contenido {id_pelicula} {calificacion} y devolver un mensaje' do
+  xit 'debería recibir un mensaje /calificar {id_pelicula} {calificacion} y devolver un mensaje' do
     token = 'fake_token'
     stub_post_request_calificacion(1, 97, 4, 201)
-    when_i_send_text(token, '/calificar_contenido 1 97 4')
+    when_i_send_text(token, '/calificar 1 97 4')
     then_i_get_text(token, '¡Gracias por calificar la película 97 con 4 estrellas!')
+    BotClient.new(token).run_once
+  end
+
+  xit 'debería recibir un mensaje /marcar_favorita {id_pelicula} y devolver un mensaje de contenido anadido a favoritos' do\
+    token = 'fake_token'
+    stub_post_request_marcar_favorita('test@test.com', 1, 201)
+    when_i_send_text(token, '/marcar_favorita 1')
+    then_i_get_text(token, 'Contenido añadido a favoritos')
+    BotClient.new(token).run_once
   end
 end
