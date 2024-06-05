@@ -17,10 +17,10 @@ def when_i_send_text(token, message_text)
     .to_return(body: body.to_json, status: 200, headers: { 'Content-Length' => 3 })
 end
 
-def when_i_send_text_with_telegram_id(token, message_text, telegram_id)
+def when_i_send_text_with_id_telegram(token, message_text, id_telegram)
   body = { "ok": true, "result": [{ "update_id": 693_981_718,
                                     "message": { "message_id": 11,
-                                                 "from": { "id": telegram_id, "is_bot": false, "first_name": 'Emilio', "last_name": 'Gutter', "username": 'egutter', "language_code": 'en' },
+                                                 "from": { "id": id_telegram, "is_bot": false, "first_name": 'Emilio', "last_name": 'Gutter', "username": 'egutter', "language_code": 'en' },
                                                  "chat": { "id": 141_733_544, "first_name": 'Emilio', "last_name": 'Gutter', "username": 'egutter', "type": 'private' },
                                                  "date": 1_557_782_998, "text": message_text,
                                                  "entities": [{ "offset": 0, "length": 6, "type": 'bot_command' }] } }] }
@@ -101,11 +101,11 @@ def stub_get_request_api
     .to_return(status: 200, body: response.to_json, headers: {})
 end
 
-def stub_post_request_usuario(email, telegram_id, status)
-  response = { id: 1, email:, telegram_id: }
+def stub_post_request_usuario(email, id_telegram, status)
+  response = { id: 1, email:, id_telegram: }
   stub_request(:post, 'http://fake/usuarios')
     .with(
-      body: "{\"email\":\"#{email}\",\"telegram_id\":#{telegram_id}}",
+      body: "{\"email\":\"#{email}\",\"id_telegram\":#{id_telegram}}",
       headers: {
         'Accept' => '*/*',
         'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
@@ -116,13 +116,13 @@ def stub_post_request_usuario(email, telegram_id, status)
     .to_return(status:, body: response.to_json, headers: {})
 end
 
-def stub_post_request_usuario_error(email, telegram_id, status, message, field)
+def stub_post_request_usuario_error(email, id_telegram, status, message, field)
   response = {  error: 'Conflicto',
                 message:,
                 field: }
   stub_request(:post, 'http://fake/usuarios')
     .with(
-      body: "{\"email\":\"#{email}\",\"telegram_id\":#{telegram_id}}",
+      body: "{\"email\":\"#{email}\",\"id_telegram\":#{id_telegram}}",
       headers: {
         'Accept' => '*/*',
         'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
@@ -179,6 +179,21 @@ def then_i_get_top_visualizaciones(token)
   then_i_get_text(token, text)
 end
 
+def stub_post_request_calificacion(id_telegram, id_pelicula, calificacion, status)
+  response = { id: 1, id_telegram:, id_pelicula:, calificacion: }
+  stub_request(:post, 'http://fake/calificar_contenido')
+    .with(
+      body: "{\"id_telegram\":\"#{id_telegram}\",\"id_pelicula\":#{id_pelicula},\"calificacion\":#{calificacion}}",
+      headers: {
+        'Accept' => '*/*',
+        'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+        'Content-Type' => 'application/json',
+        'User-Agent' => 'Faraday v2.7.4'
+      }
+    )
+    .to_return(status:, body: response.to_json, headers: {})
+end
+
 describe 'BotClient' do
   it 'should get a /version message and respond with current version and team name' do
     token = 'fake_token'
@@ -231,15 +246,15 @@ describe 'BotClient' do
 
   def stub_and_send_first_user(token)
     stub_post_request_usuario('emilio@gmail.com', 1_234_556, 201)
-    when_i_send_text_with_telegram_id(token, '/registrar emilio@gmail.com', 1_234_556)
+    when_i_send_text_with_id_telegram(token, '/registrar emilio@gmail.com', 1_234_556)
     then_i_get_text(token, 'Bienvenido, cinéfilo Emilio!')
   end
 
   def stub_and_send_second_user(token)
     message = 'El telegram ID ya está asociado con una cuenta existente.'
-    field = :telegram_id
+    field = :id_telegram
     stub_post_request_usuario_error('pablito@gmail.com', 1_234_556, 409, message, field)
-    when_i_send_text_with_telegram_id(token, '/registrar pablito@gmail.com', 1_234_556)
+    when_i_send_text_with_id_telegram(token, '/registrar pablito@gmail.com', 1_234_556)
     then_i_get_text(token, 'Error, tu usuario de telegram ya esta asociado a una cuenta existente')
   end
 
@@ -247,7 +262,7 @@ describe 'BotClient' do
     message = 'El email ya está asociado con una cuenta existente.'
     field = :email
     stub_post_request_usuario_error('emilio@gmail.com', 987_654_3, 409, message, field)
-    when_i_send_text_with_telegram_id(token, '/registrar emilio@gmail.com', 987_654_3)
+    when_i_send_text_with_id_telegram(token, '/registrar emilio@gmail.com', 987_654_3)
     then_i_get_text(token, 'Error, el email ingresado ya esta asociado a una cuenta existente')
   end
 
@@ -279,5 +294,12 @@ describe 'BotClient' do
     when_i_send_text(token, '/masvistos')
     then_i_get_text(token, 'No hay datos de visualizaciones de películas en el momento')
     BotClient.new(token).run_once
+  end
+
+  it 'debería recibir un mensaje /calificar_contenido {id_pelicula} {calificacion} y devolver un mensaje' do
+    token = 'fake_token'
+    stub_post_request_calificacion(1, 97, 4, 201)
+    when_i_send_text(token, '/calificar_contenido 1 97 4')
+    then_i_get_text(token, '¡Gracias por calificar la película 97 con 4 estrellas!')
   end
 end

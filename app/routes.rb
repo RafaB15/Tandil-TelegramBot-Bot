@@ -17,17 +17,17 @@ class Routes
 
   on_message_pattern %r{/registrar (?<email>.*)} do |bot, message, args|
     email_valido = args['email'].match?(/\A[\w+-.]+@[a-z\d-]+(.[a-z]+)*.[a-z]+\z/i)
-    telegram_id = message.from.id.to_i
+    id_telegram = message.from.id.to_i
     text = 'Error, tiene que enviar un email válido'
 
     if email_valido
       conector_api = ConectorApi.new
-      conector_api.crear_usuario(args['email'], telegram_id)
+      conector_api.crear_usuario(args['email'], id_telegram)
 
       text = if conector_api.estado == 201
                "Bienvenido, cinéfilo #{message.from.first_name}!"
              elsif conector_api.estado == 409
-               if conector_api.respuesta['field'] == 'telegram_id'
+               if conector_api.respuesta['field'] == 'id_telegram'
                  'Error, tu usuario de telegram ya esta asociado a una cuenta existente'
                else
                  'Error, el email ingresado ya esta asociado a una cuenta existente'
@@ -52,6 +52,23 @@ class Routes
 
       bot.api.send_message(chat_id: message.chat.id, text: respuesta)
     end
+  end
+
+  on_message_pattern %r{/calificar_contenido (?<id_pelicula>\d+) (?<calificacion>\d+)} do |bot, message, args|
+    id_pelicula = args['id_pelicula']
+    calificacion = args['calificacion']
+    id_telegram = message.from.id.to_i
+
+    conector_api = ConectorApi.new
+    conector_api.calificar_contenido(id_telegram, id_pelicula, calificacion)
+
+    text = if conector_api.estado == 201
+             "¡Gracias por calificar la película #{id_pelicula} con #{calificacion} estrellas!"
+           else
+             'Error al calificar la película. Inténtalo de nuevo más tarde.'
+           end
+
+    bot.api.send_message(chat_id: message.chat.id, text:)
   end
 
   default do |bot, message|
