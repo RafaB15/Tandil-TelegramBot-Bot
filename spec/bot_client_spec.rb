@@ -273,7 +273,7 @@ describe 'BotClient' do
     BotClient.new(token).run_once
   end
 
-  xit 'debería recibir un mensaje /masvistos cuando no hay visualizaciones de películas y devolver un mensaje de la situación' do
+  it 'debería recibir un mensaje /masvistos cuando no hay visualizaciones de películas y devolver un mensaje de la situación' do
     token = 'fake_token'
     stub_get_empty_top_visualizaciones
     when_i_send_text(token, '/masvistos')
