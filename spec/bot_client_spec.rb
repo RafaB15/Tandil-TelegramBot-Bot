@@ -160,6 +160,20 @@ def stub_get_top_visualizaciones
     .to_return(status: 200, body: response.to_json, headers: {})
 end
 
+def stub_get_empty_top_visualizaciones
+  response = []
+
+  stub_request(:get, 'http://fake/visualizacion/top?Content-Type=application/json')
+    .with(
+      headers: {
+        'Accept' => '*/*',
+        'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+        'User-Agent' => 'Faraday v2.7.4'
+      }
+    )
+    .to_return(status: 200, body: response.to_json, headers: {})
+end
+
 def then_i_get_top_visualizaciones(token)
   text = "Las películas con más visualizaciones son:\n  1. Iron Man (1)\n  2. Black Panther (2)\n  3. Doctor Strange (3)\n"
   then_i_get_text(token, text)
@@ -256,6 +270,14 @@ describe 'BotClient' do
     stub_get_top_visualizaciones
     when_i_send_text(token, '/masvistos')
     then_i_get_top_visualizaciones(token)
+    BotClient.new(token).run_once
+  end
+
+  xit 'debería recibir un mensaje /masvistos cuando no hay visualizaciones de películas y devolver un mensaje de la situación' do
+    token = 'fake_token'
+    stub_get_empty_top_visualizaciones
+    when_i_send_text(token, '/masvistos')
+    then_i_get_text(token, 'No hay datos de visualizaciones de películas en el momento')
     BotClient.new(token).run_once
   end
 end
