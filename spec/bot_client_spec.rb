@@ -151,17 +151,18 @@ def stub_post_request_calificacion(id_telegram, id_pelicula, calificacion, statu
 end
 
 def stub_post_request_marcar_favorita(email, id_contenido, _status)
-  response = { id: 1, email:, id_contenido: }
-  stub_request(:post, "http://fake/favorito").
-         with(
-           body: "{\"id_telegram\":141733544,\"id_pelicula\":\"1\"}",
-           headers: {
-          'Accept'=>'*/*',
-          'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-          'Content-Type'=>'application/json',
-          'User-Agent'=>'Faraday v2.7.4'
-           }).
-         to_return(status: 201, body: {id: 1}.to_json, headers: {})
+  _response = { id: 1, email:, id_contenido: }
+  stub_request(:post, 'http://fake/favorito')
+    .with(
+      body: '{"id_telegram":141733544,"id_contenido":"1"}',
+      headers: {
+        'Accept' => '*/*',
+        'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+        'Content-Type' => 'application/json',
+        'User-Agent' => 'Faraday v2.7.4'
+      }
+    )
+    .to_return(status: 201, body: { id: 1 }.to_json, headers: {})
 end
 
 describe 'BotClient' do
