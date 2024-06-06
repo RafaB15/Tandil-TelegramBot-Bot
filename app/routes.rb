@@ -41,22 +41,29 @@ class Routes
   end
 
   on_message '/masvistos' do |bot, message|
-    top_peliculas = ConectorApi.new.obtener_peliculas_mas_vistas
+    conector_api = ConectorApi.new
+    conector_api.obtener_peliculas_mas_vistas
+    top_peliculas = conector_api.respuesta
+
     if top_peliculas.empty?
       bot.api.send_message(chat_id: message.chat.id, text: 'No hay datos de visualizaciones de películas en el momento')
     else
       respuesta = "Las películas con más visualizaciones son:\n"
       top_peliculas.each_with_index do |pelicula, index|
-        respuesta += "  #{index + 1}. #{pelicula['titulo']} (#{pelicula['id']})\n"
+        id_pelicula = pelicula['id']
+        titulo = pelicula['pelicula']['titulo']
+        anio = pelicula['pelicula']['anio']
+        genero = pelicula['pelicula']['genero']
+        respuesta += "  #{index + 1}. #{titulo} (#{genero}, #{anio}) [#{id_pelicula}]\n"
       end
 
       bot.api.send_message(chat_id: message.chat.id, text: respuesta)
     end
   end
 
-  on_message_pattern %r{/calificar_contenido (?<id_pelicula>\d+) (?<calificacion>\d+)} do |bot, message, args|
-    id_pelicula = args['id_pelicula']
-    calificacion = args['calificacion']
+  on_message_pattern %r{/calificar (?<id_pelicula>\d+) (?<calificacion>\d+)} do |bot, message, args|
+    id_pelicula = args['id_pelicula'].to_i
+    calificacion = args['calificacion'].to_i
     id_telegram = message.from.id.to_i
 
     conector_api = ConectorApi.new
@@ -72,7 +79,7 @@ class Routes
   end
 
   on_message_pattern %r{/marcar_favorita (?<id_pelicula>\d+)} do |bot, message, args|
-    id_pelicula = args['id_pelicula']
+    id_pelicula = args['id_pelicula'].to_i
     conector_api = ConectorApi.new
     conector_api.marcar_favorita(message.from.id.to_i, id_pelicula)
 

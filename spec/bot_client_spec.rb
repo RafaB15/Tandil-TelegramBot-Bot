@@ -90,20 +90,20 @@ def stub_post_request_usuario_error(email, id_telegram, status, message, field)
 end
 
 def stub_get_top_visualizaciones
-  response = [
+  titulos = { "Iron Man": 2008, 'Black Panther': 2018, 'Doctor Strange': 2016 }
+  count = 0
+  response = titulos.map do |titulo, anio|
+    count += 1
     {
-      "titulo": 'Iron Man',
-      "id": 1
-    },
-    {
-      "titulo": 'Black Panther',
-      "id": 2
-    },
-    {
-      "titulo": 'Doctor Strange',
-      "id": 3
+      'id' => count,
+      'pelicula' => {
+        'titulo' => titulo,
+        'anio' => anio,
+        'genero' => 'accion'
+      },
+      'vistos' => count
     }
-  ]
+  end
 
   stub_request(:get, 'http://fake/visualizacion/top?Content-Type=application/json')
     .with(
@@ -131,15 +131,16 @@ def stub_get_empty_top_visualizaciones
 end
 
 def then_i_get_top_visualizaciones(token)
-  text = "Las películas con más visualizaciones son:\n  1. Iron Man (1)\n  2. Black Panther (2)\n  3. Doctor Strange (3)\n"
+  text = "Las películas con más visualizaciones son:\n  1. Iron Man (accion, 2008) [1]\n  2. Black Panther (accion, 2018) [2]\n  3. Doctor Strange (accion, 2016) [3]\n"
   then_i_get_text(token, text)
 end
 
 def stub_post_request_calificacion(id_telegram, id_pelicula, calificacion, status)
   response = { id: 1, id_telegram:, id_pelicula:, calificacion: }
-  stub_request(:post, 'http://fake/calificar_contenido')
+
+  stub_request(:post, 'http://fake/calificacion')
     .with(
-      body: "{\"id_telegram\":\"#{id_telegram}\",\"id_pelicula\":#{id_pelicula},\"calificacion\":#{calificacion}}",
+      body: "{\"id_telegram\":#{id_telegram},\"id_pelicula\":#{id_pelicula},\"calificacion\":#{calificacion}}",
       headers: {
         'Accept' => '*/*',
         'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
@@ -154,7 +155,7 @@ def stub_post_request_marcar_favorita(email, id_contenido, _status)
   _response = { id: 1, email:, id_contenido: }
   stub_request(:post, 'http://fake/favorito')
     .with(
-      body: '{"id_telegram":141733544,"id_contenido":"1"}',
+      body: '{"id_telegram":141733544,"id_contenido":1}',
       headers: {
         'Accept' => '*/*',
         'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
@@ -267,10 +268,10 @@ describe 'BotClient' do
     BotClient.new(token).run_once
   end
 
-  xit 'debería recibir un mensaje /calificar {id_pelicula} {calificacion} y devolver un mensaje' do
+  it 'debería recibir un mensaje /calificar {id_pelicula} {calificacion} y devolver un mensaje' do
     token = 'fake_token'
-    stub_post_request_calificacion(1, 97, 4, 201)
-    when_i_send_text(token, '/calificar 1 97 4')
+    stub_post_request_calificacion(141_733_544, 97, 4, 201)
+    when_i_send_text(token, '/calificar 97 4')
     then_i_get_text(token, '¡Gracias por calificar la película 97 con 4 estrellas!')
     BotClient.new(token).run_once
   end
