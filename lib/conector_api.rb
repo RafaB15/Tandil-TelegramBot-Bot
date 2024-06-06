@@ -35,8 +35,8 @@ class ConectorApi
     @estado = response.status
   end
 
-  def marcar_favorita(id_telegram, id_pelicula)
-    body = { id_telegram:, id_pelicula: }
+  def marcar_favorita(id_telegram, id_contenido)
+    body = { id_telegram:, id_contenido: }
     response = Faraday.post("#{@api_url}/favorito", body.to_json, 'Content-Type' => 'application/json')
     @respuesta = JSON.parse(response.body)
     @estado = response.status

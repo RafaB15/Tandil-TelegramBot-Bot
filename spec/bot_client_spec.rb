@@ -152,17 +152,16 @@ end
 
 def stub_post_request_marcar_favorita(email, id_contenido, _status)
   response = { id: 1, email:, id_contenido: }
-  stub_request(:post, 'http://fake/favorito')
-    .with(
-      body: "{\"email\":\"#{email}\",\"id_contenido\":#{id_contenido}}",
-      headers: {
-        'Accept' => '*/*',
-        'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-        'Content-Type' => 'application/json',
-        'User-Agent' => 'Faraday v2.7.4'
-      }
-    )
-    .to_return(status: 200, body: response.to_json, headers: {})
+  stub_request(:post, "http://fake/favorito").
+         with(
+           body: "{\"id_telegram\":141733544,\"id_pelicula\":\"1\"}",
+           headers: {
+          'Accept'=>'*/*',
+          'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'Content-Type'=>'application/json',
+          'User-Agent'=>'Faraday v2.7.4'
+           }).
+         to_return(status: 201, body: {id: 1}.to_json, headers: {})
 end
 
 describe 'BotClient' do
@@ -275,7 +274,7 @@ describe 'BotClient' do
     BotClient.new(token).run_once
   end
 
-  xit 'debería recibir un mensaje /marcar_favorita {id_pelicula} y devolver un mensaje de contenido anadido a favoritos' do\
+  it 'debería recibir un mensaje /marcar_favorita {id_pelicula} y devolver un mensaje de contenido anadido a favoritos' do\
     token = 'fake_token'
     stub_post_request_marcar_favorita('test@test.com', 1, 201)
     when_i_send_text(token, '/marcar_favorita 1')
