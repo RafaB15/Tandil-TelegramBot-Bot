@@ -70,7 +70,7 @@ class Routes
     conector_api.calificar_contenido(id_telegram, id_pelicula, calificacion)
 
     text = if conector_api.estado == 201
-             "¡Gracias por calificar la película #{id_pelicula} con #{calificacion} estrellas!"
+             'Calificacion registrada exitosamente'
            else
              'Error al calificar la película. Inténtalo de nuevo más tarde.'
            end

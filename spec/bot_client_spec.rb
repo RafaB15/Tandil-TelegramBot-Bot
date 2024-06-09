@@ -272,7 +272,7 @@ describe 'BotClient' do
     token = 'fake_token'
     stub_post_request_calificacion(141_733_544, 97, 4, 201)
     when_i_send_text(token, '/calificar 97 4')
-    then_i_get_text(token, '¡Gracias por calificar la película 97 con 4 estrellas!')
+    then_i_get_text(token, 'Calificacion registrada exitosamente')
     BotClient.new(token).run_once
   end
 
