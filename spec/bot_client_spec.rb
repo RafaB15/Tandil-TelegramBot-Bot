@@ -283,4 +283,11 @@ describe 'BotClient' do
     then_i_get_text(token, 'Contenido añadido a favoritos')
     BotClient.new(token).run_once
   end
+
+  it 'debería recibir un mensaje /buscartitulo {titulo} y devolver un mensaje con los resultados de la búsqueda cuando no hay coincidencias' do
+    token = 'fake_token'
+    when_i_send_text(token, '/buscartitulo Titanic')
+    then_i_get_text(token, 'No se encontraron resultados para la búsqueda')
+    BotClient.new(token).run_once
+  end
 end

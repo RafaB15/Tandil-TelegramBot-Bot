@@ -92,6 +92,10 @@ class Routes
     bot.api.send_message(chat_id: message.chat.id, text:)
   end
 
+  on_message_pattern %r{/buscartitulo (?<titulo>.+)} do |bot, message, _args|
+    bot.api.send_message(chat_id: message.chat.id, text: 'No se encontraron resultados para la búsqueda')
+  end
+
   default do |bot, message|
     bot.api.send_message(chat_id: message.chat.id, text: '¿Uh? ¡No te entiendo! ¿Me repetís la pregunta?')
   end
