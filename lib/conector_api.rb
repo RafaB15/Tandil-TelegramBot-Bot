@@ -29,6 +29,12 @@ class ConectorApi
     @estado = response.status
   end
 
+  def buscar_pelicula_por_titulo(titulo)
+    response = Faraday.get("#{@api_url}/contenido/buscar", titulo:, 'Content-Type' => 'application/json')
+    @respuesta = JSON.parse(response.body)
+    @estado = response.status
+  end
+
   def calificar_contenido(id_telegram, id_pelicula, calificacion)
     body = { id_telegram:, id_pelicula:, calificacion: }
 

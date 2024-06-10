@@ -92,8 +92,25 @@ class Routes
     bot.api.send_message(chat_id: message.chat.id, text:)
   end
 
-  on_message_pattern %r{/buscartitulo (?<titulo>.+)} do |bot, message, _args|
-    bot.api.send_message(chat_id: message.chat.id, text: 'No se encontraron resultados para la búsqueda')
+  on_message_pattern %r{/buscartitulo (?<titulo>.+)} do |bot, message, args|
+    conector_api = ConectorApi.new
+    conector_api.buscar_pelicula_por_titulo(args['titulo'])
+    peliculas = conector_api.respuesta
+
+    if peliculas.empty?
+      respuesta = 'No se encontraron resultados para la búsqueda'
+    else
+      respuesta = "Acá están los titulos que coinciden con tu busqueda:\n"
+      puts peliculas
+      peliculas.each do |pelicula|
+        id_pelicula = pelicula['id']
+        titulo = pelicula['titulo']
+        anio = pelicula['anio']
+        genero = pelicula['genero']
+        respuesta += "- [ID: #{id_pelicula}] #{titulo} (#{genero}, #{anio})\n"
+      end
+    end
+    bot.api.send_message(chat_id: message.chat.id, text: respuesta)
   end
 
   default do |bot, message|
