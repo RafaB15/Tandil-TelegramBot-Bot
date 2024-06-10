@@ -131,7 +131,7 @@ def stub_get_empty_top_visualizaciones
 end
 
 def then_i_get_top_visualizaciones(token)
-  text = "Las películas con más visualizaciones son:\n  1. Iron Man (accion, 2008) [1]\n  2. Black Panther (accion, 2018) [2]\n  3. Doctor Strange (accion, 2016) [3]\n"
+  text = "Las películas con más visualizaciones son:\n  [ID: 1] Iron Man (accion, 2008)\n  [ID: 2] Black Panther (accion, 2018)\n  [ID: 3] Doctor Strange (accion, 2016)\n"
   then_i_get_text(token, text)
 end
 

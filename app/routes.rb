@@ -49,12 +49,12 @@ class Routes
       bot.api.send_message(chat_id: message.chat.id, text: 'No hay datos de visualizaciones de películas en el momento')
     else
       respuesta = "Las películas con más visualizaciones son:\n"
-      top_peliculas.each_with_index do |pelicula, index|
+      top_peliculas.each do |pelicula|
         id_pelicula = pelicula['id']
         titulo = pelicula['pelicula']['titulo']
         anio = pelicula['pelicula']['anio']
         genero = pelicula['pelicula']['genero']
-        respuesta += "  #{index + 1}. #{titulo} (#{genero}, #{anio}) [#{id_pelicula}]\n"
+        respuesta += "  [ID: #{id_pelicula}] #{titulo} (#{genero}, #{anio})\n"
       end
 
       bot.api.send_message(chat_id: message.chat.id, text: respuesta)
