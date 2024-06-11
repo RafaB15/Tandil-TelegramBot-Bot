@@ -354,4 +354,11 @@ describe 'BotClient' do
     then_i_get_text(token, result)
     BotClient.new(token).run_once
   end
+
+  it 'debería recibir un mensaje /misfavoritos y deolver un mensaje diciendo que el usuario no tiene favoritos' do
+    token = 'fake_token'
+    when_i_send_text(token, '/misfavoritos')
+    then_i_get_text(token, 'Parece que no tienes favoritos! Empieza a marcar tus contenidos como favoritos para verlos aquí.')
+    BotClient.new(token).run_once
+  end
 end

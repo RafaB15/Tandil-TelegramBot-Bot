@@ -113,6 +113,10 @@ class Routes
     bot.api.send_message(chat_id: message.chat.id, text: respuesta)
   end
 
+  on_message '/misfavoritos' do |bot, message|
+    bot.api.send_message(chat_id: message.chat.id, text: 'Parece que no tienes favoritos! Empieza a marcar tus contenidos como favoritos para verlos aquí.')
+  end
+
   default do |bot, message|
     bot.api.send_message(chat_id: message.chat.id, text: '¿Uh? ¡No te entiendo! ¿Me repetís la pregunta?')
   end
