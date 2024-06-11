@@ -75,7 +75,9 @@ end
 def stub_post_request_usuario_error(email, id_telegram, status, message, field)
   response = {  error: 'Conflicto',
                 message:,
-                field: }
+                details: {
+                  field:
+                } }
   stub_request(:post, 'http://fake/usuarios')
     .with(
       body: "{\"email\":\"#{email}\",\"id_telegram\":#{id_telegram}}",

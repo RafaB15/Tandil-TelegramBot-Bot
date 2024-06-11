@@ -27,7 +27,7 @@ class Routes
       text = if conector_api.estado == 201
                "Bienvenido, cinéfilo #{message.from.first_name}!"
              elsif conector_api.estado == 409
-               if conector_api.respuesta['field'] == 'id_telegram'
+               if conector_api.respuesta['details']['field'] == 'id_telegram'
                  'Error, tu usuario de telegram ya esta asociado a una cuenta existente'
                else
                  'Error, el email ingresado ya esta asociado a una cuenta existente'
