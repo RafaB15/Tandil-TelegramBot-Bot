@@ -445,7 +445,7 @@ describe 'BotClient' do
     then_i_get_text(token, result)
     BotClient.new(token).run_once
   end
-  
+
   def response_get_contenidos_id_detalles
     {
       'titulo' => 'Iron Man',
@@ -457,7 +457,11 @@ describe 'BotClient' do
   end
 
   def then_i_get_masinfo(token, detalles_pelicula)
-    text = "Detalles para la película #{detalles_pelicula['titulo']}:\n- Anio: #{detalles_pelicula['anio']}\n- Premios: #{detalles_pelicula['premios']}\n- Director: #{detalles_pelicula['director']}\n- Sinopsis: #{detalles_pelicula['sinopsis']}\n"
+    text = "Detalles para la película #{detalles_pelicula['titulo']}:\n- "
+    text << "Anio: #{detalles_pelicula['anio']}\n- "
+    text << "Premios: #{detalles_pelicula['premios']}\n- "
+    text << "Director: #{detalles_pelicula['director']}\n- "
+    text << "Sinopsis: #{detalles_pelicula['sinopsis']}\n"
 
     then_i_get_text(token, text)
   end

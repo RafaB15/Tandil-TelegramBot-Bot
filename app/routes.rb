@@ -24,17 +24,7 @@ class Routes
       conector_api = ConectorApi.new
       conector_api.crear_usuario(args['email'], id_telegram)
 
-      text = if conector_api.estado == 201
-               "Bienvenido, cinéfilo #{message.from.first_name}!"
-             elsif conector_api.estado == 409
-               if conector_api.respuesta['details']['field'] == 'id_telegram'
-                 'Error, tu usuario de telegram ya esta asociado a una cuenta existente'
-               else
-                 'Error, el email ingresado ya esta asociado a una cuenta existente'
-               end
-             else
-               'Error de la API'
-             end
+      text = ensamblar_respuesta_registro(conector_api, message)
     end
 
     bot.api.send_message(chat_id: message.chat.id, text:)
@@ -48,14 +38,7 @@ class Routes
     if top_peliculas.empty?
       bot.api.send_message(chat_id: message.chat.id, text: 'No hay datos de visualizaciones de películas en el momento')
     else
-      respuesta = "Las películas con más visualizaciones son:\n"
-      top_peliculas.each do |pelicula|
-        id_pelicula = pelicula['id']
-        titulo = pelicula['pelicula']['titulo']
-        anio = pelicula['pelicula']['anio']
-        genero = pelicula['pelicula']['genero']
-        respuesta += "  [ID: #{id_pelicula}] #{titulo} (#{genero}, #{anio})\n"
-      end
+      respuesta = ensamblar_respuesta(top_peliculas)
 
       bot.api.send_message(chat_id: message.chat.id, text: respuesta)
     end
@@ -168,4 +151,30 @@ def generar_lista_de_detalles(detalles_pelicula)
   respuesta += "- Sinopsis: #{detalles_pelicula['sinopsis']}\n"
 
   respuesta
+end
+
+def ensamblar_respuesta(top_peliculas)
+  respuesta = "Las películas con más visualizaciones son:\n"
+  top_peliculas.each do |pelicula|
+    id_pelicula = pelicula['id']
+    titulo = pelicula['pelicula']['titulo']
+    anio = pelicula['pelicula']['anio']
+    genero = pelicula['pelicula']['genero']
+    respuesta += "  [ID: #{id_pelicula}] #{titulo} (#{genero}, #{anio})\n"
+  end
+  respuesta
+end
+
+def ensamblar_respuesta_registro(conector_api, message)
+  if conector_api.estado == 201
+    "Bienvenido, cinéfilo #{message.from.first_name}!"
+  elsif conector_api.estado == 409
+    if conector_api.respuesta['details']['field'] == 'id_telegram'
+      'Error, tu usuario de telegram ya esta asociado a una cuenta existente'
+    else
+      'Error, el email ingresado ya esta asociado a una cuenta existente'
+    end
+  else
+    'Error de la API'
+  end
 end
