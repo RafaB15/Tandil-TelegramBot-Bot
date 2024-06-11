@@ -399,4 +399,11 @@ describe 'BotClient' do
     then_i_get_text(token, result)
     BotClient.new(token).run_once
   end
+
+  it 'debería recibir un mensaje /contenidos/ultimos-agregados y devolver un mensaje con una lista vacía' do
+    token = 'fake_token'
+    when_i_send_text(token, '/sugerencias')
+    then_i_get_text(token, 'No contamos con sugerencias adecuadas en este momento')
+    BotClient.new(token).run_once
+  end
 end

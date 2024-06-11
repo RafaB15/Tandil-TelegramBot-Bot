@@ -118,6 +118,10 @@ class Routes
     bot.api.send_message(chat_id: message.chat.id, text: respuesta)
   end
 
+  on_message '/sugerencias' do |bot, message|
+    bot.api.send_message(chat_id: message.chat.id, text: 'No contamos con sugerencias adecuadas en este momento')
+  end
+
   default do |bot, message|
     bot.api.send_message(chat_id: message.chat.id, text: '¿Uh? ¡No te entiendo! ¿Me repetís la pregunta?')
   end
