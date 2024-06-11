@@ -171,7 +171,7 @@ end
 def stub_get_empty_matching_title
   response = []
 
-  stub_request(:get, 'http://fake/contenido/buscar?Content-Type=application/json&titulo=Titanic')
+  stub_request(:get, 'http://fake/contenido?Content-Type=application/json&titulo=Titanic')
     .with(
       headers: {
         'Accept' => '*/*',
@@ -185,7 +185,7 @@ end
 def stub_get_one_matching_title
   response = [{ 'id' => 1, 'titulo' => 'Akira', 'anio' => 1988, 'genero' => 'accion' }]
 
-  stub_request(:get, 'http://fake/contenido/buscar?Content-Type=application/json&titulo=Akira')
+  stub_request(:get, 'http://fake/contenido?Content-Type=application/json&titulo=Akira')
     .with(
       headers: {
         'Accept' => '*/*',
@@ -200,7 +200,7 @@ def stub_get_two_matching_titles
   response = [{ 'id' => 1, 'titulo' => 'Akira', 'anio' => 1988, 'genero' => 'accion' },
               { 'id' => 2, 'titulo' => 'Akira 2', 'anio' => 1990, 'genero' => 'accion' }]
 
-  stub_request(:get, 'http://fake/contenido/buscar?Content-Type=application/json&titulo=Akira')
+  stub_request(:get, 'http://fake/contenido?Content-Type=application/json&titulo=Akira')
     .with(
       headers: {
         'Accept' => '*/*',
