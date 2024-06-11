@@ -97,11 +97,8 @@ class Routes
     conector_api.buscar_pelicula_por_titulo(args['titulo'])
     peliculas = conector_api.respuesta
 
-    respuesta = if peliculas.empty?
-                  'No se encontraron resultados para la búsqueda'
-                else
-                  "Acá están los titulos que coinciden con tu busqueda:\n#{generar_lista_de_contenidos(peliculas)}"
-                end
+    respuesta = choose_output(peliculas, 'No se encontraron resultados para la búsqueda',
+                              "Acá están los titulos que coinciden con tu busqueda:\n#{generar_lista_de_contenidos(peliculas)}")
     bot.api.send_message(chat_id: message.chat.id, text: respuesta)
   end
 
@@ -110,16 +107,19 @@ class Routes
     conector_api.obtener_favoritos(message.from.id.to_i)
     favoritos = conector_api.respuesta
 
-    respuesta = if favoritos.empty?
-                  'Parece que no tienes favoritos! Empieza a marcar tus contenidos como favoritos para verlos aquí.'
-                else
-                  "Aquí tienes tu listado de favoritos:\n#{generar_lista_de_contenidos(favoritos)}"
-                end
+    respuesta = choose_output(favoritos, 'Parece que no tienes favoritos! Empieza a marcar tus contenidos como favoritos para verlos aquí.',
+                              "Aquí tienes tu listado de favoritos:\n#{generar_lista_de_contenidos(favoritos)}")
     bot.api.send_message(chat_id: message.chat.id, text: respuesta)
   end
 
   on_message '/sugerencias' do |bot, message|
-    bot.api.send_message(chat_id: message.chat.id, text: 'No contamos con sugerencias adecuadas en este momento')
+    conector_api = ConectorApi.new
+    conector_api.obtener_sugerencias
+    sugerencias = conector_api.respuesta
+
+    respuesta = choose_output(sugerencias, 'No contamos con sugerencias adecuadas en este momento',
+                              "Acá tienes algunas sugerencias:\n#{generar_lista_de_contenidos(sugerencias)}")
+    bot.api.send_message(chat_id: message.chat.id, text: respuesta)
   end
 
   default do |bot, message|
@@ -137,4 +137,12 @@ def generar_lista_de_contenidos(contenidos)
     respuesta += "- [ID: #{id_contenido}] #{titulo} (#{genero}, #{anio})\n"
   end
   respuesta
+end
+
+def choose_output(options, empty_response, list_response)
+  if options.empty?
+    empty_response
+  else
+    list_response
+  end
 end

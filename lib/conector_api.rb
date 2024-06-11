@@ -55,4 +55,10 @@ class ConectorApi
     @respuesta = JSON.parse(response.body)
     @estado = response.status
   end
+
+  def obtener_sugerencias
+    response = Faraday.get("#{@api_url}/contenidos/ultimos-agregados", 'Content-Type' => 'application/json')
+    @respuesta = JSON.parse(response.body)
+    @estado = response.status
+  end
 end

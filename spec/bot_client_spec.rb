@@ -239,6 +239,35 @@ def stub_get_one_users_favorite
     .to_return(status: 200, body: response.to_json, headers: {})
 end
 
+def stub_get_empty_sugerencias
+  response = []
+
+  stub_request(:get, 'http://fake/contenidos/ultimos-agregados?Content-Type=application/json')
+    .with(
+      headers: {
+        'Accept' => '*/*',
+        'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+        'User-Agent' => 'Faraday v2.7.4'
+      }
+    )
+    .to_return(status: 200, body: response.to_json, headers: {})
+end
+
+def stub_get_two_sugerencias
+  response = [{ 'id' => 1, 'titulo' => 'Akira', 'anio' => 1988, 'genero' => 'accion' },
+              { 'id' => 2, 'titulo' => 'Akira 2', 'anio' => 1990, 'genero' => 'accion' }]
+
+  stub_request(:get, 'http://fake/contenidos/ultimos-agregados?Content-Type=application/json')
+    .with(
+      headers: {
+        'Accept' => '*/*',
+        'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+        'User-Agent' => 'Faraday v2.7.4'
+      }
+    )
+    .to_return(status: 200, body: response.to_json, headers: {})
+end
+
 describe 'BotClient' do
   it 'should get a /version message and respond with current version and team name' do
     token = 'fake_token'
@@ -402,8 +431,18 @@ describe 'BotClient' do
 
   it 'debería recibir un mensaje /contenidos/ultimos-agregados y devolver un mensaje con una lista vacía' do
     token = 'fake_token'
+    stub_get_empty_sugerencias
     when_i_send_text(token, '/sugerencias')
     then_i_get_text(token, 'No contamos con sugerencias adecuadas en este momento')
+    BotClient.new(token).run_once
+  end
+
+  it 'debería recibir un mensaje /contenidos/ultimos-agregados y devolver un mensaje con una lista de sugerencias' do
+    token = 'fake_token'
+    stub_get_two_sugerencias
+    when_i_send_text(token, '/sugerencias')
+    result = "Acá tienes algunas sugerencias:\n- [ID: 1] Akira (accion, 1988)\n- [ID: 2] Akira 2 (accion, 1990)\n"
+    then_i_get_text(token, result)
     BotClient.new(token).run_once
   end
 end
