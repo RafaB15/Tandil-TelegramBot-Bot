@@ -445,4 +445,58 @@ describe 'BotClient' do
     then_i_get_text(token, result)
     BotClient.new(token).run_once
   end
+  
+  def response_get_contenidos_id_detalles
+    {
+      'titulo' => 'Iron Man',
+      'anio' => 2008,
+      'premios' => 'Nominated for 2 Oscars. 24 wins & 73 nominations total',
+      'director' => 'Jon Favreau',
+      'sinopsis' => 'After being held captive in an Afghan cave, billionaire engineer Tony Stark creates a unique weaponized suit of armor to fight evil'
+    }
+  end
+
+  def then_i_get_masinfo(token, detalles_pelicula)
+    text = "Detalles para la película #{detalles_pelicula['titulo']}:\n- Anio: #{detalles_pelicula['anio']}\n- Premios: #{detalles_pelicula['premios']}\n- Director: #{detalles_pelicula['director']}\n- Sinopsis: #{detalles_pelicula['sinopsis']}\n"
+
+    then_i_get_text(token, text)
+  end
+
+  def stub_get_contenidos_id_detalles(status, body, id_pelicula)
+    stub_request(:get, "http://fake/contenidos/#{id_pelicula}/detalles?Content-Type=application/json")
+      .with(
+        headers: {
+          'Accept' => '*/*',
+          'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'User-Agent' => 'Faraday v2.7.4'
+        }
+      )
+      .to_return(status:, body:, headers: {})
+  end
+
+  it 'debería recibir un mensaje /masinfo {id_pelicula} y devolver un mensaje con mas detalles sobre esa pelicula' do
+    token = 'fake_token'
+    detalles_pelicula = response_get_contenidos_id_detalles
+    id_pelicula = 1
+
+    stub_get_contenidos_id_detalles(200, detalles_pelicula.to_json, id_pelicula)
+
+    when_i_send_text(token, "/masinfo #{id_pelicula}")
+    then_i_get_masinfo(token, detalles_pelicula)
+
+    BotClient.new(token).run_once
+  end
+
+  it 'debería recibir un mensaje /masinfo {id_pelicula} con id_pelicula invalido y devolver un mensaje de error' do
+    token = 'fake_token'
+
+    detalles_pelicula = ''
+    id_pelicula = 'id_pelicula_invalido'
+
+    stub_get_contenidos_id_detalles(500, detalles_pelicula.to_json, id_pelicula)
+
+    when_i_send_text(token, "/masinfo #{id_pelicula}")
+    then_i_get_text(token, 'No se encontraron resultados para la búsqueda')
+    BotClient.new(token).run_once
+  end
 end

@@ -61,4 +61,10 @@ class ConectorApi
     @respuesta = JSON.parse(response.body)
     @estado = response.status
   end
+
+  def obtener_detalles_de_pelicula(id_pelicula)
+    response = Faraday.get("#{@api_url}/contenidos/#{id_pelicula}/detalles", 'Content-Type' => 'application/json')
+    @respuesta = JSON.parse(response.body)
+    @estado = response.status
+  end
 end

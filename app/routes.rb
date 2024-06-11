@@ -125,6 +125,20 @@ class Routes
   default do |bot, message|
     bot.api.send_message(chat_id: message.chat.id, text: '¿Uh? ¡No te entiendo! ¿Me repetís la pregunta?')
   end
+
+  on_message_pattern %r{/masinfo (?<id_pelicula>.+)} do |bot, message, args|
+    id_pelicula = args['id_pelicula']
+    conector_api = ConectorApi.new
+    conector_api.obtener_detalles_de_pelicula(id_pelicula)
+    detalles_pelicula = conector_api.respuesta
+
+    respuesta = if conector_api.estado == 200
+                  "Detalles para la película #{detalles_pelicula['titulo']}:\n#{generar_lista_de_detalles(detalles_pelicula)}"
+                else
+                  'No se encontraron resultados para la búsqueda'
+                end
+    bot.api.send_message(chat_id: message.chat.id, text: respuesta)
+  end
 end
 
 def generar_lista_de_contenidos(contenidos)
@@ -145,4 +159,13 @@ def choose_output(options, empty_response, list_response)
   else
     list_response
   end
+end
+
+def generar_lista_de_detalles(detalles_pelicula)
+  respuesta = "- Anio: #{detalles_pelicula['anio']}\n"
+  respuesta += "- Premios: #{detalles_pelicula['premios']}\n"
+  respuesta += "- Director: #{detalles_pelicula['director']}\n"
+  respuesta += "- Sinopsis: #{detalles_pelicula['sinopsis']}\n"
+
+  respuesta
 end
