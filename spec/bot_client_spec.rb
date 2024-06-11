@@ -211,6 +211,34 @@ def stub_get_two_matching_titles
     .to_return(status: 200, body: response.to_json, headers: {})
 end
 
+def stub_get_empty_users_favorite
+  response = []
+
+  stub_request(:get, 'http://fake/favoritos?Content-Type=application/json&id_telegram=141733544')
+    .with(
+      headers: {
+        'Accept' => '*/*',
+        'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+        'User-Agent' => 'Faraday v2.7.4'
+      }
+    )
+    .to_return(status: 200, body: response.to_json, headers: {})
+end
+
+def stub_get_one_users_favorite
+  response = [{ 'id' => 1, 'titulo' => 'Transformers', 'anio' => 2007, 'genero' => 'accion' }]
+
+  stub_request(:get, 'http://fake/favoritos?Content-Type=application/json&id_telegram=141733544')
+    .with(
+      headers: {
+        'Accept' => '*/*',
+        'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+        'User-Agent' => 'Faraday v2.7.4'
+      }
+    )
+    .to_return(status: 200, body: response.to_json, headers: {})
+end
+
 describe 'BotClient' do
   it 'should get a /version message and respond with current version and team name' do
     token = 'fake_token'
@@ -357,8 +385,18 @@ describe 'BotClient' do
 
   it 'debería recibir un mensaje /misfavoritos y deolver un mensaje diciendo que el usuario no tiene favoritos' do
     token = 'fake_token'
+    stub_get_empty_users_favorite
     when_i_send_text(token, '/misfavoritos')
     then_i_get_text(token, 'Parece que no tienes favoritos! Empieza a marcar tus contenidos como favoritos para verlos aquí.')
+    BotClient.new(token).run_once
+  end
+
+  it 'debería recibir un mensaje /misfavoritos y devolver un mensaje cuando un usuario tiene una película como favorita' do
+    token = 'fake_token'
+    stub_get_one_users_favorite
+    when_i_send_text(token, '/misfavoritos')
+    result = "Aquí tienes tu listado de favoritos:\n- [ID: 1] Transformers (accion, 2007)\n"
+    then_i_get_text(token, result)
     BotClient.new(token).run_once
   end
 end

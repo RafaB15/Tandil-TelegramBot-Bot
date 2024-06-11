@@ -97,27 +97,40 @@ class Routes
     conector_api.buscar_pelicula_por_titulo(args['titulo'])
     peliculas = conector_api.respuesta
 
-    if peliculas.empty?
-      respuesta = 'No se encontraron resultados para la búsqueda'
-    else
-      respuesta = "Acá están los titulos que coinciden con tu busqueda:\n"
-      puts peliculas
-      peliculas.each do |pelicula|
-        id_pelicula = pelicula['id']
-        titulo = pelicula['titulo']
-        anio = pelicula['anio']
-        genero = pelicula['genero']
-        respuesta += "- [ID: #{id_pelicula}] #{titulo} (#{genero}, #{anio})\n"
-      end
-    end
+    respuesta = if peliculas.empty?
+                  'No se encontraron resultados para la búsqueda'
+                else
+                  "Acá están los titulos que coinciden con tu busqueda:\n#{generar_lista_de_contenidos(peliculas)}"
+                end
     bot.api.send_message(chat_id: message.chat.id, text: respuesta)
   end
 
   on_message '/misfavoritos' do |bot, message|
-    bot.api.send_message(chat_id: message.chat.id, text: 'Parece que no tienes favoritos! Empieza a marcar tus contenidos como favoritos para verlos aquí.')
+    conector_api = ConectorApi.new
+    conector_api.obtener_favoritos(message.from.id.to_i)
+    favoritos = conector_api.respuesta
+
+    respuesta = if favoritos.empty?
+                  'Parece que no tienes favoritos! Empieza a marcar tus contenidos como favoritos para verlos aquí.'
+                else
+                  "Aquí tienes tu listado de favoritos:\n#{generar_lista_de_contenidos(favoritos)}"
+                end
+    bot.api.send_message(chat_id: message.chat.id, text: respuesta)
   end
 
   default do |bot, message|
     bot.api.send_message(chat_id: message.chat.id, text: '¿Uh? ¡No te entiendo! ¿Me repetís la pregunta?')
   end
+end
+
+def generar_lista_de_contenidos(contenidos)
+  respuesta = ''
+  contenidos.each do |contenido|
+    id_contenido = contenido['id']
+    titulo = contenido['titulo']
+    anio = contenido['anio']
+    genero = contenido['genero']
+    respuesta += "- [ID: #{id_contenido}] #{titulo} (#{genero}, #{anio})\n"
+  end
+  respuesta
 end

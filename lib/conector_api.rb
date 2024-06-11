@@ -49,4 +49,10 @@ class ConectorApi
     @respuesta = JSON.parse(response.body)
     @estado = response.status
   end
+
+  def obtener_favoritos(id_telegram)
+    response = Faraday.get("#{@api_url}/favoritos", id_telegram:, 'Content-Type' => 'application/json')
+    @respuesta = JSON.parse(response.body)
+    @estado = response.status
+  end
 end
