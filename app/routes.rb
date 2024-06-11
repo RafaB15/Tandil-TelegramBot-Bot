@@ -78,10 +78,10 @@ class Routes
     bot.api.send_message(chat_id: message.chat.id, text:)
   end
 
-  on_message_pattern %r{/marcar_favorita (?<id_pelicula>\d+)} do |bot, message, args|
+  on_message_pattern %r{/marcarfavorito (?<id_pelicula>\d+)} do |bot, message, args|
     id_pelicula = args['id_pelicula'].to_i
     conector_api = ConectorApi.new
-    conector_api.marcar_favorita(message.from.id.to_i, id_pelicula)
+    conector_api.marcarfavorito(message.from.id.to_i, id_pelicula)
 
     text = if conector_api.estado == 201
              'Contenido añadido a favoritos'

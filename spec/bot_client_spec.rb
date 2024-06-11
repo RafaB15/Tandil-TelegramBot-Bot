@@ -153,7 +153,7 @@ def stub_post_request_calificacion(id_telegram, id_pelicula, calificacion, statu
     .to_return(status:, body: response.to_json, headers: {})
 end
 
-def stub_post_request_marcar_favorita(email, id_contenido, _status)
+def stub_post_request_marcarfavorito(email, id_contenido, _status)
   _response = { id: 1, email:, id_contenido: }
   stub_request(:post, 'http://fake/favorito')
     .with(
@@ -349,10 +349,10 @@ describe 'BotClient' do
     BotClient.new(token).run_once
   end
 
-  it 'debería recibir un mensaje /marcar_favorita {id_pelicula} y devolver un mensaje de contenido anadido a favoritos' do\
+  it 'debería recibir un mensaje /marcarfavorito {id_pelicula} y devolver un mensaje de contenido anadido a favoritos' do\
     token = 'fake_token'
-    stub_post_request_marcar_favorita('test@test.com', 1, 201)
-    when_i_send_text(token, '/marcar_favorita 1')
+    stub_post_request_marcarfavorito('test@test.com', 1, 201)
+    when_i_send_text(token, '/marcarfavorito 1')
     then_i_get_text(token, 'Contenido añadido a favoritos')
     BotClient.new(token).run_once
   end
