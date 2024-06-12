@@ -147,8 +147,8 @@ end
 def generar_lista_de_detalles(detalles_pelicula)
   respuesta = ''
   if detalles_pelicula.key?('fue_visto')
-    visto_text = detalles_pelicula['fue_visto'] ? 'Si' : 'No'
-    respuesta += "- Visto: #{visto_text}\n"
+    visto_text = detalles_pelicula['fue_visto'] ? '¡Ya lo viste!' : '¡No lo viste!'
+    respuesta += "- #{visto_text}\n"
   end
 
   respuesta += "- Anio: #{obtener_mas_informacion(detalles_pelicula, 'anio')}\n"

@@ -491,8 +491,8 @@ describe 'BotClient' do
   def then_i_get_masinfo(token, detalles_pelicula, id_pelicula)
     text = "Info de #{detalles_pelicula['titulo']} (#{id_pelicula}):\n- "
     if detalles_pelicula.key?('fue_visto')
-      visto_text = detalles_pelicula['fue_visto'] ? 'Si' : 'No'
-      text << "Visto: #{visto_text}\n- "
+      visto_text = detalles_pelicula['fue_visto'] ? '¡Ya lo viste!' : '¡No lo viste!'
+      text << "#{visto_text}\n- "
     end
     text << "Anio: #{detalles_pelicula['anio']}\n- "
     text << "Premios: #{detalles_pelicula['premios']}\n- "
