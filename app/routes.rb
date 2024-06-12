@@ -140,11 +140,15 @@ def choose_output(options, empty_response, list_response)
   end
 end
 
+def obtener_mas_informacion(detalles, campo)
+  detalles[campo].to_s.strip.empty? ? 'No disponible' : detalles[campo]
+end
+
 def generar_lista_de_detalles(detalles_pelicula)
-  respuesta = "- Anio: #{detalles_pelicula['anio']}\n"
-  respuesta += "- Premios: #{detalles_pelicula['premios']}\n"
-  respuesta += "- Director: #{detalles_pelicula['director']}\n"
-  respuesta += "- Sinopsis: #{detalles_pelicula['sinopsis']}\n"
+  respuesta = "- Anio: #{obtener_mas_informacion(detalles_pelicula, 'anio')}\n"
+  respuesta += "- Premios: #{obtener_mas_informacion(detalles_pelicula, 'premios')}\n"
+  respuesta += "- Director: #{obtener_mas_informacion(detalles_pelicula, 'director')}\n"
+  respuesta += "- Sinopsis: #{obtener_mas_informacion(detalles_pelicula, 'sinopsis')}\n"
 
   respuesta
 end

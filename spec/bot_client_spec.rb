@@ -456,11 +456,31 @@ describe 'BotClient' do
     }
   end
 
+  def response_incompleta_get_contenidos_id_detalles
+    {
+      'titulo' => 'Iron Man',
+      'anio' => 2008,
+      'premios' => 'Nominated for 2 Oscars. 24 wins & 73 nominations total',
+      'director' => '',
+      'sinopsis' => 'After being held captive in an Afghan cave, billionaire engineer Tony Stark creates a unique weaponized suit of armor to fight evil'
+    }
+  end
+
   def then_i_get_masinfo(token, detalles_pelicula)
     text = "Detalles para la película #{detalles_pelicula['titulo']}:\n- "
     text << "Anio: #{detalles_pelicula['anio']}\n- "
     text << "Premios: #{detalles_pelicula['premios']}\n- "
     text << "Director: #{detalles_pelicula['director']}\n- "
+    text << "Sinopsis: #{detalles_pelicula['sinopsis']}\n"
+
+    then_i_get_text(token, text)
+  end
+
+  def then_i_get_incomplete_masinfo(token, detalles_pelicula)
+    text = "Detalles para la película #{detalles_pelicula['titulo']}:\n- "
+    text << "Anio: #{detalles_pelicula['anio']}\n- "
+    text << "Premios: #{detalles_pelicula['premios']}\n- "
+    text << "Director: No disponible\n- "
     text << "Sinopsis: #{detalles_pelicula['sinopsis']}\n"
 
     then_i_get_text(token, text)
@@ -550,6 +570,19 @@ describe 'BotClient' do
 
     when_i_send_text(token, "/masinfo #{id_pelicula}")
     then_i_get_text(token, 'No se encontraron detalles para el contenido buscado')
+    BotClient.new(token).run_once
+  end
+
+  it 'debería recibir un mensaje /masinfo {id_pelicula} con id_pelicula en imbd pero con campos faltantes y la api se encargará de no mostrarlos' do
+    token = 'fake_token'
+    detalles_pelicula = response_incompleta_get_contenidos_id_detalles
+    id_pelicula = 1
+
+    stub_get_contenidos_id_detalles(200, detalles_pelicula.to_json, id_pelicula)
+
+    when_i_send_text(token, "/masinfo #{id_pelicula}")
+    then_i_get_incomplete_masinfo(token, detalles_pelicula)
+
     BotClient.new(token).run_once
   end
 end
