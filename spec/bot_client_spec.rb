@@ -478,6 +478,19 @@ describe 'BotClient' do
       .to_return(status:, body:, headers: {})
   end
 
+  def stub_get_contenidos_id_detalles_id_invalido(id_pelicula)
+    body = { 'error' => 'no encontrado' }
+    stub_request(:get, "http://fake/contenidos/#{id_pelicula}/detalles?Content-Type=application/json")
+      .with(
+        headers: {
+          'Accept' => '*/*',
+          'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+          'User-Agent' => 'Faraday v2.7.4'
+        }
+      )
+      .to_return(status: 404, body: body.to_json, headers: {})
+  end
+
   it 'debería recibir un mensaje /masinfo {id_pelicula} y devolver un mensaje con mas detalles sobre esa pelicula' do
     token = 'fake_token'
     detalles_pelicula = response_get_contenidos_id_detalles
@@ -494,13 +507,12 @@ describe 'BotClient' do
   it 'debería recibir un mensaje /masinfo {id_pelicula} con id_pelicula invalido y devolver un mensaje de error' do
     token = 'fake_token'
 
-    detalles_pelicula = ''
     id_pelicula = 'id_pelicula_invalido'
 
-    stub_get_contenidos_id_detalles(500, detalles_pelicula.to_json, id_pelicula)
+    stub_get_contenidos_id_detalles_id_invalido(id_pelicula)
 
     when_i_send_text(token, "/masinfo #{id_pelicula}")
-    then_i_get_text(token, 'No se encontraron resultados para la búsqueda')
+    then_i_get_text(token, 'No se encontraron resultados para el contenido buscado')
     BotClient.new(token).run_once
   end
 end

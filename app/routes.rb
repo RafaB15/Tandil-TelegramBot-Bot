@@ -115,11 +115,7 @@ class Routes
     conector_api.obtener_detalles_de_pelicula(id_pelicula)
     detalles_pelicula = conector_api.respuesta
 
-    respuesta = if conector_api.estado == 200
-                  "Detalles para la película #{detalles_pelicula['titulo']}:\n#{generar_lista_de_detalles(detalles_pelicula)}"
-                else
-                  'No se encontraron resultados para la búsqueda'
-                end
+    respuesta = ensamblar_respuesta_mas_info(conector_api.estado, detalles_pelicula)
     bot.api.send_message(chat_id: message.chat.id, text: respuesta)
   end
 end
@@ -173,6 +169,22 @@ def ensamblar_respuesta_registro(conector_api, message)
       'Error, tu usuario de telegram ya esta asociado a una cuenta existente'
     else
       'Error, el email ingresado ya esta asociado a una cuenta existente'
+    end
+  else
+    'Error de la API'
+  end
+end
+
+def ensamblar_respuesta_mas_info(estado, detalles_pelicula)
+  if estado == 200
+    "Detalles para la película #{detalles_pelicula['titulo']}:\n#{generar_lista_de_detalles(detalles_pelicula)}"
+  elsif estado == 404
+    if detalles_pelicula['error'] == 'no encontrado'
+      'No se encontraron resultados para el contenido buscado'
+    elsif detalles_pelicula['error'] == 'no hay detalles para mostrar'
+      'No se encontraron detalles para el contenido buscado'
+    else
+      'Error de la API'
     end
   else
     'Error de la API'
