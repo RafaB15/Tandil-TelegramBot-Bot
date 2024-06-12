@@ -100,7 +100,7 @@ class Routes
     conector_api.obtener_sugerencias
     sugerencias = conector_api.respuesta
 
-    respuesta = choose_output(sugerencias, 'No contamos con sugerencias adecuadas en este momento',
+    respuesta = choose_output(sugerencias, '¡No hay nuevos contenidos esta semana, estate atento a las novedades!',
                               "Acá tienes algunas sugerencias:\n#{generar_lista_de_contenidos(sugerencias)}")
     bot.api.send_message(chat_id: message.chat.id, text: respuesta)
   end

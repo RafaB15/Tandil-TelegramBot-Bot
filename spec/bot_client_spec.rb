@@ -433,7 +433,7 @@ describe 'BotClient' do
     token = 'fake_token'
     stub_get_empty_sugerencias
     when_i_send_text(token, '/sugerenciasnuevos')
-    then_i_get_text(token, 'No contamos con sugerencias adecuadas en este momento')
+    then_i_get_text(token, '¡No hay nuevos contenidos esta semana, estate atento a las novedades!')
     BotClient.new(token).run_once
   end
 
