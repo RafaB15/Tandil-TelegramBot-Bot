@@ -477,6 +477,17 @@ describe 'BotClient' do
     }
   end
 
+  def response_get_contenidos_id_detalles_visto
+    {
+      'fue_visto' => true,
+      'titulo' => 'Iron Man',
+      'anio' => 2008,
+      'premios' => 'Nominated for 2 Oscars. 24 wins & 73 nominations total',
+      'director' => 'Jon Favreau',
+      'sinopsis' => 'After being held captive in an Afghan cave, billionaire engineer Tony Stark creates a unique weaponized suit of armor to fight evil'
+    }
+  end
+
   def then_i_get_masinfo(token, detalles_pelicula)
     text = "Detalles para la película #{detalles_pelicula['titulo']}:\n- "
     if detalles_pelicula.key?('fue_visto')
@@ -604,6 +615,19 @@ describe 'BotClient' do
   it 'deberia recibir un mensaje /masinfo {id_pelicula} con id_pelicula en imbd y con telegram id y ver que dice no visto' do
     token = 'fake_token'
     detalles_pelicula = response_get_contenidos_id_detalles_no_visto
+    id_pelicula = 1
+
+    stub_get_contenidos_id_detalles(200, detalles_pelicula.to_json, id_pelicula)
+
+    when_i_send_text(token, "/masinfo #{id_pelicula}")
+    then_i_get_masinfo(token, detalles_pelicula)
+
+    BotClient.new(token).run_once
+  end
+
+  it 'deberia recibir un mensaje /masinfo {id_pelicula} con id_pelicula en imbd y con telegram id y ver que dice visto' do
+    token = 'fake_token'
+    detalles_pelicula = response_get_contenidos_id_detalles_visto
     id_pelicula = 1
 
     stub_get_contenidos_id_detalles(200, detalles_pelicula.to_json, id_pelicula)
