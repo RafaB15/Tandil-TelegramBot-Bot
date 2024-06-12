@@ -466,8 +466,23 @@ describe 'BotClient' do
     }
   end
 
+  def response_get_contenidos_id_detalles_no_visto
+    {
+      'fue_visto' => false,
+      'titulo' => 'Iron Man',
+      'anio' => 2008,
+      'premios' => 'Nominated for 2 Oscars. 24 wins & 73 nominations total',
+      'director' => 'Jon Favreau',
+      'sinopsis' => 'After being held captive in an Afghan cave, billionaire engineer Tony Stark creates a unique weaponized suit of armor to fight evil'
+    }
+  end
+
   def then_i_get_masinfo(token, detalles_pelicula)
     text = "Detalles para la película #{detalles_pelicula['titulo']}:\n- "
+    if detalles_pelicula.key?('fue_visto')
+      visto_text = detalles_pelicula['fue_visto'] ? 'Si' : 'No'
+      text << "Visto: #{visto_text}\n- "
+    end
     text << "Anio: #{detalles_pelicula['anio']}\n- "
     text << "Premios: #{detalles_pelicula['premios']}\n- "
     text << "Director: #{detalles_pelicula['director']}\n- "
@@ -487,7 +502,7 @@ describe 'BotClient' do
   end
 
   def stub_get_contenidos_id_detalles(status, body, id_pelicula)
-    stub_request(:get, "http://fake/contenidos/#{id_pelicula}/detalles?Content-Type=application/json")
+    stub_request(:get, "http://fake/contenidos/#{id_pelicula}/detalles?Content-Type=application/json&id_telegram=141733544")
       .with(
         headers: {
           'Accept' => '*/*',
@@ -500,7 +515,7 @@ describe 'BotClient' do
 
   def stub_get_contenidos_id_detalles_id_invalido(id_pelicula)
     body = { 'error' => 'no encontrado' }
-    stub_request(:get, "http://fake/contenidos/#{id_pelicula}/detalles?Content-Type=application/json")
+    stub_request(:get, "http://fake/contenidos/#{id_pelicula}/detalles?Content-Type=application/json&id_telegram=141733544")
       .with(
         headers: {
           'Accept' => '*/*',
@@ -513,7 +528,7 @@ describe 'BotClient' do
 
   def stub_get_contenidos_id_detalles_id_no_corresponde_a_omdb(id_pelicula)
     body = { 'error' => 'no hay detalles para mostrar' }
-    stub_request(:get, "http://fake/contenidos/#{id_pelicula}/detalles?Content-Type=application/json")
+    stub_request(:get, "http://fake/contenidos/#{id_pelicula}/detalles?Content-Type=application/json&id_telegram=141733544")
       .with(
         headers: {
           'Accept' => '*/*',
@@ -582,6 +597,19 @@ describe 'BotClient' do
 
     when_i_send_text(token, "/masinfo #{id_pelicula}")
     then_i_get_incomplete_masinfo(token, detalles_pelicula)
+
+    BotClient.new(token).run_once
+  end
+
+  it 'deberia recibir un mensaje /masinfo {id_pelicula} con id_pelicula en imbd y con telegram id y ver que dice no visto' do
+    token = 'fake_token'
+    detalles_pelicula = response_get_contenidos_id_detalles_no_visto
+    id_pelicula = 1
+
+    stub_get_contenidos_id_detalles(200, detalles_pelicula.to_json, id_pelicula)
+
+    when_i_send_text(token, "/masinfo #{id_pelicula}")
+    then_i_get_masinfo(token, detalles_pelicula)
 
     BotClient.new(token).run_once
   end

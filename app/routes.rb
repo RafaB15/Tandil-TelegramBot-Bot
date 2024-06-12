@@ -112,7 +112,7 @@ class Routes
   on_message_pattern %r{/masinfo (?<id_pelicula>.+)} do |bot, message, args|
     id_pelicula = args['id_pelicula']
     conector_api = ConectorApi.new
-    conector_api.obtener_detalles_de_pelicula(id_pelicula)
+    conector_api.obtener_detalles_de_pelicula(id_pelicula, message.from.id.to_i)
     detalles_pelicula = conector_api.respuesta
 
     respuesta = ensamblar_respuesta_mas_info(conector_api.estado, detalles_pelicula)
@@ -145,7 +145,13 @@ def obtener_mas_informacion(detalles, campo)
 end
 
 def generar_lista_de_detalles(detalles_pelicula)
-  respuesta = "- Anio: #{obtener_mas_informacion(detalles_pelicula, 'anio')}\n"
+  respuesta = ''
+  if detalles_pelicula.key?('fue_visto')
+    visto_text = detalles_pelicula['fue_visto'] ? 'Si' : 'No'
+    respuesta += "- Visto: #{visto_text}\n"
+  end
+
+  respuesta += "- Anio: #{obtener_mas_informacion(detalles_pelicula, 'anio')}\n"
   respuesta += "- Premios: #{obtener_mas_informacion(detalles_pelicula, 'premios')}\n"
   respuesta += "- Director: #{obtener_mas_informacion(detalles_pelicula, 'director')}\n"
   respuesta += "- Sinopsis: #{obtener_mas_informacion(detalles_pelicula, 'sinopsis')}\n"
