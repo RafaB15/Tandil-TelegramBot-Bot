@@ -95,7 +95,7 @@ class Routes
     bot.api.send_message(chat_id: message.chat.id, text: respuesta)
   end
 
-  on_message '/sugerencias' do |bot, message|
+  on_message '/sugerenciasnuevos' do |bot, message|
     conector_api = ConectorApi.new
     conector_api.obtener_sugerencias
     sugerencias = conector_api.respuesta

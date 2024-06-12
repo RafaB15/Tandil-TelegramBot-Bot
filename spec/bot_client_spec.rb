@@ -432,7 +432,7 @@ describe 'BotClient' do
   it 'debería recibir un mensaje /contenidos/ultimos-agregados y devolver un mensaje con una lista vacía' do
     token = 'fake_token'
     stub_get_empty_sugerencias
-    when_i_send_text(token, '/sugerencias')
+    when_i_send_text(token, '/sugerenciasnuevos')
     then_i_get_text(token, 'No contamos con sugerencias adecuadas en este momento')
     BotClient.new(token).run_once
   end
@@ -440,7 +440,7 @@ describe 'BotClient' do
   it 'debería recibir un mensaje /contenidos/ultimos-agregados y devolver un mensaje con una lista de sugerencias' do
     token = 'fake_token'
     stub_get_two_sugerencias
-    when_i_send_text(token, '/sugerencias')
+    when_i_send_text(token, '/sugerenciasnuevos')
     result = "Acá tienes algunas sugerencias:\n- [ID: 1] Akira (accion, 1988)\n- [ID: 2] Akira 2 (accion, 1990)\n"
     then_i_get_text(token, result)
     BotClient.new(token).run_once
