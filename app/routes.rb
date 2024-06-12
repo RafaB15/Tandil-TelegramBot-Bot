@@ -115,7 +115,7 @@ class Routes
     conector_api.obtener_detalles_de_pelicula(id_pelicula, message.from.id.to_i)
     detalles_pelicula = conector_api.respuesta
 
-    respuesta = ensamblar_respuesta_mas_info(conector_api.estado, detalles_pelicula)
+    respuesta = ensamblar_respuesta_mas_info(conector_api.estado, detalles_pelicula, id_pelicula)
     bot.api.send_message(chat_id: message.chat.id, text: respuesta)
   end
 end
@@ -185,9 +185,9 @@ def ensamblar_respuesta_registro(conector_api, message)
   end
 end
 
-def ensamblar_respuesta_mas_info(estado, detalles_pelicula)
+def ensamblar_respuesta_mas_info(estado, detalles_pelicula, id_pelicula)
   if estado == 200
-    "Detalles para la película #{detalles_pelicula['titulo']}:\n#{generar_lista_de_detalles(detalles_pelicula)}"
+    "Info de #{detalles_pelicula['titulo']} (#{id_pelicula}):\n#{generar_lista_de_detalles(detalles_pelicula)}"
   elsif estado == 404
     if detalles_pelicula['error'] == 'no encontrado'
       'No se encontraron resultados para el contenido buscado'

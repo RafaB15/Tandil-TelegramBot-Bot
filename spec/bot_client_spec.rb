@@ -488,8 +488,8 @@ describe 'BotClient' do
     }
   end
 
-  def then_i_get_masinfo(token, detalles_pelicula)
-    text = "Detalles para la película #{detalles_pelicula['titulo']}:\n- "
+  def then_i_get_masinfo(token, detalles_pelicula, id_pelicula)
+    text = "Info de #{detalles_pelicula['titulo']} (#{id_pelicula}):\n- "
     if detalles_pelicula.key?('fue_visto')
       visto_text = detalles_pelicula['fue_visto'] ? 'Si' : 'No'
       text << "Visto: #{visto_text}\n- "
@@ -502,8 +502,8 @@ describe 'BotClient' do
     then_i_get_text(token, text)
   end
 
-  def then_i_get_incomplete_masinfo(token, detalles_pelicula)
-    text = "Detalles para la película #{detalles_pelicula['titulo']}:\n- "
+  def then_i_get_incomplete_masinfo(token, detalles_pelicula, id_pelicula)
+    text = "Info de #{detalles_pelicula['titulo']} (#{id_pelicula}):\n- "
     text << "Anio: #{detalles_pelicula['anio']}\n- "
     text << "Premios: #{detalles_pelicula['premios']}\n- "
     text << "Director: No disponible\n- "
@@ -558,7 +558,7 @@ describe 'BotClient' do
     stub_get_contenidos_id_detalles(200, detalles_pelicula.to_json, id_pelicula)
 
     when_i_send_text(token, "/masinfo #{id_pelicula}")
-    then_i_get_masinfo(token, detalles_pelicula)
+    then_i_get_masinfo(token, detalles_pelicula, id_pelicula)
 
     BotClient.new(token).run_once
   end
@@ -607,7 +607,7 @@ describe 'BotClient' do
     stub_get_contenidos_id_detalles(200, detalles_pelicula.to_json, id_pelicula)
 
     when_i_send_text(token, "/masinfo #{id_pelicula}")
-    then_i_get_incomplete_masinfo(token, detalles_pelicula)
+    then_i_get_incomplete_masinfo(token, detalles_pelicula, id_pelicula)
 
     BotClient.new(token).run_once
   end
@@ -620,7 +620,7 @@ describe 'BotClient' do
     stub_get_contenidos_id_detalles(200, detalles_pelicula.to_json, id_pelicula)
 
     when_i_send_text(token, "/masinfo #{id_pelicula}")
-    then_i_get_masinfo(token, detalles_pelicula)
+    then_i_get_masinfo(token, detalles_pelicula, id_pelicula)
 
     BotClient.new(token).run_once
   end
@@ -633,7 +633,7 @@ describe 'BotClient' do
     stub_get_contenidos_id_detalles(200, detalles_pelicula.to_json, id_pelicula)
 
     when_i_send_text(token, "/masinfo #{id_pelicula}")
-    then_i_get_masinfo(token, detalles_pelicula)
+    then_i_get_masinfo(token, detalles_pelicula, id_pelicula)
 
     BotClient.new(token).run_once
   end
