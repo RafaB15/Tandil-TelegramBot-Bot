@@ -5,7 +5,7 @@ require "#{File.dirname(__FILE__)}/../lib/conector_api"
 class Routes
   include Routing
 
-  on_message '/start' do |bot, message|
+  on_message '/empezar' do |bot, message|
     bot.api.send_message(chat_id: message.chat.id, text: "Hola, #{message.from.first_name}")
   end
 

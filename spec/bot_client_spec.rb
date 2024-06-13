@@ -282,7 +282,7 @@ describe 'BotClient' do
   it 'should get a /start message and respond with Hola' do
     token = 'fake_token'
 
-    when_i_send_text(token, '/start')
+    when_i_send_text(token, '/empezar')
     then_i_get_text(token, 'Hola, Emilio')
 
     app = BotClient.new(token)
