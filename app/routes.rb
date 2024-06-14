@@ -6,23 +6,28 @@ class Routes
   include Routing
 
   on_message '/empezar' do |bot, message|
-    bot.api.send_message(chat_id: message.chat.id, text: "Hola, #{message.from.first_name}")
+    text = "Hola, #{message.from.first_name}"
+    bot.api.send_message(chat_id: message.chat.id, text:)
   end
 
   on_message '/version' do |bot, message|
     version_api = ConectorApi.new.obtener_version
 
-    bot.api.send_message(chat_id: message.chat.id, text: "version bot: #{Version.current}, version api: #{version_api}")
+    text = "version bot: #{Version.current}, version api: #{version_api}"
+    bot.api.send_message(chat_id: message.chat.id, text:)
   end
 
   on_message_pattern %r{/registrar (?<email>.*)} do |bot, message, args|
     email_valido = args['email'].match?(/\A[\w+-.]+@[a-z\d-]+(.[a-z]+)*.[a-z]+\z/i)
+
+    email = args['email']
     id_telegram = message.from.id.to_i
+
     text = 'Error, tiene que enviar un email válido'
 
     if email_valido
       conector_api = ConectorApi.new
-      conector_api.crear_usuario(args['email'], id_telegram)
+      conector_api.crear_usuario(email, id_telegram)
 
       text = ensamblar_respuesta_registro(conector_api, message)
     end
@@ -30,27 +35,27 @@ class Routes
     bot.api.send_message(chat_id: message.chat.id, text:)
   end
 
-  on_message '/masvistos' do |bot, message|
+  on_message '/sugerenciasmasvistos' do |bot, message|
     conector_api = ConectorApi.new
-    conector_api.obtener_peliculas_mas_vistas
-    top_peliculas = conector_api.respuesta
+    conector_api.obtener_contenidos_mas_vistas
+    top_contenido = conector_api.cuerpo
 
-    if top_peliculas.empty?
+    if top_contenido.empty?
       bot.api.send_message(chat_id: message.chat.id, text: 'No hay datos de visualizaciones de películas en el momento')
     else
-      respuesta = ensamblar_respuesta(top_peliculas)
+      respuesta = ensamblar_respuesta(top_contenido)
 
       bot.api.send_message(chat_id: message.chat.id, text: respuesta)
     end
   end
 
-  on_message_pattern %r{/calificar (?<id_pelicula>\d+) (?<calificacion>\d+)} do |bot, message, args|
-    id_pelicula = args['id_pelicula'].to_i
+  on_message_pattern %r{/calificar (?<id_contenido>\d+) (?<calificacion>\d+)} do |bot, message, args|
+    id_contenido = args['id_contenido'].to_i
     calificacion = args['calificacion'].to_i
     id_telegram = message.from.id.to_i
 
     conector_api = ConectorApi.new
-    conector_api.calificar_contenido(id_telegram, id_pelicula, calificacion)
+    conector_api.calificar_contenido(id_telegram, id_contenido, calificacion)
 
     text = if conector_api.estado == 201
              'Calificacion registrada exitosamente'
@@ -61,10 +66,10 @@ class Routes
     bot.api.send_message(chat_id: message.chat.id, text:)
   end
 
-  on_message_pattern %r{/marcar_favorita (?<id_pelicula>\d+)} do |bot, message, args|
-    id_pelicula = args['id_pelicula'].to_i
+  on_message_pattern %r{/marcarfavorito (?<id_contenido>\d+)} do |bot, message, args|
+    id_contenido = args['id_contenido'].to_i
     conector_api = ConectorApi.new
-    conector_api.marcar_favorita(message.from.id.to_i, id_pelicula)
+    conector_api.marcar_favorita(message.from.id.to_i, id_contenido)
 
     text = if conector_api.estado == 201
              'Contenido añadido a favoritos'
@@ -77,46 +82,54 @@ class Routes
 
   on_message_pattern %r{/buscartitulo (?<titulo>.+)} do |bot, message, args|
     conector_api = ConectorApi.new
-    conector_api.buscar_pelicula_por_titulo(args['titulo'])
-    peliculas = conector_api.respuesta
+    conector_api.buscar_contenido_por_titulo(args['titulo'])
+    contenidos = conector_api.cuerpo
 
-    respuesta = choose_output(peliculas, 'No se encontraron resultados para la búsqueda',
-                              "Acá están los titulos que coinciden con tu busqueda:\n#{generar_lista_de_contenidos(peliculas)}")
+    respuesta = ensamblar_respuesta_lista(contenidos, 'No se encontraron resultados para la búsqueda',
+                                          "Acá están los titulos que coinciden con tu busqueda:\n#{generar_lista_de_contenidos(contenidos)}")
     bot.api.send_message(chat_id: message.chat.id, text: respuesta)
   end
 
   on_message '/misfavoritos' do |bot, message|
     conector_api = ConectorApi.new
     conector_api.obtener_favoritos(message.from.id.to_i)
-    favoritos = conector_api.respuesta
+    favoritos = conector_api.cuerpo
 
-    respuesta = choose_output(favoritos, 'Parece que no tienes favoritos! Empieza a marcar tus contenidos como favoritos para verlos aquí.',
-                              "Aquí tienes tu listado de favoritos:\n#{generar_lista_de_contenidos(favoritos)}")
+    respuesta = ensamblar_respuesta_lista(favoritos, 'Parece que no tienes favoritos! Empieza a marcar tus contenidos como favoritos para verlos aquí.',
+                                          "Aquí tienes tu listado de favoritos:\n#{generar_lista_de_contenidos(favoritos)}")
     bot.api.send_message(chat_id: message.chat.id, text: respuesta)
   end
 
   on_message '/sugerenciasnuevos' do |bot, message|
     conector_api = ConectorApi.new
     conector_api.obtener_sugerencias
-    sugerencias = conector_api.respuesta
 
-    respuesta = choose_output(sugerencias, '¡No hay nuevos contenidos esta semana, estate atento a las novedades!',
-                              "Acá tienes algunas sugerencias:\n#{generar_lista_de_contenidos(sugerencias)}")
-    bot.api.send_message(chat_id: message.chat.id, text: respuesta)
+    sugerencias = conector_api.cuerpo
+
+    text = ensamblar_respuesta_lista(sugerencias, '¡No hay nuevos contenidos esta semana, estate atento a las novedades!',
+                                     "Acá tienes algunas sugerencias:\n#{generar_lista_de_contenidos(sugerencias)}")
+
+    bot.api.send_message(chat_id: message.chat.id, text:)
+  end
+
+  on_message_pattern %r{/masinfo (?<id_contenido>.+)} do |bot, message, args|
+    id_contenido = args['id_contenido']
+    id_telegram = message.from.id.to_i
+
+    conector_api = ConectorApi.new
+    conector_api.obtener_detalles_de_contenido(id_contenido, id_telegram)
+
+    detalles_contenido = conector_api.cuerpo
+
+    text = ensamblar_respuesta_mas_info(conector_api.estado, detalles_contenido, id_contenido)
+
+    bot.api.send_message(chat_id: message.chat.id, text:)
   end
 
   default do |bot, message|
-    bot.api.send_message(chat_id: message.chat.id, text: '¿Uh? ¡No te entiendo! ¿Me repetís la pregunta?')
-  end
+    text = '¿Uh? ¡No te entiendo! ¿Me repetís la pregunta?'
 
-  on_message_pattern %r{/masinfo (?<id_pelicula>.+)} do |bot, message, args|
-    id_pelicula = args['id_pelicula']
-    conector_api = ConectorApi.new
-    conector_api.obtener_detalles_de_pelicula(id_pelicula, message.from.id.to_i)
-    detalles_pelicula = conector_api.respuesta
-
-    respuesta = ensamblar_respuesta_mas_info(conector_api.estado, detalles_pelicula, id_pelicula)
-    bot.api.send_message(chat_id: message.chat.id, text: respuesta)
+    bot.api.send_message(chat_id: message.chat.id, text:)
   end
 end
 
@@ -132,41 +145,41 @@ def generar_lista_de_contenidos(contenidos)
   respuesta
 end
 
-def choose_output(options, empty_response, list_response)
-  if options.empty?
-    empty_response
+def ensamblar_respuesta_lista(sugerencias, respuesta_lista_vacia, respuesta_lista_con_contenido)
+  if sugerencias.empty?
+    respuesta_lista_vacia
   else
-    list_response
+    respuesta_lista_con_contenido
   end
 end
 
 def obtener_mas_informacion(detalles, campo)
-  detalles[campo].to_s.strip.empty? ? 'No disponible' : detalles[campo]
+  detalles[campo].nil? ? 'No disponible' : detalles[campo]
 end
 
-def generar_lista_de_detalles(detalles_pelicula)
+def generar_lista_de_detalles(detalles_contenido)
   respuesta = ''
-  if detalles_pelicula.key?('fue_visto')
-    visto_text = detalles_pelicula['fue_visto'] ? '¡Ya lo viste!' : '¡No lo viste!'
+  if detalles_contenido.key?('fue_visto')
+    visto_text = detalles_contenido['fue_visto'] ? '¡Ya lo viste!' : '¡No lo viste!'
     respuesta += "- #{visto_text}\n"
   end
 
-  respuesta += "- Anio: #{obtener_mas_informacion(detalles_pelicula, 'anio')}\n"
-  respuesta += "- Premios: #{obtener_mas_informacion(detalles_pelicula, 'premios')}\n"
-  respuesta += "- Director: #{obtener_mas_informacion(detalles_pelicula, 'director')}\n"
-  respuesta += "- Sinopsis: #{obtener_mas_informacion(detalles_pelicula, 'sinopsis')}\n"
+  respuesta += "- Anio: #{obtener_mas_informacion(detalles_contenido, 'anio')}\n"
+  respuesta += "- Premios: #{obtener_mas_informacion(detalles_contenido, 'premios')}\n"
+  respuesta += "- Director: #{obtener_mas_informacion(detalles_contenido, 'director')}\n"
+  respuesta += "- Sinopsis: #{obtener_mas_informacion(detalles_contenido, 'sinopsis')}\n"
 
   respuesta
 end
 
-def ensamblar_respuesta(top_peliculas)
+def ensamblar_respuesta(top_contenido)
   respuesta = "Las películas con más visualizaciones son:\n"
-  top_peliculas.each do |pelicula|
-    id_pelicula = pelicula['id']
-    titulo = pelicula['pelicula']['titulo']
-    anio = pelicula['pelicula']['anio']
-    genero = pelicula['pelicula']['genero']
-    respuesta += "  [ID: #{id_pelicula}] #{titulo} (#{genero}, #{anio})\n"
+  top_contenido.each do |contenido|
+    id_contenido = contenido['id']
+    titulo = contenido['pelicula']['titulo']
+    anio = contenido['pelicula']['anio']
+    genero = contenido['pelicula']['genero']
+    respuesta += "  [ID: #{id_contenido}] #{titulo} (#{genero}, #{anio})\n"
   end
   respuesta
 end
@@ -175,7 +188,7 @@ def ensamblar_respuesta_registro(conector_api, message)
   if conector_api.estado == 201
     "Bienvenido, cinéfilo #{message.from.first_name}!"
   elsif conector_api.estado == 409
-    if conector_api.respuesta['details']['field'] == 'id_telegram'
+    if conector_api.cuerpo['details']['field'] == 'id_telegram'
       'Error, tu usuario de telegram ya esta asociado a una cuenta existente'
     else
       'Error, el email ingresado ya esta asociado a una cuenta existente'
@@ -185,13 +198,13 @@ def ensamblar_respuesta_registro(conector_api, message)
   end
 end
 
-def ensamblar_respuesta_mas_info(estado, detalles_pelicula, id_pelicula)
+def ensamblar_respuesta_mas_info(estado, detalles_contenido, id_contenido)
   if estado == 200
-    "Info de #{detalles_pelicula['titulo']} (#{id_pelicula}):\n#{generar_lista_de_detalles(detalles_pelicula)}"
+    "Info de #{detalles_contenido['titulo']} (#{id_contenido}):\n#{generar_lista_de_detalles(detalles_contenido)}"
   elsif estado == 404
-    if detalles_pelicula['error'] == 'no encontrado'
+    if detalles_contenido['error'] == 'no encontrado'
       'No se encontraron resultados para el contenido buscado'
-    elsif detalles_pelicula['error'] == 'no hay detalles para mostrar'
+    elsif detalles_contenido['error'] == 'no hay detalles para mostrar'
       'No se encontraron detalles para el contenido buscado'
     else
       'Error de la API'

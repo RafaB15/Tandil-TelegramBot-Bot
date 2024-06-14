@@ -137,12 +137,12 @@ def then_i_get_top_visualizaciones(token)
   then_i_get_text(token, text)
 end
 
-def stub_post_request_calificacion(id_telegram, id_pelicula, calificacion, status)
-  response = { id: 1, id_telegram:, id_pelicula:, calificacion: }
+def stub_post_request_calificaciones(id_telegram, id_contenido, calificacion, status)
+  response = { id: 1, id_telegram:, id_contenido:, calificacion: }
 
   stub_request(:post, 'http://fake/calificacion')
     .with(
-      body: "{\"id_telegram\":#{id_telegram},\"id_pelicula\":#{id_pelicula},\"calificacion\":#{calificacion}}",
+      body: "{\"id_telegram\":#{id_telegram},\"id_pelicula\":#{id_contenido},\"calificacion\":#{calificacion}}",
       headers: {
         'Accept' => '*/*',
         'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
@@ -153,7 +153,7 @@ def stub_post_request_calificacion(id_telegram, id_pelicula, calificacion, statu
     .to_return(status:, body: response.to_json, headers: {})
 end
 
-def stub_post_request_marcar_favorita(email, id_contenido, _status)
+def stub_post_request_favoritos(email, id_contenido, _status)
   _response = { id: 1, email:, id_contenido: }
   stub_request(:post, 'http://fake/favorito')
     .with(
@@ -168,7 +168,7 @@ def stub_post_request_marcar_favorita(email, id_contenido, _status)
     .to_return(status: 201, body: { id: 1 }.to_json, headers: {})
 end
 
-def stub_get_empty_matching_title
+def stub_get_request_contenidos_con_ningun_titulo_similar
   response = []
 
   stub_request(:get, 'http://fake/contenido?Content-Type=application/json&titulo=Titanic')
@@ -182,7 +182,7 @@ def stub_get_empty_matching_title
     .to_return(status: 200, body: response.to_json, headers: {})
 end
 
-def stub_get_one_matching_title
+def stub_get_request_contenidos_con_un_titulo_similar
   response = [{ 'id' => 1, 'titulo' => 'Akira', 'anio' => 1988, 'genero' => 'accion' }]
 
   stub_request(:get, 'http://fake/contenido?Content-Type=application/json&titulo=Akira')
@@ -196,7 +196,7 @@ def stub_get_one_matching_title
     .to_return(status: 200, body: response.to_json, headers: {})
 end
 
-def stub_get_two_matching_titles
+def stub_get_request_contenidos_con_dos_titulos_similares
   response = [{ 'id' => 1, 'titulo' => 'Akira', 'anio' => 1988, 'genero' => 'accion' },
               { 'id' => 2, 'titulo' => 'Akira 2', 'anio' => 1990, 'genero' => 'accion' }]
 
@@ -211,7 +211,7 @@ def stub_get_two_matching_titles
     .to_return(status: 200, body: response.to_json, headers: {})
 end
 
-def stub_get_empty_users_favorite
+def stub_get_request_favoritos_sin_contenidos_faveados
   response = []
 
   stub_request(:get, 'http://fake/favoritos?Content-Type=application/json&id_telegram=141733544')
@@ -225,7 +225,7 @@ def stub_get_empty_users_favorite
     .to_return(status: 200, body: response.to_json, headers: {})
 end
 
-def stub_get_one_users_favorite
+def stub_get_request_favoritos_con_un_contenido_faveado
   response = [{ 'id' => 1, 'titulo' => 'Transformers', 'anio' => 2007, 'genero' => 'accion' }]
 
   stub_request(:get, 'http://fake/favoritos?Content-Type=application/json&id_telegram=141733544')
@@ -239,7 +239,7 @@ def stub_get_one_users_favorite
     .to_return(status: 200, body: response.to_json, headers: {})
 end
 
-def stub_get_empty_sugerencias
+def stub_get_request_contenidos_ultimosagregados_sin_contenido_para_sugerir
   response = []
 
   stub_request(:get, 'http://fake/contenidos/ultimos-agregados?Content-Type=application/json')
@@ -253,7 +253,7 @@ def stub_get_empty_sugerencias
     .to_return(status: 200, body: response.to_json, headers: {})
 end
 
-def stub_get_two_sugerencias
+def stub_get_request_contenidos_ultimosagregados_con_dos_contenidos_para_sugerir
   response = [{ 'id' => 1, 'titulo' => 'Akira', 'anio' => 1988, 'genero' => 'accion' },
               { 'id' => 2, 'titulo' => 'Akira 2', 'anio' => 1990, 'genero' => 'accion' }]
 
@@ -266,6 +266,44 @@ def stub_get_two_sugerencias
       }
     )
     .to_return(status: 200, body: response.to_json, headers: {})
+end
+
+def stub_get_contenidos_id_detalles(status, body, id_contenido)
+  stub_request(:get, "http://fake/contenidos/#{id_contenido}/detalles?Content-Type=application/json&id_telegram=141733544")
+    .with(
+      headers: {
+        'Accept' => '*/*',
+        'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+        'User-Agent' => 'Faraday v2.7.4'
+      }
+    )
+    .to_return(status:, body:, headers: {})
+end
+
+def stub_get_contenidos_id_detalles_id_invalido(id_contenido)
+  body = { 'error' => 'no encontrado' }
+  stub_request(:get, "http://fake/contenidos/#{id_contenido}/detalles?Content-Type=application/json&id_telegram=141733544")
+    .with(
+      headers: {
+        'Accept' => '*/*',
+        'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+        'User-Agent' => 'Faraday v2.7.4'
+      }
+    )
+    .to_return(status: 404, body: body.to_json, headers: {})
+end
+
+def stub_get_contenidos_id_detalles_id_no_corresponde_a_omdb(id_contenido)
+  body = { 'error' => 'no hay detalles para mostrar' }
+  stub_request(:get, "http://fake/contenidos/#{id_contenido}/detalles?Content-Type=application/json&id_telegram=141733544")
+    .with(
+      headers: {
+        'Accept' => '*/*',
+        'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+        'User-Agent' => 'Faraday v2.7.4'
+      }
+    )
+    .to_return(status: 404, body: body.to_json, headers: {})
 end
 
 describe 'BotClient' do
@@ -318,13 +356,13 @@ describe 'BotClient' do
     BotClient.new(token).run_once
   end
 
-  def stub_and_send_first_user(token)
+  def stub_and_send_primer_usuario(token)
     stub_post_request_usuario('emilio@gmail.com', 1_234_556, 201)
     when_i_send_text_with_id_telegram(token, '/registrar emilio@gmail.com', 1_234_556)
     then_i_get_text(token, 'Bienvenido, cinéfilo Emilio!')
   end
 
-  def stub_and_send_second_user(token)
+  def stub_and_send_segundo_usuario(token)
     message = 'El telegram ID ya está asociado con una cuenta existente.'
     field = :id_telegram
     stub_post_request_usuario_error('pablito@gmail.com', 1_234_556, 409, message, field)
@@ -332,7 +370,7 @@ describe 'BotClient' do
     then_i_get_text(token, 'Error, tu usuario de telegram ya esta asociado a una cuenta existente')
   end
 
-  def stub_and_send_third_user(token)
+  def stub_and_send_tercer_usuario(token)
     message = 'El email ya está asociado con una cuenta existente.'
     field = :email
     stub_post_request_usuario_error('emilio@gmail.com', 987_654_3, 409, message, field)
@@ -340,106 +378,107 @@ describe 'BotClient' do
     then_i_get_text(token, 'Error, el email ingresado ya esta asociado a una cuenta existente')
   end
 
-  it 'debería recibir un mensaje /registrar con número de telegram repetido y responder con un mensaje de error' do
+  it 'deberia recibir un mensaje /registrar con número de telegram repetido y responder con un mensaje de error' do
     token = 'fake_token'
-    stub_and_send_first_user(token)
-    stub_and_send_second_user(token)
+    stub_and_send_primer_usuario(token)
+    stub_and_send_segundo_usuario(token)
     BotClient.new(token).run_once
   end
 
-  it 'debería recibir un mensaje /registrar con un email ya registrado y responder con un error' do
+  it 'deberia recibir un mensaje /registrar con un email ya registrado y responder con un error' do
     token = 'fake_token'
-    stub_and_send_first_user(token)
-    stub_and_send_third_user(token)
+    stub_and_send_primer_usuario(token)
+    stub_and_send_tercer_usuario(token)
     BotClient.new(token).run_once
   end
 
-  it 'debería recibir un mensaje /masvistos y devolver los contenidos más vistos de la plataforma' do
+  it 'deberia recibir un mensaje /sugerenciasmasvistos y devolver los contenidos más vistos de la plataforma' do
     token = 'fake_token'
     stub_get_top_visualizaciones
-    when_i_send_text(token, '/masvistos')
+    when_i_send_text(token, '/sugerenciasmasvistos')
     then_i_get_top_visualizaciones(token)
     BotClient.new(token).run_once
   end
 
-  it 'debería recibir un mensaje /masvistos cuando no hay visualizaciones de películas y devolver un mensaje de la situación' do
+  it 'deberia recibir un mensaje /sugerenciasmasvistos cuando no hay visualizaciones de películas y devolver un mensaje de la situación' do
     token = 'fake_token'
     stub_get_empty_top_visualizaciones
-    when_i_send_text(token, '/masvistos')
+    when_i_send_text(token, '/sugerenciasmasvistos')
     then_i_get_text(token, 'No hay datos de visualizaciones de películas en el momento')
     BotClient.new(token).run_once
   end
 
-  it 'debería recibir un mensaje /calificar {id_pelicula} {calificacion} y devolver un mensaje' do
+  it 'deberia recibir un mensaje /calificar {id_contenido} {calificacion} y devolver un mensaje' do
     token = 'fake_token'
-    stub_post_request_calificacion(141_733_544, 97, 4, 201)
+    stub_post_request_calificaciones(141_733_544, 97, 4, 201)
+
     when_i_send_text(token, '/calificar 97 4')
     then_i_get_text(token, 'Calificacion registrada exitosamente')
     BotClient.new(token).run_once
   end
 
-  it 'debería recibir un mensaje /marcar_favorita {id_pelicula} y devolver un mensaje de contenido anadido a favoritos' do\
+  it 'deberia recibir un mensaje /marcarfavorito {id_contenido} y devolver un mensaje de contenido anadido a favoritos' do\
     token = 'fake_token'
-    stub_post_request_marcar_favorita('test@test.com', 1, 201)
-    when_i_send_text(token, '/marcar_favorita 1')
+    stub_post_request_favoritos('test@test.com', 1, 201)
+    when_i_send_text(token, '/marcarfavorito 1')
     then_i_get_text(token, 'Contenido añadido a favoritos')
     BotClient.new(token).run_once
   end
 
-  it 'debería recibir un mensaje /buscartitulo {titulo} y devolver un mensaje con los resultados de la búsqueda cuando no hay coincidencias' do
+  it 'deberia recibir un mensaje /buscartitulo {titulo} y devolver un mensaje con los resultados de la busqueda cuando no hay coincidencias' do
     token = 'fake_token'
-    stub_get_empty_matching_title
+    stub_get_request_contenidos_con_ningun_titulo_similar
     when_i_send_text(token, '/buscartitulo Titanic')
     then_i_get_text(token, 'No se encontraron resultados para la búsqueda')
     BotClient.new(token).run_once
   end
 
-  it 'debería recibir un mensaje /buscartitulo {titulo} y devolver un mensaje con los resultados de la búsqueda cuando hay una coincidencia' do
+  it 'deberia recibir un mensaje /buscartitulo {titulo} y devolver un mensaje con los resultados de la búsqueda cuando hay una coincidencia' do
     token = 'fake_token'
-    stub_get_one_matching_title
+    stub_get_request_contenidos_con_un_titulo_similar
     when_i_send_text(token, '/buscartitulo Akira')
     result = "Acá están los titulos que coinciden con tu busqueda:\n- [ID: 1] Akira (accion, 1988)\n"
     then_i_get_text(token, result)
     BotClient.new(token).run_once
   end
 
-  it 'debería recibir un mensaje /buscartitulo {titulo} y devolver un mensaje con los resultados de la búsqueda cuando hay varias coincidencias' do
+  it 'deberia recibir un mensaje /buscartitulo {titulo} y devolver un mensaje con los resultados de la búsqueda cuando hay varias coincidencias' do
     token = 'fake_token'
-    stub_get_two_matching_titles
+    stub_get_request_contenidos_con_dos_titulos_similares
     when_i_send_text(token, '/buscartitulo Akira')
     result = "Acá están los titulos que coinciden con tu busqueda:\n- [ID: 1] Akira (accion, 1988)\n- [ID: 2] Akira 2 (accion, 1990)\n"
     then_i_get_text(token, result)
     BotClient.new(token).run_once
   end
 
-  it 'debería recibir un mensaje /misfavoritos y deolver un mensaje diciendo que el usuario no tiene favoritos' do
+  it 'deberia recibir un mensaje /misfavoritos y deolver un mensaje diciendo que el usuario no tiene favoritos' do
     token = 'fake_token'
-    stub_get_empty_users_favorite
+    stub_get_request_favoritos_sin_contenidos_faveados
     when_i_send_text(token, '/misfavoritos')
     then_i_get_text(token, 'Parece que no tienes favoritos! Empieza a marcar tus contenidos como favoritos para verlos aquí.')
     BotClient.new(token).run_once
   end
 
-  it 'debería recibir un mensaje /misfavoritos y devolver un mensaje cuando un usuario tiene una película como favorita' do
+  it 'deberia recibir un mensaje /misfavoritos y devolver un mensaje cuando un usuario tiene una película como favorita' do
     token = 'fake_token'
-    stub_get_one_users_favorite
+    stub_get_request_favoritos_con_un_contenido_faveado
     when_i_send_text(token, '/misfavoritos')
     result = "Aquí tienes tu listado de favoritos:\n- [ID: 1] Transformers (accion, 2007)\n"
     then_i_get_text(token, result)
     BotClient.new(token).run_once
   end
 
-  it 'debería recibir un mensaje /contenidos/ultimos-agregados y devolver un mensaje con una lista vacía' do
+  it 'deberia recibir un mensaje /contenidos/ultimos-agregados y devolver un mensaje con una lista vacía' do
     token = 'fake_token'
-    stub_get_empty_sugerencias
+    stub_get_request_contenidos_ultimosagregados_sin_contenido_para_sugerir
     when_i_send_text(token, '/sugerenciasnuevos')
     then_i_get_text(token, '¡No hay nuevos contenidos esta semana, estate atento a las novedades!')
     BotClient.new(token).run_once
   end
 
-  it 'debería recibir un mensaje /contenidos/ultimos-agregados y devolver un mensaje con una lista de sugerencias' do
+  it 'deberia recibir un mensaje /contenidos/ultimos-agregados y devolver un mensaje con una lista de sugerencias' do
     token = 'fake_token'
-    stub_get_two_sugerencias
+    stub_get_request_contenidos_ultimosagregados_con_dos_contenidos_para_sugerir
     when_i_send_text(token, '/sugerenciasnuevos')
     result = "Acá tienes algunas sugerencias:\n- [ID: 1] Akira (accion, 1988)\n- [ID: 2] Akira 2 (accion, 1990)\n"
     then_i_get_text(token, result)
@@ -461,7 +500,6 @@ describe 'BotClient' do
       'titulo' => 'Iron Man',
       'anio' => 2008,
       'premios' => 'Nominated for 2 Oscars. 24 wins & 73 nominations total',
-      'director' => '',
       'sinopsis' => 'After being held captive in an Afghan cave, billionaire engineer Tony Stark creates a unique weaponized suit of armor to fight evil'
     }
   end
@@ -488,152 +526,114 @@ describe 'BotClient' do
     }
   end
 
-  def then_i_get_masinfo(token, detalles_pelicula, id_pelicula)
-    text = "Info de #{detalles_pelicula['titulo']} (#{id_pelicula}):\n- "
-    if detalles_pelicula.key?('fue_visto')
-      visto_text = detalles_pelicula['fue_visto'] ? '¡Ya lo viste!' : '¡No lo viste!'
+  def then_i_get_masinfo(token, detalles_contenido, id_contenido)
+    text = "Info de #{detalles_contenido['titulo']} (#{id_contenido}):\n- "
+    if detalles_contenido.key?('fue_visto')
+      visto_text = detalles_contenido['fue_visto'] ? '¡Ya lo viste!' : '¡No lo viste!'
       text << "#{visto_text}\n- "
     end
-    text << "Anio: #{detalles_pelicula['anio']}\n- "
-    text << "Premios: #{detalles_pelicula['premios']}\n- "
-    text << "Director: #{detalles_pelicula['director']}\n- "
-    text << "Sinopsis: #{detalles_pelicula['sinopsis']}\n"
+    text << "Anio: #{detalles_contenido['anio']}\n- "
+    text << "Premios: #{detalles_contenido['premios']}\n- "
+    text << "Director: #{detalles_contenido['director']}\n- "
+    text << "Sinopsis: #{detalles_contenido['sinopsis']}\n"
 
     then_i_get_text(token, text)
   end
 
-  def then_i_get_incomplete_masinfo(token, detalles_pelicula, id_pelicula)
-    text = "Info de #{detalles_pelicula['titulo']} (#{id_pelicula}):\n- "
-    text << "Anio: #{detalles_pelicula['anio']}\n- "
-    text << "Premios: #{detalles_pelicula['premios']}\n- "
+  def then_i_get_incomplete_masinfo(token, detalles_contenido, id_contenido)
+    text = "Info de #{detalles_contenido['titulo']} (#{id_contenido}):\n- "
+    text << "Anio: #{detalles_contenido['anio']}\n- "
+    text << "Premios: #{detalles_contenido['premios']}\n- "
     text << "Director: No disponible\n- "
-    text << "Sinopsis: #{detalles_pelicula['sinopsis']}\n"
+    text << "Sinopsis: #{detalles_contenido['sinopsis']}\n"
 
     then_i_get_text(token, text)
   end
 
-  def stub_get_contenidos_id_detalles(status, body, id_pelicula)
-    stub_request(:get, "http://fake/contenidos/#{id_pelicula}/detalles?Content-Type=application/json&id_telegram=141733544")
-      .with(
-        headers: {
-          'Accept' => '*/*',
-          'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-          'User-Agent' => 'Faraday v2.7.4'
-        }
-      )
-      .to_return(status:, body:, headers: {})
-  end
-
-  def stub_get_contenidos_id_detalles_id_invalido(id_pelicula)
-    body = { 'error' => 'no encontrado' }
-    stub_request(:get, "http://fake/contenidos/#{id_pelicula}/detalles?Content-Type=application/json&id_telegram=141733544")
-      .with(
-        headers: {
-          'Accept' => '*/*',
-          'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-          'User-Agent' => 'Faraday v2.7.4'
-        }
-      )
-      .to_return(status: 404, body: body.to_json, headers: {})
-  end
-
-  def stub_get_contenidos_id_detalles_id_no_corresponde_a_omdb(id_pelicula)
-    body = { 'error' => 'no hay detalles para mostrar' }
-    stub_request(:get, "http://fake/contenidos/#{id_pelicula}/detalles?Content-Type=application/json&id_telegram=141733544")
-      .with(
-        headers: {
-          'Accept' => '*/*',
-          'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
-          'User-Agent' => 'Faraday v2.7.4'
-        }
-      )
-      .to_return(status: 404, body: body.to_json, headers: {})
-  end
-
-  it 'debería recibir un mensaje /masinfo {id_pelicula} y devolver un mensaje con mas detalles sobre esa pelicula' do
+  it 'deberia recibir un mensaje /masinfo {id_contenido} y devolver un mensaje con mas detalles sobre ese contenido' do
     token = 'fake_token'
-    detalles_pelicula = response_get_contenidos_id_detalles
-    id_pelicula = 1
+    detalles_contenido = response_get_contenidos_id_detalles
+    id_contenido = 1
 
-    stub_get_contenidos_id_detalles(200, detalles_pelicula.to_json, id_pelicula)
+    stub_get_contenidos_id_detalles(200, detalles_contenido.to_json, id_contenido)
 
-    when_i_send_text(token, "/masinfo #{id_pelicula}")
-    then_i_get_masinfo(token, detalles_pelicula, id_pelicula)
+    when_i_send_text(token, "/masinfo #{id_contenido}")
+    then_i_get_masinfo(token, detalles_contenido, id_contenido)
 
     BotClient.new(token).run_once
   end
 
-  it 'debería recibir un mensaje /masinfo {id_pelicula} con id_pelicula invalido y devolver un mensaje de error' do
+  it 'deberia recibir un mensaje /masinfo {id_contenido} con id_contenido invalido y devolver un mensaje de error' do
     token = 'fake_token'
 
-    id_pelicula = 'id_pelicula_invalido'
+    id_contenido = 'id_contenido_invalido'
 
-    stub_get_contenidos_id_detalles_id_invalido(id_pelicula)
+    stub_get_contenidos_id_detalles_id_invalido(id_contenido)
 
-    when_i_send_text(token, "/masinfo #{id_pelicula}")
+    when_i_send_text(token, "/masinfo #{id_contenido}")
     then_i_get_text(token, 'No se encontraron resultados para el contenido buscado')
     BotClient.new(token).run_once
   end
 
-  it 'debería recibir un mensaje /masinfo {id_pelicula} con id_pelicula no en la base de datos y devolver un mensaje de error' do
+  it 'deberia recibir un mensaje /masinfo {id_contenido} con id_contenido no en la base de datos y devolver un mensaje de error' do
     token = 'fake_token'
 
-    id_pelicula = '2'
+    id_contenido = '2'
 
-    stub_get_contenidos_id_detalles_id_invalido(id_pelicula)
+    stub_get_contenidos_id_detalles_id_invalido(id_contenido)
 
-    when_i_send_text(token, "/masinfo #{id_pelicula}")
+    when_i_send_text(token, "/masinfo #{id_contenido}")
     then_i_get_text(token, 'No se encontraron resultados para el contenido buscado')
     BotClient.new(token).run_once
   end
 
-  it 'debería recibir un mensaje /masinfo {id_pelicula} con id_pelicula no en omdb y devolver un mensaje de error' do
+  it 'deberia recibir un mensaje /masinfo {id_contenido} con id_contenido no en omdb y devolver un mensaje de error' do
     token = 'fake_token'
 
-    id_pelicula = '2'
+    id_contenido = '2'
 
-    stub_get_contenidos_id_detalles_id_no_corresponde_a_omdb(id_pelicula)
+    stub_get_contenidos_id_detalles_id_no_corresponde_a_omdb(id_contenido)
 
-    when_i_send_text(token, "/masinfo #{id_pelicula}")
+    when_i_send_text(token, "/masinfo #{id_contenido}")
     then_i_get_text(token, 'No se encontraron detalles para el contenido buscado')
     BotClient.new(token).run_once
   end
 
-  it 'debería recibir un mensaje /masinfo {id_pelicula} con id_pelicula en imbd pero con campos faltantes y la api se encargará de no mostrarlos' do
+  it 'deberia recibir un mensaje /masinfo {id_contenido} con id_contenido en OMDb pero con campos faltantes y la api se encargará de no mostrarlos' do
     token = 'fake_token'
-    detalles_pelicula = response_incompleta_get_contenidos_id_detalles
-    id_pelicula = 1
+    detalles_contenido = response_incompleta_get_contenidos_id_detalles
+    id_contenido = 1
 
-    stub_get_contenidos_id_detalles(200, detalles_pelicula.to_json, id_pelicula)
+    stub_get_contenidos_id_detalles(200, detalles_contenido.to_json, id_contenido)
 
-    when_i_send_text(token, "/masinfo #{id_pelicula}")
-    then_i_get_incomplete_masinfo(token, detalles_pelicula, id_pelicula)
+    when_i_send_text(token, "/masinfo #{id_contenido}")
+    then_i_get_incomplete_masinfo(token, detalles_contenido, id_contenido)
 
     BotClient.new(token).run_once
   end
 
-  it 'deberia recibir un mensaje /masinfo {id_pelicula} con id_pelicula en imbd y con telegram id y ver que dice no visto' do
+  it 'deberia recibir un mensaje /masinfo {id_contenido} con id_contenido en imbd y con telegram id y ver que dice no visto' do
     token = 'fake_token'
-    detalles_pelicula = response_get_contenidos_id_detalles_no_visto
-    id_pelicula = 1
+    detalles_contenido = response_get_contenidos_id_detalles_no_visto
+    id_contenido = 1
 
-    stub_get_contenidos_id_detalles(200, detalles_pelicula.to_json, id_pelicula)
+    stub_get_contenidos_id_detalles(200, detalles_contenido.to_json, id_contenido)
 
-    when_i_send_text(token, "/masinfo #{id_pelicula}")
-    then_i_get_masinfo(token, detalles_pelicula, id_pelicula)
+    when_i_send_text(token, "/masinfo #{id_contenido}")
+    then_i_get_masinfo(token, detalles_contenido, id_contenido)
 
     BotClient.new(token).run_once
   end
 
-  it 'deberia recibir un mensaje /masinfo {id_pelicula} con id_pelicula en imbd y con telegram id y ver que dice visto' do
+  it 'deberia recibir un mensaje /masinfo {id_contenido} con id_contenido en imbd y con telegram id y ver que dice visto' do
     token = 'fake_token'
-    detalles_pelicula = response_get_contenidos_id_detalles_visto
-    id_pelicula = 1
+    detalles_contenido = response_get_contenidos_id_detalles_visto
+    id_contenido = 1
 
-    stub_get_contenidos_id_detalles(200, detalles_pelicula.to_json, id_pelicula)
+    stub_get_contenidos_id_detalles(200, detalles_contenido.to_json, id_contenido)
 
-    when_i_send_text(token, "/masinfo #{id_pelicula}")
-    then_i_get_masinfo(token, detalles_pelicula, id_pelicula)
+    when_i_send_text(token, "/masinfo #{id_contenido}")
+    then_i_get_masinfo(token, detalles_contenido, id_contenido)
 
     BotClient.new(token).run_once
   end
