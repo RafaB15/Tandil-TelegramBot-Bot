@@ -637,4 +637,28 @@ describe 'BotClient' do
 
     BotClient.new(token).run_once
   end
+
+  def then_i_get_mensaje_de_ayuda(token)
+    text = "Sé responder los siguientes mensajes:
+- /version: Devuelve la versión en la que el Bot está corriendo
+- /registrar <email>: Registra tu usuario de telegram asignandole un email
+- /sugerenciasmasvistos: Devuelve una lista con los 3 contenidos mas vistos de toda la plataforma
+- /calificar <id_contenido> <calificacion>: Si estas registrado podes calificar con una calificacion del 1 al 5 cualquier contenido
+- /marcarfavorito <id_contenido>: Si estas registrado podes marcar un contenido como favorito
+- /buscartitulo <titulo>: Devuelve todos los contenidos en nuestra bases de datos que sean similares a tu busqueda
+- /misfavoritos: Si estas registrado, devuelve tu lista de favoritos
+- /sugerenciasnuevos: Devuelve una lista con los 5 contenidos mas nuevos de la ultima semana
+- /masinfo <id_pelicula>: Devuelve informacion extra acerca de la pelicula - director, premios, sinopsis"
+
+    then_i_get_text(token, text)
+  end
+
+  it 'deberia recibir un mensaje /ayuda y ver que devuelve un texto explicando todos los comandos que sabe responder el bot' do
+    token = 'fake_token'
+
+    when_i_send_text(token, '/ayuda')
+    then_i_get_mensaje_de_ayuda(token)
+
+    BotClient.new(token).run_once
+  end
 end

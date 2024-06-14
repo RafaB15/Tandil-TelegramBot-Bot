@@ -2,6 +2,17 @@ require "#{File.dirname(__FILE__)}/../lib/routing"
 require "#{File.dirname(__FILE__)}/../lib/version"
 require "#{File.dirname(__FILE__)}/../lib/conector_api"
 
+LISTA_DE_COMANDOS = "Sé responder los siguientes mensajes:
+- /version: Devuelve la versión en la que el Bot está corriendo
+- /registrar <email>: Registra tu usuario de telegram asignandole un email
+- /sugerenciasmasvistos: Devuelve una lista con los 3 contenidos mas vistos de toda la plataforma
+- /calificar <id_contenido> <calificacion>: Si estas registrado podes calificar con una calificacion del 1 al 5 cualquier contenido
+- /marcarfavorito <id_contenido>: Si estas registrado podes marcar un contenido como favorito
+- /buscartitulo <titulo>: Devuelve todos los contenidos en nuestra bases de datos que sean similares a tu busqueda
+- /misfavoritos: Si estas registrado, devuelve tu lista de favoritos
+- /sugerenciasnuevos: Devuelve una lista con los 5 contenidos mas nuevos de la ultima semana
+- /masinfo <id_pelicula>: Devuelve informacion extra acerca de la pelicula - director, premios, sinopsis".freeze
+
 class Routes
   include Routing
 
@@ -29,7 +40,9 @@ class Routes
       conector_api = ConectorApi.new
       conector_api.crear_usuario(email, id_telegram)
 
-      text = ensamblar_respuesta_registro(conector_api, message)
+      nombre_usuario = message.from.first_name
+
+      text = ensamblar_respuesta_registro(conector_api, nombre_usuario)
     end
 
     bot.api.send_message(chat_id: message.chat.id, text:)
@@ -126,6 +139,12 @@ class Routes
     bot.api.send_message(chat_id: message.chat.id, text:)
   end
 
+  on_message_pattern %r{/ayuda} do |bot, message|
+    text = LISTA_DE_COMANDOS
+
+    bot.api.send_message(chat_id: message.chat.id, text:)
+  end
+
   default do |bot, message|
     text = '¿Uh? ¡No te entiendo! ¿Me repetís la pregunta?'
 
@@ -184,9 +203,9 @@ def ensamblar_respuesta(top_contenido)
   respuesta
 end
 
-def ensamblar_respuesta_registro(conector_api, message)
+def ensamblar_respuesta_registro(conector_api, nombre_usuario)
   if conector_api.estado == 201
-    "Bienvenido, cinéfilo #{message.from.first_name}!"
+    "Bienvenido, cinéfilo #{nombre_usuario}!"
   elsif conector_api.estado == 409
     if conector_api.cuerpo['details']['field'] == 'id_telegram'
       'Error, tu usuario de telegram ya esta asociado a una cuenta existente'
