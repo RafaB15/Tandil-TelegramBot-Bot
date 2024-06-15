@@ -91,7 +91,7 @@ def stub_post_request_usuario_error(email, id_telegram, status, message, field)
     .to_return(status:, body: response.to_json, headers: {})
 end
 
-def stub_get_top_visualizaciones
+def stub_get_request_contenidos_top
   titulos = { "Iron Man": 2008, 'Black Panther': 2018, 'Doctor Strange': 2016 }
   count = 0
   response = titulos.map do |titulo, anio|
@@ -107,7 +107,7 @@ def stub_get_top_visualizaciones
     }
   end
 
-  stub_request(:get, 'http://fake/visualizacion/top?Content-Type=application/json')
+  stub_request(:get, 'http://fake/visualizaciones/top?Content-Type=application/json')
     .with(
       headers: {
         'Accept' => '*/*',
@@ -118,10 +118,10 @@ def stub_get_top_visualizaciones
     .to_return(status: 200, body: response.to_json, headers: {})
 end
 
-def stub_get_empty_top_visualizaciones
+def stub_get_request_contenidos_top_vacio
   response = []
 
-  stub_request(:get, 'http://fake/visualizacion/top?Content-Type=application/json')
+  stub_request(:get, 'http://fake/visualizaciones/top?Content-Type=application/json')
     .with(
       headers: {
         'Accept' => '*/*',
@@ -137,12 +137,12 @@ def then_i_get_top_visualizaciones(token)
   then_i_get_text(token, text)
 end
 
-def stub_post_request_calificaciones(id_telegram, id_contenido, calificacion, status)
-  response = { id: 1, id_telegram:, id_contenido:, calificacion: }
+def stub_post_request_calificaciones(id_telegram, id_contenido, puntaje, status)
+  response = { id: 1, id_telegram:, id_contenido:, puntaje: }
 
-  stub_request(:post, 'http://fake/calificacion')
+  stub_request(:post, 'http://fake/calificaciones')
     .with(
-      body: "{\"id_telegram\":#{id_telegram},\"id_pelicula\":#{id_contenido},\"calificacion\":#{calificacion}}",
+      body: "{\"id_telegram\":#{id_telegram},\"id_pelicula\":#{id_contenido},\"puntaje\":#{puntaje}}",
       headers: {
         'Accept' => '*/*',
         'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
@@ -155,7 +155,7 @@ end
 
 def stub_post_request_favoritos(email, id_contenido, _status)
   _response = { id: 1, email:, id_contenido: }
-  stub_request(:post, 'http://fake/favorito')
+  stub_request(:post, 'http://fake/favoritos')
     .with(
       body: '{"id_telegram":141733544,"id_contenido":1}',
       headers: {
@@ -394,7 +394,7 @@ describe 'BotClient' do
 
   it 'deberia recibir un mensaje /sugerenciasmasvistos y devolver los contenidos más vistos de la plataforma' do
     token = 'fake_token'
-    stub_get_top_visualizaciones
+    stub_get_request_contenidos_top
     when_i_send_text(token, '/sugerenciasmasvistos')
     then_i_get_top_visualizaciones(token)
     BotClient.new(token).run_once
@@ -402,7 +402,7 @@ describe 'BotClient' do
 
   it 'deberia recibir un mensaje /sugerenciasmasvistos cuando no hay visualizaciones de películas y devolver un mensaje de la situación' do
     token = 'fake_token'
-    stub_get_empty_top_visualizaciones
+    stub_get_request_contenidos_top_vacio
     when_i_send_text(token, '/sugerenciasmasvistos')
     then_i_get_text(token, 'No hay datos de visualizaciones de películas en el momento')
     BotClient.new(token).run_once

@@ -25,8 +25,8 @@ class ConectorApi
     guardar_respuesta_api(respuesta)
   end
 
-  def obtener_contenidos_mas_vistas
-    respuesta = Faraday.get("#{API_REST_URL}/visualizacion/top", 'Content-Type' => 'application/json')
+  def obtener_sugerencias_contenidos_mas_vistos
+    respuesta = Faraday.get("#{API_REST_URL}/visualizaciones/top", 'Content-Type' => 'application/json')
 
     guardar_respuesta_api(respuesta)
   end
@@ -37,18 +37,18 @@ class ConectorApi
     guardar_respuesta_api(respuesta)
   end
 
-  def calificar_contenido(id_telegram, id_contenido, calificacion)
-    body = { id_telegram:, id_pelicula: id_contenido, calificacion: }
+  def calificar_contenido(id_telegram, id_contenido, puntaje)
+    body = { id_telegram:, id_pelicula: id_contenido, puntaje: }
 
-    respuesta = Faraday.post("#{API_REST_URL}/calificacion", body.to_json, 'Content-Type' => 'application/json')
+    respuesta = Faraday.post("#{API_REST_URL}/calificaciones", body.to_json, 'Content-Type' => 'application/json')
 
     guardar_respuesta_api(respuesta)
   end
 
-  def marcar_favorita(id_telegram, id_contenido)
+  def marcar_contenido_como_favorito(id_telegram, id_contenido)
     body = { id_telegram:, id_contenido: }
 
-    respuesta = Faraday.post("#{API_REST_URL}/favorito", body.to_json, 'Content-Type' => 'application/json')
+    respuesta = Faraday.post("#{API_REST_URL}/favoritos", body.to_json, 'Content-Type' => 'application/json')
 
     guardar_respuesta_api(respuesta)
   end
@@ -59,7 +59,7 @@ class ConectorApi
     guardar_respuesta_api(respuesta)
   end
 
-  def obtener_sugerencias
+  def obtener_sugerencias_contenidos_mas_nuevos
     respuesta = Faraday.get("#{API_REST_URL}/contenidos/ultimos-agregados", 'Content-Type' => 'application/json')
 
     guardar_respuesta_api(respuesta)

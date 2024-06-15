@@ -50,7 +50,7 @@ class Routes
 
   on_message '/sugerenciasmasvistos' do |bot, message|
     conector_api = ConectorApi.new
-    conector_api.obtener_contenidos_mas_vistas
+    conector_api.obtener_sugerencias_contenidos_mas_vistos
     top_contenido = conector_api.cuerpo
 
     if top_contenido.empty?
@@ -62,13 +62,13 @@ class Routes
     end
   end
 
-  on_message_pattern %r{/calificar (?<id_contenido>\d+) (?<calificacion>\d+)} do |bot, message, args|
+  on_message_pattern %r{/calificar (?<id_contenido>\d+) (?<puntaje>\d+)} do |bot, message, args|
     id_contenido = args['id_contenido'].to_i
-    calificacion = args['calificacion'].to_i
+    puntaje = args['puntaje'].to_i
     id_telegram = message.from.id.to_i
 
     conector_api = ConectorApi.new
-    conector_api.calificar_contenido(id_telegram, id_contenido, calificacion)
+    conector_api.calificar_contenido(id_telegram, id_contenido, puntaje)
 
     text = if conector_api.estado == 201
              'Calificacion registrada exitosamente'
@@ -81,8 +81,10 @@ class Routes
 
   on_message_pattern %r{/marcarfavorito (?<id_contenido>\d+)} do |bot, message, args|
     id_contenido = args['id_contenido'].to_i
+    id_telegram = message.from.id.to_i
+
     conector_api = ConectorApi.new
-    conector_api.marcar_favorita(message.from.id.to_i, id_contenido)
+    conector_api.marcar_contenido_como_favorito(id_telegram, id_contenido)
 
     text = if conector_api.estado == 201
              'Contenido añadido a favoritos'
@@ -94,8 +96,10 @@ class Routes
   end
 
   on_message_pattern %r{/buscartitulo (?<titulo>.+)} do |bot, message, args|
+    titulo = args['titulo']
+
     conector_api = ConectorApi.new
-    conector_api.buscar_contenido_por_titulo(args['titulo'])
+    conector_api.buscar_contenido_por_titulo(titulo)
     contenidos = conector_api.cuerpo
 
     respuesta = ensamblar_respuesta_lista(contenidos, 'No se encontraron resultados para la búsqueda',
@@ -104,8 +108,10 @@ class Routes
   end
 
   on_message '/misfavoritos' do |bot, message|
+    id_telegram = message.from.id.to_i
+
     conector_api = ConectorApi.new
-    conector_api.obtener_favoritos(message.from.id.to_i)
+    conector_api.obtener_favoritos(id_telegram)
     favoritos = conector_api.cuerpo
 
     respuesta = ensamblar_respuesta_lista(favoritos, 'Parece que no tienes favoritos! Empieza a marcar tus contenidos como favoritos para verlos aquí.',
@@ -115,7 +121,7 @@ class Routes
 
   on_message '/sugerenciasnuevos' do |bot, message|
     conector_api = ConectorApi.new
-    conector_api.obtener_sugerencias
+    conector_api.obtener_sugerencias_contenidos_mas_nuevos
 
     sugerencias = conector_api.cuerpo
 
