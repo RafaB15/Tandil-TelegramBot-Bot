@@ -171,7 +171,7 @@ end
 def stub_get_request_contenidos_con_ningun_titulo_similar
   response = []
 
-  stub_request(:get, 'http://fake/contenido?Content-Type=application/json&titulo=Titanic')
+  stub_request(:get, 'http://fake/contenidos?Content-Type=application/json&titulo=Titanic')
     .with(
       headers: {
         'Accept' => '*/*',
@@ -185,7 +185,7 @@ end
 def stub_get_request_contenidos_con_un_titulo_similar
   response = [{ 'id' => 1, 'titulo' => 'Akira', 'anio' => 1988, 'genero' => 'accion' }]
 
-  stub_request(:get, 'http://fake/contenido?Content-Type=application/json&titulo=Akira')
+  stub_request(:get, 'http://fake/contenidos?Content-Type=application/json&titulo=Akira')
     .with(
       headers: {
         'Accept' => '*/*',
@@ -200,7 +200,7 @@ def stub_get_request_contenidos_con_dos_titulos_similares
   response = [{ 'id' => 1, 'titulo' => 'Akira', 'anio' => 1988, 'genero' => 'accion' },
               { 'id' => 2, 'titulo' => 'Akira 2', 'anio' => 1990, 'genero' => 'accion' }]
 
-  stub_request(:get, 'http://fake/contenido?Content-Type=application/json&titulo=Akira')
+  stub_request(:get, 'http://fake/contenidos?Content-Type=application/json&titulo=Akira')
     .with(
       headers: {
         'Accept' => '*/*',

@@ -32,7 +32,7 @@ class ConectorApi
   end
 
   def buscar_contenido_por_titulo(titulo)
-    respuesta = Faraday.get("#{API_REST_URL}/contenido", titulo:, 'Content-Type' => 'application/json')
+    respuesta = Faraday.get("#{API_REST_URL}/contenidos", titulo:, 'Content-Type' => 'application/json')
 
     guardar_respuesta_api(respuesta)
   end
