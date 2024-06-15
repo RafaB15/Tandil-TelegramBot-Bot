@@ -16,7 +16,7 @@ LISTA_DE_COMANDOS = "Sé responder los siguientes mensajes:
 class Routes
   include Routing
 
-  on_message '/empezar' do |bot, message|
+  on_message '/start' do |bot, message|
     text = "Hola, #{message.from.first_name}"
     bot.api.send_message(chat_id: message.chat.id, text:)
   end
