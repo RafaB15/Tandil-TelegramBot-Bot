@@ -153,6 +153,22 @@ def stub_post_request_calificaciones(id_telegram, id_contenido, puntaje, status)
     .to_return(status:, body: response.to_json, headers: {})
 end
 
+def stub_post_request_calificacion_contenido_no_visto(id_telegram, id_contenido, puntaje)
+  response = { error: 'Entidad no procesable', message: '', details: { field: 'visualizacion' } }
+
+  stub_request(:post, 'http://fake/calificaciones')
+    .with(
+      body: "{\"id_telegram\":#{id_telegram},\"id_pelicula\":#{id_contenido},\"puntaje\":#{puntaje}}",
+      headers: {
+        'Accept' => '*/*',
+        'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+        'Content-Type' => 'application/json',
+        'User-Agent' => 'Faraday v2.7.4'
+      }
+    )
+    .to_return(status: 422, body: response.to_json, headers: {})
+end
+
 def stub_post_request_favoritos(email, id_contenido, _status)
   _response = { id: 1, email:, id_contenido: }
   stub_request(:post, 'http://fake/favoritos')
@@ -414,6 +430,15 @@ describe 'BotClient' do
 
     when_i_send_text(token, '/calificar 97 4')
     then_i_get_text(token, 'Calificacion registrada exitosamente')
+    BotClient.new(token).run_once
+  end
+
+  it 'deberia recibir un mensaje /calificar {id_contenido} {calificacion} con mensaje de error 422 y decirme que no vi el contenido' do
+    token = 'fake_token'
+    stub_post_request_calificacion_contenido_no_visto(141_733_544, 97, 4)
+
+    when_i_send_text(token, '/calificar 97 4')
+    then_i_get_text(token, '¡Aún no viste este contenido, miralo para poder calificarlo!')
     BotClient.new(token).run_once
   end
 

@@ -70,11 +70,13 @@ class Routes
     conector_api = ConectorApi.new
     conector_api.calificar_contenido(id_telegram, id_contenido, puntaje)
 
-    text = if conector_api.estado == 201
-             'Calificacion registrada exitosamente'
-           else
-             'Error al calificar la película. Inténtalo de nuevo más tarde.'
-           end
+    if conector_api.estado == 201
+      text = 'Calificacion registrada exitosamente'
+    elsif conector_api.estado == 422
+      text = '¡Aún no viste este contenido, miralo para poder calificarlo!'
+    else
+      'Error al calificar la película. Inténtalo de nuevo más tarde.'
+    end
 
     bot.api.send_message(chat_id: message.chat.id, text:)
   end
