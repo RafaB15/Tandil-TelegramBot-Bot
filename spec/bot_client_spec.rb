@@ -169,6 +169,22 @@ def stub_post_request_calificacion_contenido_no_visto(id_telegram, id_contenido,
     .to_return(status: 422, body: response.to_json, headers: {})
 end
 
+def stub_post_request_calificacion_contenido_inexistente(id_telegram, id_contenido, puntaje)
+  response = { error: 'No encontrado', message: '', details: { field: 'pelicula' } }
+
+  stub_request(:post, 'http://fake/calificaciones')
+    .with(
+      body: "{\"id_telegram\":#{id_telegram},\"id_pelicula\":#{id_contenido},\"puntaje\":#{puntaje}}",
+      headers: {
+        'Accept' => '*/*',
+        'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+        'Content-Type' => 'application/json',
+        'User-Agent' => 'Faraday v2.7.4'
+      }
+    )
+    .to_return(status: 404, body: response.to_json, headers: {})
+end
+
 def stub_post_request_recalificacion(id_telegram, id_contenido, puntaje, puntaje_anterior)
   response = { id: 1, id_telegram:, id_contenido:, puntaje:, puntaje_anterior: }
 
@@ -464,6 +480,14 @@ describe 'BotClient' do
 
     when_i_send_text(token, '/calificar 97 4')
     then_i_get_text(token, 'Calificacion actualizada exitosamente')
+  end
+
+  it 'deberia recibir un mensaje /calificar {id_contenido} {calificacion} con mensaje de error 404 y decirme que el contenido no existe' do
+    token = 'fake_token'
+    stub_post_request_calificacion_contenido_inexistente(141_733_544, 97, 4)
+
+    when_i_send_text(token, '/calificar 97 4')
+    then_i_get_text(token, 'El contenido ingresado no existe')
   end
 
   it 'deberia recibir un mensaje /marcarfavorito {id_contenido} y devolver un mensaje de contenido anadido a favoritos' do\
