@@ -10,7 +10,9 @@ module RutasSugerencias
   RESPUESTA_LISTA_DE_SUGERENCIAS_NUEVOS_VACIA = '¡No hay nuevos contenidos esta semana, estate atento a las novedades!'.freeze
 
   on_message COMANDO_SUGERENCIAS_MAS_VISTOS do |bot, message|
-    sugerencias_mas_vistos = ConectorApi.new.obtener_sugerencias_contenidos_mas_vistos
+    respuesta = ConectorApi.new.obtener_sugerencias_contenidos_mas_vistos
+
+    sugerencias_mas_vistos = JSON.parse(respuesta.body)
 
     text = if sugerencias_mas_vistos.empty?
              RESPUESTA_LISTA_DE_SUGERENCIAS_MAS_VISTOS_VACIA
@@ -22,7 +24,9 @@ module RutasSugerencias
   end
 
   on_message COMANDO_SUGERENCIAS_NUEVOS do |bot, message|
-    sugerencias_nuevos = ConectorApi.new.obtener_sugerencias_contenidos_mas_nuevos
+    respuesta = ConectorApi.new.obtener_sugerencias_contenidos_mas_nuevos
+
+    sugerencias_nuevos = JSON.parse(respuesta.body)
 
     text = if sugerencias_nuevos.empty?
              RESPUESTA_LISTA_DE_SUGERENCIAS_NUEVOS_VACIA

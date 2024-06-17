@@ -15,7 +15,9 @@ module RutasCalificaciones
     puntaje = args['puntaje'].to_i
     id_telegram = message.from.id.to_i
 
-    estado = ConectorApi.new.calificar_contenido(id_telegram, id_contenido, puntaje)
+    respuesta = ConectorApi.new.calificar_contenido(id_telegram, id_contenido, puntaje)
+
+    estado = respuesta.status
 
     text = case estado
            when 201

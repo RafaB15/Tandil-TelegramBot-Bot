@@ -29,7 +29,9 @@ class Routes
   end
 
   on_message '/version' do |bot, message|
-    version_api = ConectorApi.new.obtener_version
+    respuesta = ConectorApi.new.obtener_version
+
+    version_api = JSON.parse(respuesta.body)['version']
 
     text = "version bot: #{Version.current}, version api: #{version_api}"
     bot.api.send_message(chat_id: message.chat.id, text:)

@@ -17,7 +17,10 @@ module RutasUsuarios
     text = RESPUESTA_EMAIL_INVALIDO
 
     if email_valido
-      estado, cuerpo = ConectorApi.new.crear_usuario(email, id_telegram)
+      respuesta = ConectorApi.new.crear_usuario(email, id_telegram)
+
+      estado = respuesta.status
+      cuerpo = JSON.parse(respuesta.body)
 
       nombre_usuario = message.from.first_name
 

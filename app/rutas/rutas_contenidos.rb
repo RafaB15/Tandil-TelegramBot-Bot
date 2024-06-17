@@ -11,7 +11,9 @@ module RutasContenidos
   on_message_pattern COMANDO_BUSCAR_TITULO do |bot, message, args|
     titulo = args['titulo']
 
-    contenidos = ConectorApi.new.buscar_contenido_por_titulo(titulo)
+    respuesta = ConectorApi.new.buscar_contenido_por_titulo(titulo)
+
+    contenidos = JSON.parse(respuesta.body)
 
     text = if contenidos.empty?
              RESPUESTA_LISTA_DE_CONTENIDOS_VACIA
@@ -26,7 +28,10 @@ module RutasContenidos
     id_contenido = args['id_contenido']
     id_telegram = message.from.id.to_i
 
-    estado, detalles_contenido = ConectorApi.new.obtener_detalles_de_contenido(id_contenido, id_telegram)
+    respuesta = ConectorApi.new.obtener_detalles_de_contenido(id_contenido, id_telegram)
+
+    estado = respuesta.status
+    detalles_contenido = JSON.parse(respuesta.body)
 
     text = ensamblar_respuesta_mas_info(estado, detalles_contenido, id_contenido)
 

@@ -14,7 +14,9 @@ module RutasFavoritos
     id_contenido = args['id_contenido'].to_i
     id_telegram = message.from.id.to_i
 
-    estado = ConectorApi.new.marcar_contenido_como_favorito(id_telegram, id_contenido)
+    respuesta = ConectorApi.new.marcar_contenido_como_favorito(id_telegram, id_contenido)
+
+    estado = respuesta.status
 
     text = if estado == 201
              RESPUESTA_MARCAR_FAVORITOS_EXITO
@@ -28,7 +30,9 @@ module RutasFavoritos
   on_message COMANDO_MIS_FAVORITOS do |bot, message|
     id_telegram = message.from.id.to_i
 
-    favoritos = ConectorApi.new.obtener_favoritos(id_telegram)
+    respuesta = ConectorApi.new.obtener_favoritos(id_telegram)
+
+    favoritos = JSON.parse(respuesta.body)
 
     text = if favoritos.empty?
              RESPUESTA_LISTA_DE_FAVORITOS_VACIA
