@@ -169,6 +169,22 @@ def stub_post_request_calificacion_contenido_no_visto(id_telegram, id_contenido,
     .to_return(status: 422, body: response.to_json, headers: {})
 end
 
+def stub_post_request_calificacion_puntaje_invalido(id_telegram, id_contenido, puntaje)
+  response = { error: '', message: '', details: { field: 'calificacion' } }
+
+  stub_request(:post, 'http://fake/calificaciones')
+    .with(
+      body: "{\"id_telegram\":#{id_telegram},\"id_pelicula\":#{id_contenido},\"puntaje\":#{puntaje}}",
+      headers: {
+        'Accept' => '*/*',
+        'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+        'Content-Type' => 'application/json',
+        'User-Agent' => 'Faraday v2.7.4'
+      }
+    )
+    .to_return(status: 422, body: response.to_json, headers: {})
+end
+
 def stub_post_request_calificacion_contenido_inexistente(id_telegram, id_contenido, puntaje)
   response = { error: 'No encontrado', message: '', details: { field: 'pelicula' } }
 
@@ -474,6 +490,15 @@ describe 'BotClient' do
     BotClient.new(token).run_once
   end
 
+  it 'deberia recibir un mensaje /calificar {id_contenido} {calificacion} con mensaje de error 422 y decirme que la calificación es inválida' do
+    token = 'fake_token'
+    stub_post_request_calificacion_puntaje_invalido(141_733_544, 97, -1)
+
+    when_i_send_text(token, '/calificar 97 -1')
+    then_i_get_text(token, 'La calificacion es del 1 al 5. ¡Volve a calificar!')
+    BotClient.new(token).run_once
+  end
+
   it 'deberia recibir un mensaje /calificar {id_contenido} {calificacion} con estado 200 y decirme que recalifique' do
     token = 'fake_token'
     stub_post_request_recalificacion(141_733_544, 97, 4, 3)
@@ -639,7 +664,7 @@ describe 'BotClient' do
   it 'deberia recibir un mensaje /masinfo {id_contenido} con id_contenido invalido y devolver un mensaje de error' do
     token = 'fake_token'
 
-    id_contenido = 'id_contenido_invalido'
+    id_contenido = -1
 
     stub_get_contenidos_id_detalles_id_invalido(id_contenido)
 

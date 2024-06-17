@@ -4,7 +4,7 @@ module RutasContenidos
   include Routing
 
   COMANDO_BUSCAR_TITULO = %r{/buscartitulo (?<titulo>.+)}
-  COMANDO_MAS_INFO = %r{/masinfo (?<id_contenido>.+)}
+  COMANDO_MAS_INFO = %r{/masinfo (?<id_contenido>-?\d+)}
 
   RESPUESTA_LISTA_DE_CONTENIDOS_VACIA = 'No se encontraron resultados para la búsqueda'.freeze
 
