@@ -18,7 +18,7 @@ module RutasCalificaciones
 
     text = if estado == 201
              RESPUESTA_EXITO_AL_CALIFICAR_CONTENIDO
-           elsif conector_api.estado == 422
+           elsif estado == 422
              RESPUESTA_ERROR_DEBE_ESTAR_VISTO_EL_CONTENIDO_AL_CALIFICAR_CONTENIDO
            else
              RESPUESTA_ERROR_PREDETERMINADO_AL_CALIFICAR_CONTENIDO
