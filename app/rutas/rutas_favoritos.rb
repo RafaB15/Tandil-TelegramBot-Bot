@@ -33,15 +33,17 @@ module RutasFavoritos
   on_message COMANDO_MIS_FAVORITOS do |bot, message|
     id_telegram = message.from.id.to_i
 
-    respuesta = ConectorApi.new.obtener_favoritos(id_telegram)
+    conector_api = ConectorApi.new
 
-    favoritos = JSON.parse(respuesta.body)
+    plataforma = Plataforma.new(conector_api)
 
-    text = if favoritos.empty?
-             RESPUESTA_LISTA_DE_FAVORITOS_VACIA
-           else
-             "Aquí tienes tu listado de favoritos:\n#{generar_lista_de_contenidos(favoritos)}"
-           end
+    begin
+      favoritos = plataforma.obtener_favoritos(id_telegram)
+
+      text = "Aquí tienes tu listado de favoritos:\n#{generar_lista_de_contenidos(favoritos)}"
+    rescue StandardError => _e
+      text = RESPUESTA_LISTA_DE_FAVORITOS_VACIA
+    end
 
     bot.api.send_message(chat_id: message.chat.id, text:)
   end

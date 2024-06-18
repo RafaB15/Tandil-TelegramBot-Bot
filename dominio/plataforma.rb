@@ -22,4 +22,14 @@ class Plataforma
 
     @conector_api.marcar_contenido_como_favorito(favorito)
   end
+
+  def obtener_favoritos(id_telegram)
+    respuesta = @conector_api.obtener_favoritos(id_telegram)
+
+    favoritos = JSON.parse(respuesta.body)
+
+    raise IOError if favoritos.empty?
+
+    favoritos
+  end
 end

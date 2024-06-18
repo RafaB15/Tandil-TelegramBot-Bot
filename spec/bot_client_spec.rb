@@ -201,7 +201,7 @@ def stub_post_request_recalificacion(id_telegram, id_contenido, puntaje, puntaje
     .to_return(status: 200, body: response.to_json, headers: {})
 end
 
-def stub_post_request_favoritos(id_telegram, id_contenido, _status)
+def stub_post_request_favoritos(id_telegram, id_contenido, status)
   cuerpo = { id: 1, id_telegram:, id_contenido: }
 
   stub_request(:post, 'http://fake/favoritos')
@@ -214,7 +214,7 @@ def stub_post_request_favoritos(id_telegram, id_contenido, _status)
         'User-Agent' => 'Faraday v2.7.4'
       }
     )
-    .to_return(status: 201, body: cuerpo.to_json, headers: {})
+    .to_return(status:, body: cuerpo.to_json, headers: {})
 end
 
 def stub_get_request_contenidos_con_ningun_titulo_similar
@@ -499,9 +499,9 @@ describe 'BotClient' do
     then_i_get_text(token, 'El contenido ingresado no existe')
   end
 
-  xit 'deberia recibir un mensaje /marcarfavorito {id_contenido} y devolver un mensaje de contenido anadido a favoritos' do
+  it 'deberia recibir un mensaje /marcarfavorito {id_contenido} y devolver un mensaje de contenido anadido a favoritos' do
     token = 'fake_token'
-    stub_post_request_favoritos('test@test.com', 1, 201)
+    stub_post_request_favoritos(141_733_544, 1, 201)
     when_i_send_text(token, '/marcarfavorito 1')
     then_i_get_text(token, 'Contenido añadido a favoritos')
     BotClient.new(token).run_once
@@ -533,7 +533,7 @@ describe 'BotClient' do
     BotClient.new(token).run_once
   end
 
-  it 'deberia recibir un mensaje /misfavoritos y deolver un mensaje diciendo que el usuario no tiene favoritos' do
+  it 'deberia recibir un mensaje /misfavoritos y devolver un mensaje diciendo que el usuario no tiene favoritos' do
     token = 'fake_token'
     stub_get_request_favoritos_sin_contenidos_faveados
     when_i_send_text(token, '/misfavoritos')

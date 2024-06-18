@@ -147,4 +147,26 @@ describe ConectorApi do
       described_class.new.marcar_contenido_como_favorito(favorito)
     end
   end
+
+  describe 'obtener_favoritos' do
+    it 'Deberia pedir mis contenidos favoritos y si no tengo, recibir una respuesta con status 200' do
+      id_telegram = 141_733_544
+      estado = 200
+
+      stub_get_request_favoritos_sin_contenidos_faveados
+
+      respuesta = described_class.new.obtener_favoritos(id_telegram)
+      expect(respuesta.status).to eq estado
+    end
+
+    it 'Deberia pedir mis contenidos favoritos y recibir una respuesta con status 200' do
+      id_telegram = 141_733_544
+      estado = 200
+
+      stub_get_request_favoritos_con_un_contenido_faveado
+
+      respuesta = described_class.new.obtener_favoritos(id_telegram)
+      expect(respuesta.status).to eq estado
+    end
+  end
 end
