@@ -134,4 +134,17 @@ describe ConectorApi do
       expect { described_class.new.calificar_contenido(calificacion) }.to raise_error(ErrorContenidoInexistenteEnAPI)
     end
   end
+
+  describe 'marcar_contenido_como_favorito' do
+    it 'Deberia enviar los datos de un contenido faveado para registrarlo en la API y devolver exito' do
+      id_telegram = 123_456_789
+      id_contenido = 24
+      estado = 201
+
+      favorito = instance_double(Favorito, id_telegram:, id_contenido:)
+      stub_post_request_favoritos(id_telegram, id_contenido, estado)
+
+      described_class.new.marcar_contenido_como_favorito(favorito)
+    end
+  end
 end

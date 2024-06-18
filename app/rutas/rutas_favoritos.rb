@@ -6,13 +6,14 @@ module RutasFavoritos
   COMANDO_MARCAR_FAVORITO = %r{/marcarfavorito (?<id_contenido>\d+)}
   COMANDO_MIS_FAVORITOS = '/misfavoritos'.freeze
 
-  RESPUESTA_LISTA_DE_FAVORITOS_VACIA = 'Parece que no tienes favoritos! Empieza a marcar tus contenidos como favoritos para verlos aquí.'.freeze
   RESPUESTA_MARCAR_FAVORITOS_EXITO = 'Contenido añadido a favoritos'.freeze
   RESPUESTA_MARCAR_FAVORITOS_ERROR = 'Error al guardar favorito'.freeze
 
+  RESPUESTA_LISTA_DE_FAVORITOS_VACIA = 'Parece que no tienes favoritos! Empieza a marcar tus contenidos como favoritos para verlos aquí.'.freeze
+
   on_message_pattern COMANDO_MARCAR_FAVORITO do |bot, message, args|
-    id_contenido = args['id_contenido'].to_i
-    id_telegram = message.from.id.to_i # Passar a logica de negocio.
+    id_contenido = args['id_contenido']
+    id_telegram = message.from.id
 
     conector_api = ConectorApi.new
 

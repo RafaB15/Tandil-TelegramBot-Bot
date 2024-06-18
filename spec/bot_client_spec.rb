@@ -201,11 +201,12 @@ def stub_post_request_recalificacion(id_telegram, id_contenido, puntaje, puntaje
     .to_return(status: 200, body: response.to_json, headers: {})
 end
 
-def stub_post_request_favoritos(email, id_contenido, _status)
-  _response = { id: 1, email:, id_contenido: }
+def stub_post_request_favoritos(id_telegram, id_contenido, _status)
+  cuerpo = { id: 1, id_telegram:, id_contenido: }
+
   stub_request(:post, 'http://fake/favoritos')
     .with(
-      body: '{"id_telegram":141733544,"id_contenido":1}',
+      body: "{\"id_telegram\":#{id_telegram},\"id_contenido\":#{id_contenido}}",
       headers: {
         'Accept' => '*/*',
         'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
@@ -213,7 +214,7 @@ def stub_post_request_favoritos(email, id_contenido, _status)
         'User-Agent' => 'Faraday v2.7.4'
       }
     )
-    .to_return(status: 201, body: { id: 1 }.to_json, headers: {})
+    .to_return(status: 201, body: cuerpo.to_json, headers: {})
 end
 
 def stub_get_request_contenidos_con_ningun_titulo_similar
