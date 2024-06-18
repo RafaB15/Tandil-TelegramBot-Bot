@@ -29,7 +29,19 @@ class Plataforma
   def calificar_contenido(id_telegram, id_contenido, puntaje)
     calificacion = Calificacion.new(id_telegram, id_contenido, puntaje)
 
-    @conector_api.calificar_contenido(calificacion)
+    respuesta = @conector_api.calificar_contenido(calificacion)
+
+    estado = respuesta.status
+    cuerpo = JSON.parse(respuesta.body)
+
+    if estado == 200
+      puntaje_anterior = cuerpo['puntaje_anterior']
+      calificacion.recalificar(puntaje_anterior)
+
+      return calificacion
+    end
+
+    manejar_respuesta_calificar_contenido(estado, cuerpo)
   end
 
   def marcar_contenido_como_favorito(id_telegram, id_contenido)
@@ -50,5 +62,64 @@ class Plataforma
     raise IOError if favoritos.empty?
 
     favoritos
+  end
+
+  private
+
+  def manejar_respuesta_calificar_contenido(estado, cuerpo)
+    case estado
+    when 201
+      nil
+    when 422
+      if cuerpo['details']['field'] == 'visualizacion'
+        raise ErrorAlPedirCalificacionContenidoNoVistoPorUsuarioDeTelegram
+      elsif cuerpo['details']['field'] == 'calificacion'
+        raise ErrorAlInstanciarCalificacionPuntajeInvalido
+      else
+        raise IOError
+      end
+    when 404
+      raise ErrorContenidoInexistenteEnAPI
+    else
+      raise IOError
+    end
+  end
+end
+
+# Error registrar usuario
+# ==============================================================================
+
+class ErrorIDTelegramYaAsociadoAUnaCuentaExistenteEnLaAPI < IOError
+  MSG_DE_ERROR = 'Error: email ya asociado a una cuenta existente en la API'.freeze
+
+  def initialize(msg_de_error = MSG_DE_ERROR)
+    super(msg_de_error)
+  end
+end
+
+class ErrorEmailYaAsociadoAUnaCuentaExistenteEnLaAPI < IOError
+  MSG_DE_ERROR = 'Error: ID telegram ya asociado a una cuenta existente en la API'.freeze
+
+  def initialize(msg_de_error = MSG_DE_ERROR)
+    super(msg_de_error)
+  end
+end
+
+# Error calificar
+# ==============================================================================
+
+class ErrorAlPedirCalificacionContenidoNoVistoPorUsuarioDeTelegram < IOError
+  MSG_DE_ERROR = 'Error: el usuario de telegram no tiene el contenido visto'.freeze
+
+  def initialize(msg_de_error = MSG_DE_ERROR)
+    super(msg_de_error)
+  end
+end
+
+class ErrorContenidoInexistenteEnAPI < IOError
+  MSG_DE_ERROR = 'Error: contenido no existente en la base de datos de la API Rest'.freeze
+
+  def initialize(msg_de_error = MSG_DE_ERROR)
+    super(msg_de_error)
   end
 end

@@ -72,16 +72,77 @@ describe Plataforma do
     let(:calificacion) { instance_double('Calificacion') }
 
     it 'deberia crear una calificacion y enviar una request a la APIRest para persistirla' do
+      allow(Calificacion).to receive(:new).and_return(calificacion)
+      respuesta = instance_double('RespuestaFaraday', status: 201, body: {}.to_json)
+      conector_api = instance_double('ConectorAPI', calificar_contenido: respuesta)
       id_telegram = 123_456_789
       id_contenido = 40
       puntaje = 4
 
-      allow(Calificacion).to receive(:new).and_return(calificacion)
       expect(Calificacion).to receive(:new).with(id_telegram, id_contenido, puntaje)
       expect(conector_api).to receive(:calificar_contenido).with(calificacion)
 
       plataforma = described_class.new(conector_api)
       plataforma.calificar_contenido(id_telegram, id_contenido, puntaje)
+    end
+
+    it 'Deberia enviar los datos de una calificacion no vista aun por el usuario de telegram y levantar un error de usuario no vio el contenido' do
+      allow(Calificacion).to receive(:new).and_return(calificacion)
+      id_telegram = 123_456_789
+      id_contenido = 40
+      puntaje = 4
+
+      body = { 'details' => { 'field' => 'visualizacion' } }
+      respuesta = instance_double('RespuestaFaraday', status: 422, body: body.to_json)
+      conector_api = instance_double('ConectorAPI', calificar_contenido: respuesta)
+
+      plataforma = described_class.new(conector_api)
+
+      expect { plataforma.calificar_contenido(id_telegram, id_contenido, puntaje) }.to raise_error(ErrorAlPedirCalificacionContenidoNoVistoPorUsuarioDeTelegram)
+    end
+
+    it 'Deberia enviar los datos de una calificacion con un puntaje negativo y levantar un error de puntaje invalido' do
+      allow(Calificacion).to receive(:new).and_return(calificacion)
+      id_telegram = 123_456_789
+      id_contenido = 40
+      puntaje = 4
+
+      body = { 'details' => { 'field' => 'calificacion' } }
+      respuesta = instance_double('RespuestaFaraday', status: 422, body: body.to_json)
+      conector_api = instance_double('ConectorAPI', calificar_contenido: respuesta)
+
+      plataforma = described_class.new(conector_api)
+
+      expect { plataforma.calificar_contenido(id_telegram, id_contenido, puntaje) }.to raise_error(ErrorAlInstanciarCalificacionPuntajeInvalido)
+    end
+
+    it 'Deberia enviar nuevos datos para registrar una calificacion ya calificada y devolver una calificacion con el puntaje anterior' do
+      id_telegram = 123_456_789
+      id_contenido = 40
+      puntaje = 4
+      puntaje_anterior = 3
+
+      respuesta = instance_double('RespuestaFaraday', status: 200, body: { 'puntaje_anterior' => puntaje_anterior }.to_json)
+      conector_api = instance_double('ConectorAPI', calificar_contenido: respuesta)
+
+      plataforma = described_class.new(conector_api)
+      calificacion_anterior = plataforma.calificar_contenido(id_telegram, id_contenido, puntaje)
+
+      expect(calificacion_anterior.puntaje).to eq puntaje_anterior
+    end
+
+    it 'Deberia enviar los datos de una calificacion con un contenido que no esta en la base de datos de la API y levantar un error de contenido inexistente' do
+      allow(Calificacion).to receive(:new).and_return(calificacion)
+      id_telegram = 123_456_789
+      id_contenido = 40
+      puntaje = 4
+
+      respuesta = instance_double('RespuestaFaraday', status: 404, body: {}.to_json)
+      conector_api = instance_double('ConectorAPI', calificar_contenido: respuesta)
+
+      plataforma = described_class.new(conector_api)
+
+      expect { plataforma.calificar_contenido(id_telegram, id_contenido, puntaje) }.to raise_error(ErrorContenidoInexistenteEnAPI)
     end
   end
 

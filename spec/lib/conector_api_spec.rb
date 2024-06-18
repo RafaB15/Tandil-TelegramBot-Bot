@@ -83,7 +83,7 @@ describe ConectorApi do
   end
 
   describe 'calificar_contenido' do
-    it 'Deberia enviar los datos de una calificacion para registrarlos en la API y devolver exito' do
+    it 'Deberia enviar los datos de una calificacion para registrarlos en la API y devolver exito 201' do
       id_telegram = 123_456_789
       id_contenido = 40
       puntaje = 4
@@ -92,54 +92,23 @@ describe ConectorApi do
       calificacion = instance_double(Calificacion, id_telegram:, id_contenido:, puntaje:)
       stub_post_request_calificaciones(id_telegram, id_contenido, puntaje, estado)
 
-      described_class.new.calificar_contenido(calificacion)
+      respuesta = described_class.new.calificar_contenido(calificacion)
+
+      expect(respuesta.status).to eq estado
     end
 
-    it 'Deberia enviar los datos de una calificacion no vista aun por el usuario de telegram y levantar un error de usuario no vio el contenido' do
+    it 'Deberia enviar los datos de una calificacion y se recibe un error con estado 500' do
       id_telegram = 123_456_789
       id_contenido = 40
       puntaje = 4
+      estado = 500
 
       calificacion = instance_double(Calificacion, id_telegram:, id_contenido:, puntaje:)
-      stub_post_request_calificacion_contenido_no_visto(id_telegram, id_contenido, puntaje)
+      stub_post_request_calificaciones(id_telegram, id_contenido, puntaje, estado)
 
-      expect { described_class.new.calificar_contenido(calificacion) }.to raise_error(ErrorAlPedirCalificacionContenidoNoVistoPorUsuarioDeTelegram)
-    end
+      respuesta = described_class.new.calificar_contenido(calificacion)
 
-    it 'Deberia enviar los datos de una calificacion con un puntaje negativo y levantar un error de puntaje invalido' do
-      id_telegram = 123_456_789
-      id_contenido = 40
-      puntaje = -1
-
-      calificacion = instance_double(Calificacion, id_telegram:, id_contenido:, puntaje:)
-      stub_post_request_calificacion_puntaje_invalido(id_telegram, id_contenido, puntaje)
-
-      expect { described_class.new.calificar_contenido(calificacion) }.to raise_error(ErrorAlInstanciarCalificacionPuntajeInvalido)
-    end
-
-    it 'Deberia enviar nuevos datos para registrar una calificacion ya calificada y devolver una calificacion con el puntaje anterior' do
-      id_telegram = 123_456_789
-      id_contenido = 50
-      puntaje = 4
-      puntaje_anterior = 5
-
-      calificacion = Calificacion.new(id_telegram, id_contenido, puntaje)
-      stub_post_request_recalificacion(id_telegram, id_contenido, puntaje, puntaje_anterior)
-
-      calificacion_anterior = described_class.new.calificar_contenido(calificacion)
-
-      expect(calificacion_anterior.puntaje).to eq puntaje_anterior
-    end
-
-    it 'Deberia enviar los datos de una calificacion con un contenido que no esta en la base de datos de la API y levantar un error de conido inexistente' do
-      id_telegram = 123_456_789
-      id_contenido = 40
-      puntaje = 4
-
-      calificacion = instance_double(Calificacion, id_telegram:, id_contenido:, puntaje:)
-      stub_post_request_calificacion_contenido_inexistente(id_telegram, id_contenido, puntaje)
-
-      expect { described_class.new.calificar_contenido(calificacion) }.to raise_error(ErrorContenidoInexistenteEnAPI)
+      expect(respuesta.status).to eq estado
     end
   end
 
