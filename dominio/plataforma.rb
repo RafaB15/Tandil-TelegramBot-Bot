@@ -9,7 +9,11 @@ class Plataforma
     usuario = Usuario.new(email, id_telegram)
 
     @conector_api.registrar_usuario(usuario)
+  end
 
-    usuario
+  def calificar_contenido(id_telegram, id_contenido, puntaje)
+    calificacion = Calificacion.new(id_telegram, id_contenido, puntaje)
+
+    @conector_api.calificar_contenido(calificacion)
   end
 end
