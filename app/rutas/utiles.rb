@@ -1,5 +1,6 @@
-require "#{File.dirname(__FILE__)}/../../lib/routing"
-require "#{File.dirname(__FILE__)}/../../lib/conector_api"
+require_relative '../../lib/routing'
+require_relative '../../lib/conector_api'
+require_relative '../../dominio/plataforma'
 
 def generar_lista_de_contenidos(contenidos)
   respuesta = ''
@@ -14,4 +15,12 @@ def generar_lista_de_contenidos(contenidos)
   end
 
   respuesta
+end
+
+def manejar_error(error)
+  if ERROR_MAP.key?(error.class.name)
+    ERROR_MAP[error.class.name]
+  else
+    ERROR_DEFAULT
+  end
 end

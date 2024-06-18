@@ -3,7 +3,7 @@ require 'web_mock'
 # Uncomment to use VCR
 # require 'vcr_helper'
 
-require "#{File.dirname(__FILE__)}/../app/bot_client"
+require_relative '../app/bot_client'
 
 def when_i_send_text(token, message_text)
   body = { "ok": true, "result": [{ "update_id": 693_981_718,
@@ -142,7 +142,7 @@ def stub_post_request_calificaciones(id_telegram, id_contenido, puntaje, status)
 
   stub_request(:post, 'http://fake/calificaciones')
     .with(
-      body: "{\"id_telegram\":#{id_telegram},\"id_pelicula\":#{id_contenido},\"puntaje\":#{puntaje}}",
+      body: "{\"id_telegram\":#{id_telegram},\"id_contenido\":#{id_contenido},\"puntaje\":#{puntaje}}",
       headers: {
         'Accept' => '*/*',
         'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
@@ -158,7 +158,7 @@ def stub_post_request_calificacion_contenido_no_visto(id_telegram, id_contenido,
 
   stub_request(:post, 'http://fake/calificaciones')
     .with(
-      body: "{\"id_telegram\":#{id_telegram},\"id_pelicula\":#{id_contenido},\"puntaje\":#{puntaje}}",
+      body: "{\"id_telegram\":#{id_telegram},\"id_contenido\":#{id_contenido},\"puntaje\":#{puntaje}}",
       headers: {
         'Accept' => '*/*',
         'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
@@ -174,7 +174,7 @@ def stub_post_request_calificacion_puntaje_invalido(id_telegram, id_contenido, p
 
   stub_request(:post, 'http://fake/calificaciones')
     .with(
-      body: "{\"id_telegram\":#{id_telegram},\"id_pelicula\":#{id_contenido},\"puntaje\":#{puntaje}}",
+      body: "{\"id_telegram\":#{id_telegram},\"id_contenido\":#{id_contenido},\"puntaje\":#{puntaje}}",
       headers: {
         'Accept' => '*/*',
         'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',

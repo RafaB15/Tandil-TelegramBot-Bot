@@ -1,5 +1,5 @@
 require 'telegram/bot'
-require "#{File.dirname(__FILE__)}/../app/routes"
+require_relative 'routes'
 require 'semantic_logger'
 
 class BotClient

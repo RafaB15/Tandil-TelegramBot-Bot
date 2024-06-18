@@ -1,5 +1,5 @@
-require "#{File.dirname(__FILE__)}/rutas/utiles"
-require "#{File.dirname(__FILE__)}/../lib/version"
+require_relative 'rutas/utiles'
+require_relative '../lib/version'
 Dir[File.join(__dir__, 'rutas', '*.rb')].each { |file| require file }
 
 class Routes
@@ -10,7 +10,7 @@ class Routes
   include RutasUsuarios
   include RutasContenidos
 
-  LISTA_DE_COMANDOS = [
+  RESPUESTA_AYUDA_LISTA_DE_COMANDOS = [
     'Sé responder los siguientes mensajes:',
     '- /version: Devuelve la versión en la que el Bot está corriendo',
     '- /registrar <email>: Registra tu usuario de telegram asignandole un email',
@@ -23,28 +23,36 @@ class Routes
     '- /masinfo <id_pelicula>: Devuelve informacion extra acerca de la pelicula - director, premios, sinopsis'
   ].join("\n")
 
-  on_message '/start' do |bot, message|
+  RESPUESTA_DEFAULT = '¿Uh? ¡No te entiendo! ¿Me repetís la pregunta?'.freeze
+
+  COMANDO_START = '/start'.freeze
+  COMANDO_VERSION = '/version'.freeze
+  COMANDO_AYUDA = %r{/ayuda}
+
+  on_message COMANDO_START do |bot, message|
     text = "Hola, #{message.from.first_name}"
+
     bot.api.send_message(chat_id: message.chat.id, text:)
   end
 
-  on_message '/version' do |bot, message|
+  on_message COMANDO_VERSION do |bot, message|
     respuesta = ConectorApi.new.obtener_version
 
     version_api = JSON.parse(respuesta.body)['version']
 
     text = "version bot: #{Version.current}, version api: #{version_api}"
+
     bot.api.send_message(chat_id: message.chat.id, text:)
   end
 
-  on_message_pattern %r{/ayuda} do |bot, message|
-    text = LISTA_DE_COMANDOS
+  on_message_pattern COMANDO_AYUDA do |bot, message|
+    text = RESPUESTA_AYUDA_LISTA_DE_COMANDOS
 
     bot.api.send_message(chat_id: message.chat.id, text:)
   end
 
   default do |bot, message|
-    text = '¿Uh? ¡No te entiendo! ¿Me repetís la pregunta?'
+    text = RESPUESTA_DEFAULT
 
     bot.api.send_message(chat_id: message.chat.id, text:)
   end

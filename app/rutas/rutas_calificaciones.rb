@@ -1,4 +1,4 @@
-require "#{File.dirname(__FILE__)}/utiles"
+require_relative 'utiles'
 
 module RutasCalificaciones
   include Routing
