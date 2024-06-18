@@ -16,11 +16,3 @@ def generar_lista_de_contenidos(contenidos)
 
   respuesta
 end
-
-def manejar_error(error)
-  if ERROR_MAP.key?(error.class.name)
-    ERROR_MAP[error.class.name]
-  else
-    ERROR_DEFAULT
-  end
-end

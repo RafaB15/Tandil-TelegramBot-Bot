@@ -28,10 +28,22 @@ class ConectorApi
     end
   end
 
-  def calificar_contenido(id_telegram, id_contenido, puntaje)
-    cuerpo = { id_telegram:, id_contenido:, puntaje: }
+  def calificar_contenido(calificacion)
+    cuerpo = { id_telegram: calificacion.id_telegram, id_contenido: calificacion.id_contenido, puntaje: calificacion.puntaje }
 
-    Faraday.post("#{API_REST_URL}/calificaciones", cuerpo.to_json, 'Content-Type' => 'application/json')
+    respuesta = Faraday.post("#{API_REST_URL}/calificaciones", cuerpo.to_json, 'Content-Type' => 'application/json')
+
+    estado = respuesta.status
+    cuerpo = JSON.parse(respuesta.body)
+
+    if estado == 200
+      puntaje_anterior = cuerpo['puntaje_anterior']
+      calificacion.recalificar(puntaje_anterior)
+
+      return calificacion
+    end
+
+    manejar_respuesta_calificar_contenido(estado, cuerpo)
   end
 
   def marcar_contenido_como_favorito(id_telegram, id_contenido)
@@ -59,7 +71,31 @@ class ConectorApi
   def obtener_detalles_de_contenido(id_contenido, id_telegram)
     Faraday.get("#{API_REST_URL}/contenidos/#{id_contenido}/detalles", id_telegram:, 'Content-Type' => 'application/json')
   end
+
+  private
+
+  def manejar_respuesta_calificar_contenido(estado, cuerpo)
+    case estado
+    when 201
+      nil
+    when 422
+      if cuerpo['details']['field'] == 'visualizacion'
+        raise ErrorAlPedirCalificacionContenidoNoVistoPorUsuarioDeTelegram
+      elsif cuerpo['details']['field'] == 'calificacion'
+        raise ErrorAlInstanciarCalificacionPuntajeInvalido
+      else
+        raise IOError
+      end
+    when 404
+      raise ErrorContenidoInexistenteEnAPI
+    else
+      raise IOError
+    end
+  end
 end
+
+# Error registrar usuario
+# ==============================================================================
 
 class ErrorIDTelegramYaAsociadoAUnaCuentaExistenteEnLaAPI < IOError
   MSG_DE_ERROR = 'Error: email ya asociado a una cuenta existente en la API'.freeze
@@ -71,6 +107,25 @@ end
 
 class ErrorEmailYaAsociadoAUnaCuentaExistenteEnLaAPI < IOError
   MSG_DE_ERROR = 'Error: ID telegram ya asociado a una cuenta existente en la API'.freeze
+
+  def initialize(msg_de_error = MSG_DE_ERROR)
+    super(msg_de_error)
+  end
+end
+
+# Error calificar
+# ==============================================================================
+
+class ErrorAlPedirCalificacionContenidoNoVistoPorUsuarioDeTelegram < IOError
+  MSG_DE_ERROR = 'Error: el usuario de telegram no tiene el contenido visto'.freeze
+
+  def initialize(msg_de_error = MSG_DE_ERROR)
+    super(msg_de_error)
+  end
+end
+
+class ErrorContenidoInexistenteEnAPI < IOError
+  MSG_DE_ERROR = 'Error: contenido no existente en la base de datos de la API Rest'.freeze
 
   def initialize(msg_de_error = MSG_DE_ERROR)
     super(msg_de_error)
