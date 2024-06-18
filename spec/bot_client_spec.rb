@@ -201,7 +201,7 @@ def stub_post_request_recalificacion(id_telegram, id_contenido, puntaje, puntaje
     .to_return(status: 200, body: response.to_json, headers: {})
 end
 
-def stub_post_request_favoritos(id_telegram, id_contenido, status)
+def stub_post_request_favoritos(id_telegram, id_contenido, estado)
   cuerpo = { id: 1, id_telegram:, id_contenido: }
 
   stub_request(:post, 'http://fake/favoritos')
@@ -214,7 +214,7 @@ def stub_post_request_favoritos(id_telegram, id_contenido, status)
         'User-Agent' => 'Faraday v2.7.4'
       }
     )
-    .to_return(status:, body: cuerpo.to_json, headers: {})
+    .to_return(status: estado, body: cuerpo.to_json, headers: {})
 end
 
 def stub_get_request_contenidos_con_ningun_titulo_similar

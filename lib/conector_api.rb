@@ -49,11 +49,7 @@ class ConectorApi
   def marcar_contenido_como_favorito(favorito)
     cuerpo = { id_telegram: favorito.id_telegram, id_contenido: favorito.id_contenido }
 
-    respuesta = Faraday.post("#{API_REST_URL}/favoritos", cuerpo.to_json, 'Content-Type' => 'application/json')
-
-    estado = respuesta.status
-
-    raise IOError if estado != 201
+    Faraday.post("#{API_REST_URL}/favoritos", cuerpo.to_json, 'Content-Type' => 'application/json')
   end
 
   def obtener_favoritos(id_telegram)

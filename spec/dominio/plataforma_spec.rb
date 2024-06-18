@@ -41,19 +41,34 @@ describe Plataforma do
   end
 
   describe 'marcar_contenido_como_favorito' do
-    let(:conector_api) { instance_double('ConectorAPI', marcar_contenido_como_favorito: nil) }
     let(:favorito) { instance_double('Favorito') }
 
-    it 'deberia crear un favorito y enviar una request a la APIRest para persistirla' do
+    before(:each) { allow(Favorito).to receive(:new).and_return(favorito) }
+
+    it 'deberia crear un favorito y enviar una request a la APIRest para persistirla y recibir un estado de exito' do
+      respuesta = instance_double('RespuestaFaraday', status: 201)
+      conector_api = instance_double('ConectorAPI', marcar_contenido_como_favorito: respuesta)
       id_telegram = 123_456_789
       id_contenido = 55
 
-      allow(Favorito).to receive(:new).and_return(favorito)
       expect(Favorito).to receive(:new).with(id_telegram, id_contenido)
       expect(conector_api).to receive(:marcar_contenido_como_favorito).with(favorito)
 
       plataforma = described_class.new(conector_api)
       plataforma.marcar_contenido_como_favorito(id_telegram, id_contenido)
+    end
+
+    it 'deberia crear un favorito y enviar una request a la APIRest para persistirla, si hubo un error, deberia devolver un error IO' do
+      respuesta = instance_double('RespuestaFaraday', status: 500)
+      conector_api = instance_double('ConectorAPI', marcar_contenido_como_favorito: respuesta)
+      id_telegram = 123_456_789
+      id_contenido = 55
+
+      expect(Favorito).to receive(:new).with(id_telegram, id_contenido)
+      expect(conector_api).to receive(:marcar_contenido_como_favorito).with(favorito)
+
+      plataforma = described_class.new(conector_api)
+      expect { plataforma.marcar_contenido_como_favorito(id_telegram, id_contenido) }.to raise_error(IOError)
     end
   end
 

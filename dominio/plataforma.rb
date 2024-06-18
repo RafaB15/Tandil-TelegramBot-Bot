@@ -20,7 +20,11 @@ class Plataforma
   def marcar_contenido_como_favorito(id_telegram, id_contenido)
     favorito = Favorito.new(id_telegram, id_contenido)
 
-    @conector_api.marcar_contenido_como_favorito(favorito)
+    respuesta = @conector_api.marcar_contenido_como_favorito(favorito)
+
+    estado = respuesta.status
+
+    raise IOError if estado != 201
   end
 
   def obtener_favoritos(id_telegram)

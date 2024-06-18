@@ -144,7 +144,9 @@ describe ConectorApi do
       favorito = instance_double(Favorito, id_telegram:, id_contenido:)
       stub_post_request_favoritos(id_telegram, id_contenido, estado)
 
-      described_class.new.marcar_contenido_como_favorito(favorito)
+      respuesta = described_class.new.marcar_contenido_como_favorito(favorito)
+
+      expect(respuesta.status).to eq estado
     end
   end
 
