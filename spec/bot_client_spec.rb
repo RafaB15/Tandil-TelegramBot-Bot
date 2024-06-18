@@ -330,7 +330,8 @@ def stub_get_contenidos_id_detalles(status, body, id_contenido)
 end
 
 def stub_get_contenidos_id_detalles_id_invalido(id_contenido)
-  body = { 'error' => 'no encontrado' }
+  body = { 'details' => { 'field' => 'contenido' } }
+
   stub_request(:get, "http://fake/contenidos/#{id_contenido}/detalles?Content-Type=application/json&id_telegram=141733544")
     .with(
       headers: {
@@ -343,7 +344,8 @@ def stub_get_contenidos_id_detalles_id_invalido(id_contenido)
 end
 
 def stub_get_contenidos_id_detalles_id_no_corresponde_a_omdb(id_contenido)
-  body = { 'error' => 'no hay detalles para mostrar' }
+  body = { 'details' => { 'field' => 'omdb' } }
+
   stub_request(:get, "http://fake/contenidos/#{id_contenido}/detalles?Content-Type=application/json&id_telegram=141733544")
     .with(
       headers: {

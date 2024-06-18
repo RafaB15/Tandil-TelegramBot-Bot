@@ -41,6 +41,8 @@ class Plataforma
       return calificacion
     end
 
+    return if estado == 201
+
     manejar_respuesta_calificar_contenido(estado, cuerpo)
   end
 
@@ -68,25 +70,18 @@ class Plataforma
 
   def manejar_respuesta_calificar_contenido(estado, cuerpo)
     case estado
-    when 201
-      nil
+
     when 422
       if cuerpo['details']['field'] == 'visualizacion'
         raise ErrorAlPedirCalificacionContenidoNoVistoPorUsuarioDeTelegram
       elsif cuerpo['details']['field'] == 'calificacion'
         raise ErrorAlInstanciarCalificacionPuntajeInvalido
-      else
-        raise IOError
       end
     when 404
-      if cuerpo['details']['field'] == 'contenido'
-        raise ErrorContenidoInexistenteEnAPI
-      else
-        raise IOError
-      end
-    else
-      raise IOError
+      raise ErrorContenidoInexistenteEnAPI if cuerpo['details']['field'] == 'contenido'
     end
+
+    raise IOError
   end
 end
 

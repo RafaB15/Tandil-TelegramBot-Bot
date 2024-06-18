@@ -65,9 +65,9 @@ def ensamblar_respuesta_mas_info(estado, detalles_contenido, id_contenido)
   if estado == 200
     respuesta = "Info de #{detalles_contenido['titulo']} (#{id_contenido}):\n#{generar_lista_de_detalles(detalles_contenido)}"
   elsif estado == 404
-    if detalles_contenido['error'] == 'no encontrado'
+    if detalles_contenido['details']['field'] == 'contenido'
       respuesta = 'No se encontraron resultados para el contenido buscado'
-    elsif detalles_contenido['error'] == 'no hay detalles para mostrar'
+    elsif detalles_contenido['details']['field'] == 'omdb'
       respuesta = 'No se encontraron detalles para el contenido buscado'
     end
   end
