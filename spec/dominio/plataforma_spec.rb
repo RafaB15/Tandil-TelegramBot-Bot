@@ -122,7 +122,8 @@ describe Plataforma do
       puntaje = 4
       puntaje_anterior = 3
 
-      respuesta = instance_double('RespuestaFaraday', status: 200, body: { 'puntaje_anterior' => puntaje_anterior }.to_json)
+      body = { 'puntaje_anterior' => puntaje_anterior }
+      respuesta = instance_double('RespuestaFaraday', status: 200, body: body.to_json)
       conector_api = instance_double('ConectorAPI', calificar_contenido: respuesta)
 
       plataforma = described_class.new(conector_api)
@@ -137,7 +138,8 @@ describe Plataforma do
       id_contenido = 40
       puntaje = 4
 
-      respuesta = instance_double('RespuestaFaraday', status: 404, body: {}.to_json)
+      body = { 'details' => { 'field' => 'contenido' } }
+      respuesta = instance_double('RespuestaFaraday', status: 404, body: body.to_json)
       conector_api = instance_double('ConectorAPI', calificar_contenido: respuesta)
 
       plataforma = described_class.new(conector_api)

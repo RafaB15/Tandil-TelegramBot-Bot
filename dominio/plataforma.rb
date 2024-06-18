@@ -79,7 +79,11 @@ class Plataforma
         raise IOError
       end
     when 404
-      raise ErrorContenidoInexistenteEnAPI
+      if cuerpo['details']['field'] == 'contenido'
+        raise ErrorContenidoInexistenteEnAPI
+      else
+        raise IOError
+      end
     else
       raise IOError
     end

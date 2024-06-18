@@ -20,7 +20,7 @@ class Routes
     '- /buscartitulo <titulo>: Devuelve todos los contenidos en nuestra bases de datos que sean similares a tu busqueda',
     '- /misfavoritos: Si estas registrado, devuelve tu lista de favoritos',
     '- /sugerenciasnuevos: Devuelve una lista con los 5 contenidos mas nuevos de la ultima semana',
-    '- /masinfo <id_contenido>: Devuelve informacion extra acerca de la pelicula - director, premios, sinopsis'
+    '- /masinfo <id_contenido>: Devuelve informacion extra acerca del contenido - director, premios, sinopsis'
   ].join("\n")
 
   RESPUESTA_DEFAULT = '¿Uh? ¡No te entiendo! ¿Me repetís la pregunta?'.freeze

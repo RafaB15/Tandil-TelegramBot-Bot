@@ -43,9 +43,9 @@ def ensamblar_respuesta_sugerencias_mas_vistos(sugerencias_mas_vistos)
 
   sugerencias_mas_vistos.each do |contenido|
     id_contenido = contenido['id']
-    titulo = contenido['pelicula']['titulo']
-    anio = contenido['pelicula']['anio']
-    genero = contenido['pelicula']['genero']
+    titulo = contenido['contenido']['titulo']
+    anio = contenido['contenido']['anio']
+    genero = contenido['contenido']['genero']
 
     respuesta += "  [ID: #{id_contenido}] #{titulo} (#{genero}, #{anio})\n"
   end

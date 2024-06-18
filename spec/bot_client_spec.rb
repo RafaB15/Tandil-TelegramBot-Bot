@@ -98,7 +98,7 @@ def stub_get_request_contenidos_top
     count += 1
     {
       'id' => count,
-      'pelicula' => {
+      'contenido' => {
         'titulo' => titulo,
         'anio' => anio,
         'genero' => 'accion'
@@ -170,7 +170,7 @@ def stub_post_request_calificacion_contenido_no_visto(id_telegram, id_contenido,
 end
 
 def stub_post_request_calificacion_contenido_inexistente(id_telegram, id_contenido, puntaje)
-  response = { error: 'No encontrado', message: '', details: { field: 'pelicula' } }
+  response = { error: 'No encontrado', message: '', details: { field: 'contenido' } }
 
   stub_request(:post, 'http://fake/calificaciones')
     .with(
@@ -730,7 +730,7 @@ describe 'BotClient' do
 - /buscartitulo <titulo>: Devuelve todos los contenidos en nuestra bases de datos que sean similares a tu busqueda
 - /misfavoritos: Si estas registrado, devuelve tu lista de favoritos
 - /sugerenciasnuevos: Devuelve una lista con los 5 contenidos mas nuevos de la ultima semana
-- /masinfo <id_contenido>: Devuelve informacion extra acerca de la pelicula - director, premios, sinopsis"
+- /masinfo <id_contenido>: Devuelve informacion extra acerca del contenido - director, premios, sinopsis"
 
     then_i_get_text(token, text)
   end
