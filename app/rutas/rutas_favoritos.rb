@@ -12,17 +12,19 @@ module RutasFavoritos
 
   on_message_pattern COMANDO_MARCAR_FAVORITO do |bot, message, args|
     id_contenido = args['id_contenido'].to_i
-    id_telegram = message.from.id.to_i
+    id_telegram = message.from.id.to_i # Passar a logica de negocio.
 
-    respuesta = ConectorApi.new.marcar_contenido_como_favorito(id_telegram, id_contenido)
+    conector_api = ConectorApi.new
 
-    estado = respuesta.status
+    plataforma = Plataforma.new(conector_api)
 
-    text = if estado == 201
-             RESPUESTA_MARCAR_FAVORITOS_EXITO
-           else
-             RESPUESTA_MARCAR_FAVORITOS_ERROR
-           end
+    begin
+      plataforma.marcar_contenido_como_favorito(id_telegram, id_contenido)
+
+      text = RESPUESTA_MARCAR_FAVORITOS_EXITO
+    rescue StandardError => _e
+      text = RESPUESTA_MARCAR_FAVORITOS_ERROR
+    end
 
     bot.api.send_message(chat_id: message.chat.id, text:)
   end

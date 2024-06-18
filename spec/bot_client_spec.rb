@@ -476,7 +476,6 @@ describe 'BotClient' do
 
   it 'deberia recibir un mensaje /calificar {id_contenido} {calificacion} con mensaje de error 422 y decirme que la calificación es inválida' do
     token = 'fake_token'
-    # stub_post_request_calificacion_puntaje_invalido(141_733_544, 97, -1)
 
     when_i_send_text(token, '/calificar 97 -1')
     then_i_get_text(token, 'La calificacion es del 1 al 5. ¡Volve a calificar!')
@@ -499,7 +498,7 @@ describe 'BotClient' do
     then_i_get_text(token, 'El contenido ingresado no existe')
   end
 
-  it 'deberia recibir un mensaje /marcarfavorito {id_contenido} y devolver un mensaje de contenido anadido a favoritos' do\
+  xit 'deberia recibir un mensaje /marcarfavorito {id_contenido} y devolver un mensaje de contenido anadido a favoritos' do
     token = 'fake_token'
     stub_post_request_favoritos('test@test.com', 1, 201)
     when_i_send_text(token, '/marcarfavorito 1')

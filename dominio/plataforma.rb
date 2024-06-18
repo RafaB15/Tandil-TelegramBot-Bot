@@ -16,4 +16,10 @@ class Plataforma
 
     @conector_api.calificar_contenido(calificacion)
   end
+
+  def marcar_contenido_como_favorito(id_telegram, id_contenido)
+    favorito = Favorito.new(id_telegram, id_contenido)
+
+    @conector_api.marcar_contenido_como_favorito(favorito)
+  end
 end

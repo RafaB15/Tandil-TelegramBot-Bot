@@ -16,3 +16,11 @@ def generar_lista_de_contenidos(contenidos)
 
   respuesta
 end
+
+def manejar_error(error_map, error)
+  if error_map.key?(error.class.name)
+    error_map[error.class.name]
+  else
+    error_map['ErrorPredeterinado']
+  end
+end

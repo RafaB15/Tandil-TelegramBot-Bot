@@ -11,9 +11,9 @@ module RutasCalificaciones
   ERROR_MAP = {
     'ErrorAlPedirCalificacionContenidoNoVistoPorUsuarioDeTelegram' => '¡Aún no viste este contenido, miralo para poder calificarlo!',
     'ErrorAlInstanciarCalificacionPuntajeInvalido' => 'La calificacion es del 1 al 5. ¡Volve a calificar!',
-    'ErrorContenidoInexistenteEnAPI' => 'El contenido ingresado no existe'
+    'ErrorContenidoInexistenteEnAPI' => 'El contenido ingresado no existe',
+    'ErrorPredeterinado' => 'Error al calificar el contenido. Inténtalo de nuevo más tarde.'
   }.freeze
-  ERROR_DEFAULT = 'Error al calificar el contenido. Inténtalo de nuevo más tarde.'.freeze
 
   on_message_pattern COMANDO_CALIFICAR_CONTENIDO do |bot, message, args|
     id_telegram = message.from.id
@@ -33,11 +33,7 @@ module RutasCalificaciones
                RESPUESTA_RECALIFICAR_CONTENIDO
              end
     rescue StandardError => e
-      text = if ERROR_MAP.key?(e.class.name)
-               ERROR_MAP[e.class.name]
-             else
-               ERROR_DEFAULT
-             end
+      text = manejar_error(ERROR_MAP, e)
     end
 
     bot.api.send_message(chat_id: message.chat.id, text:)

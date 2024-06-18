@@ -8,10 +8,9 @@ module RutasUsuarios
   ERROR_MAP = {
     'ErrorIDTelegramYaAsociadoAUnaCuentaExistenteEnLaAPI' => 'Error, tu usuario de telegram ya esta asociado a una cuenta existente',
     'ErrorEmailYaAsociadoAUnaCuentaExistenteEnLaAPI' => 'Error, el email ingresado ya esta asociado a una cuenta existente',
-    'ErrorAlInstanciarUsuarioEmailInvalido' => 'Error, tiene que enviar un email válido'
+    'ErrorAlInstanciarUsuarioEmailInvalido' => 'Error, tiene que enviar un email válido',
+    'ErrorPredeterminado' => 'Error de la API'
   }.freeze
-
-  ERROR_DEFAULT = 'Error de la API'.freeze
 
   on_message_pattern COMANDO_REGISTRAR_USUARIO do |bot, message, args|
     email = args['email']
@@ -28,11 +27,7 @@ module RutasUsuarios
 
       text = "Bienvenido, cinéfilo #{nombre_usuario}!"
     rescue StandardError => e
-      text = if ERROR_MAP.key?(e.class.name)
-               ERROR_MAP[e.class.name]
-             else
-               ERROR_DEFAULT
-             end
+      text = manejar_error(ERROR_MAP, e)
     end
 
     bot.api.send_message(chat_id: message.chat.id, text:)

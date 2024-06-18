@@ -8,7 +8,7 @@ describe Plataforma do
     let(:conector_api) { instance_double('ConectorAPI', registrar_usuario: nil) }
     let(:usuario) { instance_double('Usuario') }
 
-    it 'deberia crear un usuario y enviar un request a la APIRest para crear un usuario' do
+    it 'deberia crear un usuario y enviar una request a la APIRest para crear un usuario' do
       email = 'juan@gmail.com'
       id_telegram = 123_456_789
 
@@ -25,7 +25,7 @@ describe Plataforma do
     let(:conector_api) { instance_double('ConectorAPI', calificar_contenido: nil) }
     let(:calificacion) { instance_double('Calificacion') }
 
-    it 'deberia crear una calificacion y enviar un request a la APIRest para persistirla' do
+    it 'deberia crear una calificacion y enviar una request a la APIRest para persistirla' do
       id_telegram = 123_456_789
       id_contenido = 40
       puntaje = 4
@@ -36,6 +36,23 @@ describe Plataforma do
 
       plataforma = described_class.new(conector_api)
       plataforma.calificar_contenido(id_telegram, id_contenido, puntaje)
+    end
+  end
+
+  describe 'marcar_contenido_como_favorito' do
+    let(:conector_api) { instance_double('ConectorAPI', marcar_contenido_como_favorito: nil) }
+    let(:favorito) { instance_double('Favorito') }
+
+    it 'deberia crear un favorito y enviar una request a la APIRest para persistirla' do
+      id_telegram = 123_456_789
+      id_contenido = 55
+
+      allow(Favorito).to receive(:new).and_return(favorito)
+      expect(Favorito).to receive(:new).with(id_telegram, id_contenido)
+      expect(conector_api).to receive(:marcar_contenido_como_favorito).with(favorito)
+
+      plataforma = described_class.new(conector_api)
+      plataforma.marcar_contenido_como_favorito(id_telegram, id_contenido)
     end
   end
 end
