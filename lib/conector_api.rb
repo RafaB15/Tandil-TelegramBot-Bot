@@ -10,22 +10,7 @@ class ConectorApi
   def registrar_usuario(usuario)
     cuerpo = { email: usuario.email, id_telegram: usuario.id_telegram }
 
-    respuesta = Faraday.post("#{API_REST_URL}/usuarios", cuerpo.to_json, 'Content-Type' => 'application/json')
-
-    estado = respuesta.status
-    cuerpo = JSON.parse(respuesta.body)
-
-    return if estado == 201
-
-    if estado == 409
-      if cuerpo['details']['field'] == 'id_telegram'
-        raise ErrorIDTelegramYaAsociadoAUnaCuentaExistenteEnLaAPI
-      else
-        raise ErrorEmailYaAsociadoAUnaCuentaExistenteEnLaAPI
-      end
-    else
-      raise IOError
-    end
+    Faraday.post("#{API_REST_URL}/usuarios", cuerpo.to_json, 'Content-Type' => 'application/json')
   end
 
   def calificar_contenido(calificacion)

@@ -6,19 +6,64 @@ require 'rspec'
 
 describe Plataforma do
   describe 'registrar_usuario' do
-    let(:conector_api) { instance_double('ConectorAPI', registrar_usuario: nil) }
     let(:usuario) { instance_double('Usuario') }
 
+    before(:each) { allow(Usuario).to receive(:new).and_return(usuario) }
+
     it 'deberia crear un usuario y enviar una request a la APIRest para crear un usuario' do
+      respuesta = instance_double('RespuestaFaraday', status: 201, body: {}.to_json)
+      conector_api = instance_double('ConectorAPI', registrar_usuario: respuesta)
       email = 'juan@gmail.com'
       id_telegram = 123_456_789
 
-      allow(Usuario).to receive(:new).and_return(usuario)
       expect(Usuario).to receive(:new).with(email, id_telegram)
       expect(conector_api).to receive(:registrar_usuario).with(usuario)
 
       plataforma = described_class.new(conector_api)
       plataforma.registrar_usuario(email, id_telegram)
+    end
+
+    it 'Deberia enviar los datos de un usuario con email valido y levantar un error de I/O por una respuesta de error de email de la API (Caso raro)' do
+      respuesta = instance_double('RespuestaFaraday', status: 500, body: {}.to_json)
+      conector_api = instance_double('ConectorAPI', registrar_usuario: respuesta)
+      email = 'juan@gmail.com'
+      id_telegram = 123_456_789
+
+      plataforma = described_class.new(conector_api)
+      expect { plataforma.registrar_usuario(email, id_telegram) }.to raise_error(IOError)
+    end
+
+    it 'Deberia enviar los datos de un usuario con email invalido y levantar un error de Error al instanciar un usuario con email invalidos' do
+      conector_api = instance_double('ConectorApi')
+      email = 'juan@gmail.com'
+      id_telegram = 123_456_789
+
+      allow(Usuario).to receive(:new).and_raise(ErrorAlInstanciarUsuarioEmailInvalido)
+
+      plataforma = described_class.new(conector_api)
+      expect { plataforma.registrar_usuario(email, id_telegram) }.to raise_error(ErrorAlInstanciarUsuarioEmailInvalido)
+    end
+
+    it 'Deberia enviar los datos de un usuario con un ID de Telegram ya en uso y levantar un error de ID Telegram ya asociado a una cuenta' do
+      body = { 'details' => { 'field' => 'id_telegram' } }
+      respuesta = instance_double('RespuestaFaraday', status: 409, body: body.to_json)
+      conector_api = instance_double('ConectorAPI', registrar_usuario: respuesta)
+      email = 'juan@gmail.com'
+      id_telegram = 123_456_789
+
+      plataforma = described_class.new(conector_api)
+      expect { plataforma.registrar_usuario(email, id_telegram) }.to raise_error(ErrorIDTelegramYaAsociadoAUnaCuentaExistenteEnLaAPI)
+    end
+
+    it 'Deberia enviar los datos de un usuario con un email ya en uso y levantar un error de email ya asociado a una cuenta' do
+      body = { 'details' => { 'field' => 'email' } }
+      respuesta = instance_double('RespuestaFaraday', status: 409, body: body.to_json)
+      conector_api = instance_double('ConectorAPI', registrar_usuario: respuesta)
+      email = 'juan@gmail.com'
+      id_telegram = 123_456_789
+
+      plataforma = described_class.new(conector_api)
+      expect { plataforma.registrar_usuario(email, id_telegram) }.to raise_error(ErrorEmailYaAsociadoAUnaCuentaExistenteEnLaAPI)
     end
   end
 

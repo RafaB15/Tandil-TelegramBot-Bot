@@ -8,7 +8,22 @@ class Plataforma
   def registrar_usuario(email, id_telegram)
     usuario = Usuario.new(email, id_telegram)
 
-    @conector_api.registrar_usuario(usuario)
+    respuesta = @conector_api.registrar_usuario(usuario)
+
+    estado = respuesta.status
+    cuerpo = JSON.parse(respuesta.body)
+
+    return if estado == 201
+
+    if estado == 409
+      if cuerpo['details']['field'] == 'id_telegram'
+        raise ErrorIDTelegramYaAsociadoAUnaCuentaExistenteEnLaAPI
+      else
+        raise ErrorEmailYaAsociadoAUnaCuentaExistenteEnLaAPI
+      end
+    end
+
+    raise IOError
   end
 
   def calificar_contenido(id_telegram, id_contenido, puntaje)

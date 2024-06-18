@@ -57,7 +57,7 @@ def stub_get_request_api
     .to_return(status: 200, body: response.to_json, headers: {})
 end
 
-def stub_post_request_usuario(email, id_telegram, status)
+def stub_post_request_usuario(email, id_telegram, estado)
   response = { id: 1, email:, id_telegram: }
   stub_request(:post, 'http://fake/usuarios')
     .with(
@@ -69,7 +69,7 @@ def stub_post_request_usuario(email, id_telegram, status)
         'User-Agent' => 'Faraday v2.7.4'
       }
     )
-    .to_return(status:, body: response.to_json, headers: {})
+    .to_return(status: estado, body: response.to_json, headers: {})
 end
 
 def stub_post_request_usuario_error(email, id_telegram, status, message, field)

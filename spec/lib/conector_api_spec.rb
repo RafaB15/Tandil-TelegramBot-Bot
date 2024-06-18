@@ -21,7 +21,7 @@ end
 
 describe ConectorApi do
   describe 'registrar_usuario' do
-    it 'Deberia enviar los datos de un usuario para registrarlos en la API y devolver exito' do
+    it 'Deberia enviar los datos de un usuario para registrarlos en la API y devolver exito 201' do
       email = 'juan@gmail.com'
       id_telegram = 123_456_789
       estado = 201
@@ -29,10 +29,12 @@ describe ConectorApi do
       usuario = instance_double(Usuario, email:, id_telegram:)
       stub_post_request_usuario(email, id_telegram, estado)
 
-      described_class.new.registrar_usuario(usuario)
+      respuesta = described_class.new.registrar_usuario(usuario)
+
+      expect(respuesta.status).to eq estado
     end
 
-    it 'Deberia enviar los datos de un usuario con email invalido y levantar un error de I/O' do
+    it 'Deberia enviar los datos de un usuario con email invalido y devolver un estado 422' do
       email = 'juan'
       id_telegram = 123_456_789
       estado = 422
@@ -40,37 +42,43 @@ describe ConectorApi do
       usuario = instance_double(Usuario, email:, id_telegram:)
       stub_post_request_usuario(email, id_telegram, estado)
 
-      expect { described_class.new.registrar_usuario(usuario) }.to raise_error(IOError)
+      respuesta = described_class.new.registrar_usuario(usuario)
+
+      expect(respuesta.status).to eq estado
     end
 
-    it 'Deberia enviar los datos de un usuario con un ID de Telegram ya en uso y levantar un error de ID Telegram ya asociado a una cuenta' do
+    it 'Deberia enviar los datos de un usuario con un ID de Telegram ya en uso y devolver un estado 409 con field id telegram' do
       id_telegram = 123_456_789
 
       usuario = instance_double(Usuario, email: 'juan@gmail.com', id_telegram:)
       stub_post_request_usuario('juan@gmail.com', id_telegram, 201)
       described_class.new.registrar_usuario(usuario)
 
-      message = 'El telegram ID ya está asociado con una cuenta existente.'
-      field = :id_telegram
+      field = 'id_telegram'
       usuario = instance_double(Usuario, email: 'pablito@gmail.com', id_telegram:)
-      stub_post_request_usuario_error('pablito@gmail.com', id_telegram, 409, message, field)
+      stub_post_request_usuario_error('pablito@gmail.com', id_telegram, 409, 'El telegram ID ya está asociado con una cuenta existente.', field)
 
-      expect { described_class.new.registrar_usuario(usuario) }.to raise_error(ErrorIDTelegramYaAsociadoAUnaCuentaExistenteEnLaAPI)
+      respuesta = described_class.new.registrar_usuario(usuario)
+
+      expect(respuesta.status).to eq 409
+      expect(JSON.parse(respuesta.body)['details']['field']).to eq field
     end
 
-    it 'Deberia enviar los datos de un usuario con un email ya en uso y levantar un error de email ya asociado a una cuenta' do
+    it 'Deberia enviar los datos de un usuario con un email ya en uso y devolver un estado 409 con field email' do
       email = 'juan@gmail.com'
 
       usuario = instance_double(Usuario, email:, id_telegram: 123_456_789)
       stub_post_request_usuario(email, 123_456_789, 201)
       described_class.new.registrar_usuario(usuario)
 
-      message = 'El email ya está asociado con una cuenta existente.'
-      field = :email
+      field = 'email'
       usuario = instance_double(Usuario, email:, id_telegram: 987_654_321)
-      stub_post_request_usuario_error(email, 987_654_321, 409, message, field)
+      stub_post_request_usuario_error(email, 987_654_321, 409, 'El email ya está asociado con una cuenta existente.', field)
 
-      expect { described_class.new.registrar_usuario(usuario) }.to raise_error(ErrorEmailYaAsociadoAUnaCuentaExistenteEnLaAPI)
+      respuesta = described_class.new.registrar_usuario(usuario)
+
+      expect(respuesta.status).to eq 409
+      expect(JSON.parse(respuesta.body)['details']['field']).to eq field
     end
   end
 
