@@ -11,15 +11,17 @@ module RutasContenidos
   on_message_pattern COMANDO_BUSCAR_TITULO do |bot, message, args|
     titulo = args['titulo']
 
-    respuesta = ConectorApi.new.buscar_contenido_por_titulo(titulo)
+    conector_api = ConectorApi.new
 
-    contenidos = JSON.parse(respuesta.body)
+    plataforma = Plataforma.new(conector_api)
 
-    text = if contenidos.empty?
-             RESPUESTA_LISTA_DE_CONTENIDOS_VACIA
-           else
-             "Acá están los titulos que coinciden con tu busqueda:\n#{generar_lista_de_contenidos(contenidos)}"
-           end
+    begin
+      contenidos = plataforma.buscar_contenido_por_titulo(titulo)
+
+      text = "Acá están los titulos que coinciden con tu busqueda:\n#{generar_lista_de_contenidos(contenidos)}"
+    rescue StandardError => _e
+      text = RESPUESTA_LISTA_DE_CONTENIDOS_VACIA
+    end
 
     bot.api.send_message(chat_id: message.chat.id, text:)
   end

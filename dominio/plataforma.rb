@@ -71,6 +71,16 @@ class Plataforma
     favoritos
   end
 
+  def buscar_contenido_por_titulo(titulo)
+    respuesta = @conector_api.buscar_contenido_por_titulo(titulo)
+
+    contenidos = JSON.parse(respuesta.body)
+
+    raise IOError if contenidos.empty?
+
+    contenidos
+  end
+
   def obtener_mas_vistos
     respuesta = @conector_api.obtener_sugerencias_contenidos_mas_vistos
 

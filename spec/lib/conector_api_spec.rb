@@ -135,6 +135,9 @@ describe ConectorApi do
       stub_get_request_favoritos_sin_contenidos_faveados
 
       respuesta = described_class.new.obtener_favoritos(id_telegram)
+      favoritos = JSON.parse(respuesta.body)
+
+      expect(favoritos.empty?).to eq true
       expect(respuesta.status).to eq estado
     end
 
@@ -145,6 +148,37 @@ describe ConectorApi do
       stub_get_request_favoritos_con_un_contenido_faveado
 
       respuesta = described_class.new.obtener_favoritos(id_telegram)
+      favoritos = JSON.parse(respuesta.body)
+
+      expect(favoritos.empty?).to eq false
+      expect(respuesta.status).to eq estado
+    end
+  end
+
+  describe 'buscar_contenido_por_titulo' do
+    it 'Deberia buscar contenidos por titulo y si la BDD de la API no encuentra ningun titulo similar, recibir una respuesta con status 200 y una lista vacia' do
+      titulo = 'Titanic'
+      estado = 200
+
+      stub_get_request_contenidos_con_ningun_titulo_similar
+
+      respuesta = described_class.new.buscar_contenido_por_titulo(titulo)
+      contenidos_favoritos = JSON.parse(respuesta.body)
+
+      expect(contenidos_favoritos.empty?).to eq true
+      expect(respuesta.status).to eq estado
+    end
+
+    it 'Deberia pedir mis contenidos favoritos y recibir una respuesta con status 200' do
+      titulo = 'Akira'
+      estado = 200
+
+      stub_get_request_contenidos_con_un_titulo_similar
+
+      respuesta = described_class.new.buscar_contenido_por_titulo(titulo)
+      contenidos_favoritos = JSON.parse(respuesta.body)
+
+      expect(contenidos_favoritos.empty?).to eq false
       expect(respuesta.status).to eq estado
     end
   end

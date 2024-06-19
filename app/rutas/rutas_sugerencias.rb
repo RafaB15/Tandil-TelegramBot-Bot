@@ -36,6 +36,7 @@ module RutasSugerencias
     rescue StandardError => _e
       text = RESPUESTA_LISTA_DE_SUGERENCIAS_NUEVOS_VACIA
     end
+
     bot.api.send_message(chat_id: message.chat.id, text:)
   end
 end

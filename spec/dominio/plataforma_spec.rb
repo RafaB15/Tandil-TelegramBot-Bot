@@ -280,4 +280,33 @@ describe Plataforma do
       expect(mas_nuevos).to eq [mas_nuevo]
     end
   end
+
+  describe 'buscar_contenido_por_titulo' do
+    let(:conector_api) { instance_double('ConectorAPI') }
+
+    it 'deberia buscar contenidos a partir de un titulo y obtener una lista de ellos' do
+      contenido = { 'id' => 516, 'titulo' => 'Nahir', 'anio' => 2024, 'genero' => 'drama' }
+      respuesta = instance_double('RespuestaFaraday', body: [contenido].to_json)
+      titulo = 'Nah'
+
+      allow(conector_api).to receive(:buscar_contenido_por_titulo).and_return(respuesta)
+      expect(conector_api).to receive(:buscar_contenido_por_titulo).with(titulo)
+
+      plataforma = described_class.new(conector_api)
+      contenidos = plataforma.buscar_contenido_por_titulo(titulo)
+
+      expect(contenidos).to eq [contenido]
+    end
+
+    it 'deberia buscar contenidos a partir de un titulo y si no hay, arrojar error de IO' do
+      respuesta = instance_double('RespuestaFaraday', body: [].to_json)
+
+      allow(conector_api).to receive(:buscar_contenido_por_titulo).and_return(respuesta)
+      expect(conector_api).to receive(:buscar_contenido_por_titulo)
+
+      plataforma = described_class.new(conector_api)
+
+      expect { plataforma.buscar_contenido_por_titulo('Titan') }.to raise_error(IOError)
+    end
+  end
 end
