@@ -224,5 +224,18 @@ describe Plataforma do
 
       expect { plataforma.obtener_mas_vistos }.to raise_error(IOError)
     end
+
+    it 'deberia pedir los mas vistos y obtener una lista de ellos' do
+      mas_visto = { 'id' => 516, 'contenido' => { 'titulo' => 'Nahir', 'anio' => 2024, 'genero' => 'drama' }, 'vistas' => 3 }
+      respuesta = instance_double('RespuestaFaraday', body: [mas_visto].to_json)
+
+      allow(conector_api).to receive(:obtener_sugerencias_contenidos_mas_vistos).and_return(respuesta)
+      expect(conector_api).to receive(:obtener_sugerencias_contenidos_mas_vistos)
+
+      plataforma = described_class.new(conector_api)
+      mas_vistos = plataforma.obtener_mas_vistos
+
+      expect(mas_vistos).to eq [mas_visto]
+    end
   end
 end
