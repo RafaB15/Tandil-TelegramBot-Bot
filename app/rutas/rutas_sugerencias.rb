@@ -6,8 +6,15 @@ module RutasSugerencias
   COMANDO_SUGERENCIAS_MAS_VISTOS = '/sugerenciasmasvistos'.freeze
   COMANDO_SUGERENCIAS_NUEVOS = '/sugerenciasnuevos'.freeze
 
-  RESPUESTA_LISTA_DE_SUGERENCIAS_MAS_VISTOS_VACIA = 'No hay datos de visualizaciones de contenidos en este momento'.freeze
-  RESPUESTA_LISTA_DE_SUGERENCIAS_NUEVOS_VACIA = '¡No hay nuevos contenidos esta semana, estate atento a las novedades!'.freeze
+  MAPA_DE_ERRORES_MAS_VISTOS = {
+    'ErrorListaVacia' => 'Perdon, no tenemos suficientes datos para deteriminar los contenidos mas vistos de la plataforma.',
+    'ErrorPredeterminado' => 'Error, no se pueden ver los contenidos mas vistos de la plataforma en este momento, intentelo mas tarde'
+  }.freeze
+
+  MAPA_DE_ERRORES_MAS_NUEVOS = {
+    'ErrorListaVacia' => '¡No hay nuevos contenidos esta semana, estate atento a las novedades!',
+    'ErrorPredeterminado' => 'Error, no se pueden ver los contenidos mas nuevos de la plataforma en este momento, intentelo mas tarde'
+  }.freeze
 
   on_message COMANDO_SUGERENCIAS_MAS_VISTOS do |bot, message|
     conector_api = ConectorApi.new
@@ -18,8 +25,8 @@ module RutasSugerencias
       sugerencias_mas_vistos = plataforma.obtener_mas_vistos
 
       text = ensamblar_respuesta_sugerencias_mas_vistos(sugerencias_mas_vistos)
-    rescue StandardError => _e
-      text = RESPUESTA_LISTA_DE_SUGERENCIAS_MAS_VISTOS_VACIA
+    rescue StandardError => e
+      text = manejar_error(MAPA_DE_ERRORES_MAS_VISTOS, e)
     end
 
     bot.api.send_message(chat_id: message.chat.id, text:)
@@ -33,8 +40,8 @@ module RutasSugerencias
 
       sugerencias_nuevos = plataforma.obtener_mas_nuevos
       text = "Acá tienes algunas sugerencias:\n#{generar_lista_de_contenidos(sugerencias_nuevos)}"
-    rescue StandardError => _e
-      text = RESPUESTA_LISTA_DE_SUGERENCIAS_NUEVOS_VACIA
+    rescue StandardError => e
+      text = manejar_error(MAPA_DE_ERRORES_MAS_NUEVOS, e)
     end
 
     bot.api.send_message(chat_id: message.chat.id, text:)

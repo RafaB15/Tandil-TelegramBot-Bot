@@ -21,6 +21,6 @@ def manejar_error(mapa_de_errores, error)
   if mapa_de_errores.key?(error.class.name)
     mapa_de_errores[error.class.name]
   else
-    mapa_de_errores['ErrorPredeterinado']
+    mapa_de_errores['ErrorPredeterminado']
   end
 end

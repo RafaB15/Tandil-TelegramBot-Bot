@@ -198,8 +198,8 @@ describe Plataforma do
   describe 'obtener_favoritos' do
     let(:conector_api) { instance_double('ConectorAPI') }
 
-    it 'deberia pedir mis favoritos y si no tengo, levantar un error de IO' do
-      respuesta = instance_double('RespuestaFaraday', body: [].to_json)
+    it 'deberia pedir mis favoritos y si falla, levantar un error de IO' do
+      respuesta = instance_double('RespuestaFaraday', status: 500)
       id_telegram = 141_733_544
 
       allow(conector_api).to receive(:obtener_favoritos).and_return(respuesta)
@@ -212,7 +212,7 @@ describe Plataforma do
 
     it 'deberia pedir mis favoritos y obtener una lista de ellos' do
       favorito = { 'id' => 1, 'titulo' => 'Transformers', 'anio' => 2007, 'genero' => 'accion' }
-      respuesta = instance_double('RespuestaFaraday', body: [favorito].to_json)
+      respuesta = instance_double('RespuestaFaraday', status: 200, body: [favorito].to_json)
 
       id_telegram = 141_733_544
 
@@ -224,13 +224,25 @@ describe Plataforma do
 
       expect(favoritos).to eq [favorito]
     end
+
+    it 'deberia pedir mis favoritos y obtener una lista vacia si no tengo, levanto error' do
+      respuesta = instance_double('RespuestaFaraday', status: 200, body: [].to_json)
+      id_telegram = 141_733_544
+
+      allow(conector_api).to receive(:obtener_favoritos).and_return(respuesta)
+      expect(conector_api).to receive(:obtener_favoritos).with(id_telegram)
+
+      plataforma = described_class.new(conector_api)
+
+      expect { plataforma.obtener_favoritos(id_telegram) }.to raise_error(ErrorListaVacia)
+    end
   end
 
   describe 'obtener_mas_vistos' do
     let(:conector_api) { instance_double('ConectorAPI') }
 
-    it 'deberia pedir los mas vistos y si no hay, arrojar error de IO' do
-      respuesta = instance_double('RespuestaFaraday', body: [].to_json)
+    it 'deberia pedir los mas vistos y si falla, arrojar error de IO' do
+      respuesta = instance_double('RespuestaFaraday', status: 500)
 
       allow(conector_api).to receive(:obtener_sugerencias_contenidos_mas_vistos).and_return(respuesta)
       expect(conector_api).to receive(:obtener_sugerencias_contenidos_mas_vistos)
@@ -242,7 +254,7 @@ describe Plataforma do
 
     it 'deberia pedir los mas vistos y obtener una lista de ellos' do
       mas_visto = { 'id' => 516, 'contenido' => { 'titulo' => 'Nahir', 'anio' => 2024, 'genero' => 'drama' }, 'vistas' => 3 }
-      respuesta = instance_double('RespuestaFaraday', body: [mas_visto].to_json)
+      respuesta = instance_double('RespuestaFaraday', status: 200, body: [mas_visto].to_json)
 
       allow(conector_api).to receive(:obtener_sugerencias_contenidos_mas_vistos).and_return(respuesta)
       expect(conector_api).to receive(:obtener_sugerencias_contenidos_mas_vistos)
@@ -252,13 +264,24 @@ describe Plataforma do
 
       expect(mas_vistos).to eq [mas_visto]
     end
+
+    it 'deberia pedir los mas vistos y obtener una lista vacia si no tengo, levanto error' do
+      respuesta = instance_double('RespuestaFaraday', status: 200, body: [].to_json)
+
+      allow(conector_api).to receive(:obtener_sugerencias_contenidos_mas_vistos).and_return(respuesta)
+      expect(conector_api).to receive(:obtener_sugerencias_contenidos_mas_vistos)
+
+      plataforma = described_class.new(conector_api)
+
+      expect { plataforma.obtener_mas_vistos }.to raise_error(ErrorListaVacia)
+    end
   end
 
   describe 'obtener_mas_nuevos' do
     let(:conector_api) { instance_double('ConectorAPI') }
 
     it 'deberia pedir los mas nuevos y si no hay, arrojar error de IO' do
-      respuesta = instance_double('RespuestaFaraday', body: [].to_json)
+      respuesta = instance_double('RespuestaFaraday', status: 500, body: {}.to_json)
 
       allow(conector_api).to receive(:obtener_sugerencias_contenidos_mas_nuevos).and_return(respuesta)
       expect(conector_api).to receive(:obtener_sugerencias_contenidos_mas_nuevos)
@@ -270,7 +293,7 @@ describe Plataforma do
 
     it 'deberia pedir los mas nuevos y obtener una lista de ellos' do
       mas_nuevo = { 'id' => 764, 'titulo' => 'Aurora', 'anio' => 1989, 'genero' => 'drama' }
-      respuesta = instance_double('RespuestaFaraday', body: [mas_nuevo].to_json)
+      respuesta = instance_double('RespuestaFaraday', status: 200, body: [mas_nuevo].to_json)
 
       allow(conector_api).to receive(:obtener_sugerencias_contenidos_mas_nuevos).and_return(respuesta)
       expect(conector_api).to receive(:obtener_sugerencias_contenidos_mas_nuevos)
@@ -280,6 +303,17 @@ describe Plataforma do
 
       expect(mas_nuevos).to eq [mas_nuevo]
     end
+
+    it 'deberia pedir los mas nuevos y obtener una lista vacia si no tengo, levanto error' do
+      respuesta = instance_double('RespuestaFaraday', status: 200, body: [].to_json)
+
+      allow(conector_api).to receive(:obtener_sugerencias_contenidos_mas_nuevos).and_return(respuesta)
+      expect(conector_api).to receive(:obtener_sugerencias_contenidos_mas_nuevos)
+
+      plataforma = described_class.new(conector_api)
+
+      expect { plataforma.obtener_mas_nuevos }.to raise_error(ErrorListaVacia)
+    end
   end
 
   describe 'buscar_contenido_por_titulo' do
@@ -287,7 +321,7 @@ describe Plataforma do
 
     it 'deberia buscar contenidos a partir de un titulo y obtener una lista de ellos' do
       contenido = { 'id' => 516, 'titulo' => 'Nahir', 'anio' => 2024, 'genero' => 'drama' }
-      respuesta = instance_double('RespuestaFaraday', body: [contenido].to_json)
+      respuesta = instance_double('RespuestaFaraday', status: 200, body: [contenido].to_json)
       titulo = 'Nah'
 
       allow(conector_api).to receive(:buscar_contenido_por_titulo).and_return(respuesta)
@@ -299,8 +333,8 @@ describe Plataforma do
       expect(contenidos).to eq [contenido]
     end
 
-    it 'deberia buscar contenidos a partir de un titulo y si no hay, arrojar error de IO' do
-      respuesta = instance_double('RespuestaFaraday', body: [].to_json)
+    it 'deberia buscar contenidos a partir de un titulo y si falla, arrojar error de IO' do
+      respuesta = instance_double('RespuestaFaraday', status: 500, body: {}.to_json)
 
       allow(conector_api).to receive(:buscar_contenido_por_titulo).and_return(respuesta)
       expect(conector_api).to receive(:buscar_contenido_por_titulo)
@@ -308,6 +342,17 @@ describe Plataforma do
       plataforma = described_class.new(conector_api)
 
       expect { plataforma.buscar_contenido_por_titulo('Titan') }.to raise_error(IOError)
+    end
+
+    it 'deberia buscar contenidos a partir de un titulo y obtener una lista vacia si no tengo, levanto error' do
+      respuesta = instance_double('RespuestaFaraday', status: 200, body: [].to_json)
+
+      allow(conector_api).to receive(:buscar_contenido_por_titulo).and_return(respuesta)
+      expect(conector_api).to receive(:buscar_contenido_por_titulo)
+
+      plataforma = described_class.new(conector_api)
+
+      expect { plataforma.buscar_contenido_por_titulo('Titan') }.to raise_error(ErrorListaVacia)
     end
   end
 end

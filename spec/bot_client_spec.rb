@@ -132,6 +132,18 @@ def stub_get_request_contenidos_top_vacio
     .to_return(status: 200, body: response.to_json, headers: {})
 end
 
+def stub_get_request_contenidos_top_error
+  stub_request(:get, 'http://fake/visualizaciones/top?Content-Type=application/json')
+    .with(
+      headers: {
+        'Accept' => '*/*',
+        'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+        'User-Agent' => 'Faraday v2.7.4'
+      }
+    )
+    .to_return(status: 500, body: {}.to_json, headers: {})
+end
+
 def then_i_get_top_visualizaciones(token)
   text = "Las películas con más visualizaciones son:\n  [ID: 1] Iron Man (accion, 2008)\n  [ID: 2] Black Panther (accion, 2018)\n  [ID: 3] Doctor Strange (accion, 2016)\n"
   then_i_get_text(token, text)
@@ -263,6 +275,18 @@ def stub_get_request_contenidos_con_ningun_titulo_similar
     .to_return(status: 200, body: response.to_json, headers: {})
 end
 
+def stub_get_request_contenidos_con_titulo_error
+  stub_request(:get, 'http://fake/contenidos?Content-Type=application/json&titulo=Titanic')
+    .with(
+      headers: {
+        'Accept' => '*/*',
+        'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+        'User-Agent' => 'Faraday v2.7.4'
+      }
+    )
+    .to_return(status: 500, body: {}.to_json, headers: {})
+end
+
 def stub_get_request_contenidos_con_un_titulo_similar
   response = [{ 'id' => 1, 'titulo' => 'Akira', 'anio' => 1988, 'genero' => 'accion' }]
 
@@ -306,6 +330,18 @@ def stub_get_request_favoritos_sin_contenidos_faveados
     .to_return(status: 200, body: response.to_json, headers: {})
 end
 
+def stub_get_request_favoritos_error
+  stub_request(:get, 'http://fake/favoritos?Content-Type=application/json&id_telegram=141733544')
+    .with(
+      headers: {
+        'Accept' => '*/*',
+        'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+        'User-Agent' => 'Faraday v2.7.4'
+      }
+    )
+    .to_return(status: 500, body: {}.to_json, headers: {})
+end
+
 def stub_get_request_favoritos_con_un_contenido_faveado
   response = [{ 'id' => 1, 'titulo' => 'Transformers', 'anio' => 2007, 'genero' => 'accion' }]
 
@@ -347,6 +383,18 @@ def stub_get_request_contenidos_ultimosagregados_con_dos_contenidos_para_sugerir
       }
     )
     .to_return(status: 200, body: response.to_json, headers: {})
+end
+
+def stub_get_request_contenidos_ultimosagregados_error
+  stub_request(:get, 'http://fake/contenidos/ultimos-agregados?Content-Type=application/json')
+    .with(
+      headers: {
+        'Accept' => '*/*',
+        'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+        'User-Agent' => 'Faraday v2.7.4'
+      }
+    )
+    .to_return(status: 500, body: {}.to_json, headers: {})
 end
 
 def stub_get_contenidos_id_detalles(status, body, id_contenido)
@@ -487,7 +535,15 @@ describe 'BotClient' do
     token = 'fake_token'
     stub_get_request_contenidos_top_vacio
     when_i_send_text(token, '/sugerenciasmasvistos')
-    then_i_get_text(token, 'No hay datos de visualizaciones de contenidos en este momento')
+    then_i_get_text(token, 'Perdon, no tenemos suficientes datos para deteriminar los contenidos mas vistos de la plataforma.')
+    BotClient.new(token).run_once
+  end
+
+  it 'deberia recibir un mensaje /sugerenciasmasvistos y si falla la API, devolver un mensaje de error' do
+    token = 'fake_token'
+    stub_get_request_contenidos_top_error
+    when_i_send_text(token, '/sugerenciasmasvistos')
+    then_i_get_text(token, 'Error, no se pueden ver los contenidos mas vistos de la plataforma en este momento, intentelo mas tarde')
     BotClient.new(token).run_once
   end
 
@@ -558,6 +614,14 @@ describe 'BotClient' do
     BotClient.new(token).run_once
   end
 
+  it 'deberia recibir un mensaje /buscartitulo {titulo} y, si falla la API, devolver un mensaje de error' do
+    token = 'fake_token'
+    stub_get_request_contenidos_con_titulo_error
+    when_i_send_text(token, '/buscartitulo Titanic')
+    then_i_get_text(token, 'Error, no se pueden ver titulos de contenidos en este momento, intentelo mas tarde')
+    BotClient.new(token).run_once
+  end
+
   it 'deberia recibir un mensaje /buscartitulo {titulo} y devolver un mensaje con los resultados de la búsqueda cuando hay una coincidencia' do
     token = 'fake_token'
     stub_get_request_contenidos_con_un_titulo_similar
@@ -593,7 +657,15 @@ describe 'BotClient' do
     BotClient.new(token).run_once
   end
 
-  it 'deberia recibir un mensaje /contenidos/ultimos-agregados y devolver un mensaje con una lista vacía' do
+  it 'deberia recibir un mensaje /misfavoritos y devolver un mensaje diciendo que en este momento no se pueden ver' do
+    token = 'fake_token'
+    stub_get_request_favoritos_error
+    when_i_send_text(token, '/misfavoritos')
+    then_i_get_text(token, 'Error, no se pueden ver tus favoritos en este momento, intentelo mas tarde')
+    BotClient.new(token).run_once
+  end
+
+  it 'deberia recibir un mensaje /sugerenciasnuevos y devolver un mensaje con una lista vacía' do
     token = 'fake_token'
     stub_get_request_contenidos_ultimosagregados_sin_contenido_para_sugerir
     when_i_send_text(token, '/sugerenciasnuevos')
@@ -601,12 +673,20 @@ describe 'BotClient' do
     BotClient.new(token).run_once
   end
 
-  it 'deberia recibir un mensaje /contenidos/ultimos-agregados y devolver un mensaje con una lista de sugerencias' do
+  it 'deberia recibir un mensaje /sugerenciasnuevos y devolver un mensaje con una lista de sugerencias' do
     token = 'fake_token'
     stub_get_request_contenidos_ultimosagregados_con_dos_contenidos_para_sugerir
     when_i_send_text(token, '/sugerenciasnuevos')
     result = "Acá tienes algunas sugerencias:\n- [ID: 1] Akira (accion, 1988)\n- [ID: 2] Akira 2 (accion, 1990)\n"
     then_i_get_text(token, result)
+    BotClient.new(token).run_once
+  end
+
+  it 'deberia recibir un mensaje /sugerenciasnuevos y, si la API falla, devolver un error' do
+    token = 'fake_token'
+    stub_get_request_contenidos_ultimosagregados_error
+    when_i_send_text(token, '/sugerenciasnuevos')
+    then_i_get_text(token, 'Error, no se pueden ver los contenidos mas nuevos de la plataforma en este momento, intentelo mas tarde')
     BotClient.new(token).run_once
   end
 

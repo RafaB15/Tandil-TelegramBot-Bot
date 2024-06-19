@@ -59,46 +59,58 @@ class Plataforma
   end
 
   def obtener_favoritos(id_telegram)
-    respuesta = @conector_api.obtener_favoritos(id_telegram)
-
-    favoritos = JSON.parse(respuesta.body)
-
-    raise IOError if favoritos.empty?
-
-    favoritos
+    obtener_lista_de_recursos(:obtener_favoritos, id_telegram)
   end
 
   def buscar_contenido_por_titulo(titulo)
-    respuesta = @conector_api.buscar_contenido_por_titulo(titulo)
-
-    contenidos = JSON.parse(respuesta.body)
-
-    raise IOError if contenidos.empty?
-
-    contenidos
+    obtener_lista_de_recursos(:buscar_contenido_por_titulo, titulo)
   end
 
   def obtener_mas_vistos
-    respuesta = @conector_api.obtener_sugerencias_contenidos_mas_vistos
-
-    sugerencias_mas_vistos = JSON.parse(respuesta.body)
-
-    raise IOError if sugerencias_mas_vistos.empty?
-
-    sugerencias_mas_vistos
+    obtener_lista_de_recursos(:obtener_sugerencias_contenidos_mas_vistos)
   end
 
   def obtener_mas_nuevos
-    respuesta = @conector_api.obtener_sugerencias_contenidos_mas_nuevos
+    obtener_lista_de_recursos(:obtener_sugerencias_contenidos_mas_nuevos)
+  end
 
-    sugerencias_mas_nuevos = JSON.parse(respuesta.body)
+  def obtener_detalles_de_contenido(id_contenido, id_telegram)
+    respuesta = @conector_api.obtener_detalles_de_contenido(id_contenido.to_i, id_telegram.to_i)
 
-    raise IOError if sugerencias_mas_nuevos.empty?
+    estado = respuesta.status
+    cuerpo = JSON.parse(respuesta.body)
 
-    sugerencias_mas_nuevos
+    return cuerpo if estado == 200
+
+    if estado == 404
+      if cuerpo['details']['field'] == 'contenido'
+        raise ErrorAlDetallarContenidoNoExisteContenidoEnLaAPI
+      elsif cuerpo['details']['field'] == 'omdb'
+        raise ErrorAlDetallarContenidoNoExisteContenidoEnOMDb
+      end
+    end
+
+    raise IOError
   end
 
   private
+
+  def obtener_lista_de_recursos(metodo, parametro = nil)
+    respuesta = if parametro.nil?
+                  @conector_api.send(metodo)
+                else
+                  @conector_api.send(metodo, parametro)
+                end
+
+    estado = respuesta.status
+    raise IOError if estado != 200
+
+    lista_de_recursos = JSON.parse(respuesta.body)
+
+    raise ErrorListaVacia if lista_de_recursos.empty?
+
+    lista_de_recursos
+  end
 
   def manejar_respuesta_calificar_contenido(estado, cuerpo)
     case estado
@@ -116,6 +128,17 @@ class Plataforma
     end
 
     raise IOError
+  end
+end
+
+# Error
+# ==============================================================================
+
+class ErrorListaVacia < IOError
+  MSG_DE_ERROR = 'Error: lista vacia'.freeze
+
+  def initialize(msg_de_error = MSG_DE_ERROR)
+    super(msg_de_error)
   end
 end
 
@@ -170,6 +193,25 @@ end
 
 class ErrorAlMarcarComoFavoritoContenidoNoVistoPorUsuarioDeTelegram < IOError
   MSG_DE_ERROR = 'Error: el usuario de telegram no tiene el contenido visto al marcar como favorito el contenido'.freeze
+
+  def initialize(msg_de_error = MSG_DE_ERROR)
+    super(msg_de_error)
+  end
+end
+
+# Error detallar contenido
+# ==============================================================================
+
+class ErrorAlDetallarContenidoNoExisteContenidoEnLaAPI < IOError
+  MSG_DE_ERROR = 'Error: el contenido que se pide detallar no existe en la API Rest'.freeze
+
+  def initialize(msg_de_error = MSG_DE_ERROR)
+    super(msg_de_error)
+  end
+end
+
+class ErrorAlDetallarContenidoNoExisteContenidoEnOMDb < IOError
+  MSG_DE_ERROR = 'Error: el contenido que se pide detallar no existe en la API de OMDb'.freeze
 
   def initialize(msg_de_error = MSG_DE_ERROR)
     super(msg_de_error)

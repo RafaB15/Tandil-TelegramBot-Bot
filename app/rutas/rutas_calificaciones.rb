@@ -13,7 +13,7 @@ module RutasCalificaciones
     'ErrorAlInstanciarCalificacionPuntajeInvalido' => 'La calificacion es del 1 al 5. ¡Volve a calificar!',
     'ErrorContenidoInexistenteEnAPI' => 'El contenido ingresado no existe',
     'ErrorAlCalificarTemporadaSinSuficientesCapitulosVistosPorUsuarioDeTelegram' => '¡No tenés suficientes capítulos diferentes vistos de esta Temporada para poder calificarla!',
-    'ErrorPredeterinado' => 'Error al calificar el contenido. Inténtalo de nuevo más tarde.'
+    'ErrorPredeterminado' => 'Error al calificar el contenido. Inténtalo de nuevo más tarde.'
   }.freeze
 
   on_message_pattern COMANDO_CALIFICAR_CONTENIDO do |bot, message, args|
@@ -26,9 +26,9 @@ module RutasCalificaciones
     plataforma = Plataforma.new(conector_api)
 
     begin
-      puntaje_anterior = plataforma.calificar_contenido(id_telegram, id_contenido, puntaje)
+      calificacion_anterior = plataforma.calificar_contenido(id_telegram, id_contenido, puntaje)
 
-      text = if puntaje_anterior.nil?
+      text = if calificacion_anterior.nil?
                RESPUESTA_EXITO_AL_CALIFICAR_CONTENIDO
              else
                RESPUESTA_RECALIFICAR_CONTENIDO

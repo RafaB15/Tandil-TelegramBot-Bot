@@ -6,7 +6,16 @@ module RutasContenidos
   COMANDO_BUSCAR_TITULO = %r{/buscartitulo (?<titulo>.+)}
   COMANDO_MAS_INFO = %r{/masinfo (?<id_contenido>-?\d+)}
 
-  RESPUESTA_LISTA_DE_CONTENIDOS_VACIA = 'No se encontraron resultados para la búsqueda'.freeze
+  MAPA_DE_ERRORES_BUSCAR_TITULO = {
+    'ErrorListaVacia' => 'No se encontraron resultados para la búsqueda',
+    'ErrorPredeterminado' => 'Error, no se pueden ver titulos de contenidos en este momento, intentelo mas tarde'
+  }.freeze
+
+  MAPA_DE_ERRORES_MAS_INFO = {
+    'ErrorAlDetallarContenidoNoExisteContenidoEnLaAPI' => 'No se encontraron resultados para el contenido buscado',
+    'ErrorAlDetallarContenidoNoExisteContenidoEnOMDb' => 'No se encontraron detalles para el contenido buscado',
+    'ErrorPredeterminado' => 'Error, no se puede pedir mas informacion acerca de un contenido en este momento, intentelo mas tarde'
+  }.freeze
 
   on_message_pattern COMANDO_BUSCAR_TITULO do |bot, message, args|
     titulo = args['titulo']
@@ -19,8 +28,8 @@ module RutasContenidos
       contenidos = plataforma.buscar_contenido_por_titulo(titulo)
 
       text = "Acá están los titulos que coinciden con tu busqueda:\n#{generar_lista_de_contenidos(contenidos)}"
-    rescue StandardError => _e
-      text = RESPUESTA_LISTA_DE_CONTENIDOS_VACIA
+    rescue StandardError => e
+      text = manejar_error(MAPA_DE_ERRORES_BUSCAR_TITULO, e)
     end
 
     bot.api.send_message(chat_id: message.chat.id, text:)
@@ -28,14 +37,19 @@ module RutasContenidos
 
   on_message_pattern COMANDO_MAS_INFO do |bot, message, args|
     id_contenido = args['id_contenido']
-    id_telegram = message.from.id.to_i
+    id_telegram = message.from.id
 
-    respuesta = ConectorApi.new.obtener_detalles_de_contenido(id_contenido, id_telegram)
+    conector_api = ConectorApi.new
 
-    estado = respuesta.status
-    detalles_contenido = JSON.parse(respuesta.body)
+    plataforma = Plataforma.new(conector_api)
 
-    text = ensamblar_respuesta_mas_info(estado, detalles_contenido, id_contenido)
+    begin
+      detalles_contenido = plataforma.obtener_detalles_de_contenido(id_contenido, id_telegram)
+
+      text = "Info de #{detalles_contenido['titulo']} (#{id_contenido}):\n#{generar_lista_de_detalles(detalles_contenido)}"
+    rescue StandardError => e
+      text = manejar_error(MAPA_DE_ERRORES_MAS_INFO, e)
+    end
 
     bot.api.send_message(chat_id: message.chat.id, text:)
   end
@@ -57,22 +71,6 @@ def generar_lista_de_detalles(detalles_contenido)
   respuesta += "- Premios: #{obtener_mas_informacion(detalles_contenido, 'premios')}\n"
   respuesta += "- Director: #{obtener_mas_informacion(detalles_contenido, 'director')}\n"
   respuesta += "- Sinopsis: #{obtener_mas_informacion(detalles_contenido, 'sinopsis')}\n"
-
-  respuesta
-end
-
-def ensamblar_respuesta_mas_info(estado, detalles_contenido, id_contenido)
-  respuesta = 'Error de la API'
-
-  if estado == 200
-    respuesta = "Info de #{detalles_contenido['titulo']} (#{id_contenido}):\n#{generar_lista_de_detalles(detalles_contenido)}"
-  elsif estado == 404
-    if detalles_contenido['details']['field'] == 'contenido'
-      respuesta = 'No se encontraron resultados para el contenido buscado'
-    elsif detalles_contenido['details']['field'] == 'omdb'
-      respuesta = 'No se encontraron detalles para el contenido buscado'
-    end
-  end
 
   respuesta
 end
