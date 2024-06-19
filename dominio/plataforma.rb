@@ -72,10 +72,10 @@ class Plataforma
     sugerencias_mas_vistos = JSON.parse(respuesta.body)
 
     raise IOError if sugerencias_mas_vistos.empty?
-    
+
     sugerencias_mas_vistos
   end
-  
+
   private
 
   def manejar_respuesta_calificar_contenido(estado, cuerpo)

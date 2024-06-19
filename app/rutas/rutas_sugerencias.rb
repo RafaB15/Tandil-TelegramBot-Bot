@@ -18,11 +18,11 @@ module RutasSugerencias
       sugerencias_mas_vistos = plataforma.obtener_mas_vistos
 
       text = ensamblar_respuesta_sugerencias_mas_vistos(sugerencias_mas_vistos)
-
-      bot.api.send_message(chat_id: message.chat.id, text:)
     rescue StandardError => _e
       text = RESPUESTA_LISTA_DE_SUGERENCIAS_MAS_VISTOS_VACIA
     end
+
+    bot.api.send_message(chat_id: message.chat.id, text:)
   end
 
   on_message COMANDO_SUGERENCIAS_NUEVOS do |bot, message|
