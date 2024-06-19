@@ -26,16 +26,16 @@ module RutasSugerencias
   end
 
   on_message COMANDO_SUGERENCIAS_NUEVOS do |bot, message|
-    respuesta = ConectorApi.new.obtener_sugerencias_contenidos_mas_nuevos
+    begin
+      conector_api = ConectorApi.new
 
-    sugerencias_nuevos = JSON.parse(respuesta.body)
+      plataforma = Plataforma.new(conector_api)
 
-    text = if sugerencias_nuevos.empty?
-             RESPUESTA_LISTA_DE_SUGERENCIAS_NUEVOS_VACIA
-           else
-             "Acá tienes algunas sugerencias:\n#{generar_lista_de_contenidos(sugerencias_nuevos)}"
-           end
-
+      sugerencias_nuevos = plataforma.obtener_mas_nuevos
+      text = "Acá tienes algunas sugerencias:\n#{generar_lista_de_contenidos(sugerencias_nuevos)}"
+    rescue StandardError => _e
+      text = RESPUESTA_LISTA_DE_SUGERENCIAS_NUEVOS_VACIA
+    end
     bot.api.send_message(chat_id: message.chat.id, text:)
   end
 end

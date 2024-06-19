@@ -238,4 +238,32 @@ describe Plataforma do
       expect(mas_vistos).to eq [mas_visto]
     end
   end
+
+  describe 'obtener_mas_nuevos' do
+    let(:conector_api) { instance_double('ConectorAPI') }
+
+    it 'deberia pedir los mas nuevos y si no hay, arrojar error de IO' do
+      respuesta = instance_double('RespuestaFaraday', body: [].to_json)
+
+      allow(conector_api).to receive(:obtener_sugerencias_contenidos_mas_nuevos).and_return(respuesta)
+      expect(conector_api).to receive(:obtener_sugerencias_contenidos_mas_nuevos)
+
+      plataforma = described_class.new(conector_api)
+
+      expect { plataforma.obtener_mas_nuevos }.to raise_error(IOError)
+    end
+
+    it 'deberia pedir los mas nuevos y obtener una lista de ellos' do
+      mas_nuevo = { 'id' => 764, 'titulo' => 'Aurora', 'anio' => 1989, 'genero' => 'drama' }
+      respuesta = instance_double('RespuestaFaraday', body: [mas_nuevo].to_json)
+
+      allow(conector_api).to receive(:obtener_sugerencias_contenidos_mas_nuevos).and_return(respuesta)
+      expect(conector_api).to receive(:obtener_sugerencias_contenidos_mas_nuevos)
+
+      plataforma = described_class.new(conector_api)
+      mas_nuevos = plataforma.obtener_mas_nuevos
+
+      expect(mas_nuevos).to eq [mas_nuevo]
+    end
+  end
 end

@@ -76,6 +76,16 @@ class Plataforma
     sugerencias_mas_vistos
   end
 
+  def obtener_mas_nuevos
+    respuesta = @conector_api.obtener_sugerencias_contenidos_mas_nuevos
+
+    sugerencias_mas_nuevos = JSON.parse(respuesta.body)
+
+    raise IOError if sugerencias_mas_nuevos.empty?
+
+    sugerencias_mas_nuevos
+  end
+
   private
 
   def manejar_respuesta_calificar_contenido(estado, cuerpo)
