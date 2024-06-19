@@ -98,7 +98,7 @@ describe Plataforma do
 
       plataforma = described_class.new(conector_api)
 
-      expect { plataforma.calificar_contenido(id_telegram, id_contenido, puntaje) }.to raise_error(ErrorAlPedirCalificacionContenidoNoVistoPorUsuarioDeTelegram)
+      expect { plataforma.calificar_contenido(id_telegram, id_contenido, puntaje) }.to raise_error(ErrorAlCalificarContenidoNoVistoPorUsuarioDeTelegram)
     end
 
     it 'Deberia enviar los datos de una calificacion con un puntaje negativo y levantar un error de puntaje invalido' do
@@ -145,6 +145,21 @@ describe Plataforma do
       plataforma = described_class.new(conector_api)
 
       expect { plataforma.calificar_contenido(id_telegram, id_contenido, puntaje) }.to raise_error(ErrorContenidoInexistenteEnAPI)
+    end
+
+    it 'Deberia enviar los datos de una calificacion sin suficientes capitulos vistos por el usuario de telegram y levantar un error de usuario no vio suficientes capitulos' do
+      allow(Calificacion).to receive(:new).and_return(calificacion)
+      id_telegram = 123_456_789
+      id_contenido = 40
+      puntaje = 4
+
+      body = { 'details' => { 'field' => 'visualizacion_de_capitulo' } }
+      respuesta = instance_double('RespuestaFaraday', status: 422, body: body.to_json)
+      conector_api = instance_double('ConectorAPI', calificar_contenido: respuesta)
+
+      plataforma = described_class.new(conector_api)
+
+      expect { plataforma.calificar_contenido(id_telegram, id_contenido, puntaje) }.to raise_error(ErrorAlCalificarTemporadaSinSuficientesCapitulosVistosPorUsuarioDeTelegram)
     end
   end
 

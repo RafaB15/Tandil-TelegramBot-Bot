@@ -169,6 +169,22 @@ def stub_post_request_calificacion_contenido_no_visto(id_telegram, id_contenido,
     .to_return(status: 422, body: response.to_json, headers: {})
 end
 
+def stub_post_request_calificacion_no_hay_suficientes_capitulos_vistos(id_telegram, id_contenido, puntaje)
+  response = { error: 'Entidad no procesable', message: '', details: { field: 'visualizacion_de_capitulo' } }
+
+  stub_request(:post, 'http://fake/calificaciones')
+    .with(
+      body: "{\"id_telegram\":#{id_telegram},\"id_contenido\":#{id_contenido},\"puntaje\":#{puntaje}}",
+      headers: {
+        'Accept' => '*/*',
+        'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+        'Content-Type' => 'application/json',
+        'User-Agent' => 'Faraday v2.7.4'
+      }
+    )
+    .to_return(status: 422, body: response.to_json, headers: {})
+end
+
 def stub_post_request_calificacion_contenido_inexistente(id_telegram, id_contenido, puntaje)
   response = { error: 'No encontrado', message: '', details: { field: 'contenido' } }
 
@@ -515,6 +531,15 @@ describe 'BotClient' do
 
     when_i_send_text(token, '/calificar 97 4')
     then_i_get_text(token, 'El contenido ingresado no existe')
+  end
+
+  it 'deberia recibir un mensaje /calificar {id_contenido} {calificacion} con mensaje de error 422 y decirme que no vi suficientes capitulos para poder calificar' do
+    token = 'fake_token'
+    stub_post_request_calificacion_no_hay_suficientes_capitulos_vistos(141_733_544, 97, 4)
+
+    when_i_send_text(token, '/calificar 97 4')
+    then_i_get_text(token, '¡No tenés suficientes capítulos diferentes vistos de esta Temporada para poder calificarla!')
+    BotClient.new(token).run_once
   end
 
   it 'deberia recibir un mensaje /marcarfavorito {id_contenido} y devolver un mensaje de contenido anadido a favoritos' do

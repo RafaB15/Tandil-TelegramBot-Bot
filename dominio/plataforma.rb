@@ -105,12 +105,14 @@ class Plataforma
 
   def manejar_respuesta_calificar_contenido(estado, cuerpo)
     case estado
-
     when 422
-      if cuerpo['details']['field'] == 'visualizacion'
-        raise ErrorAlPedirCalificacionContenidoNoVistoPorUsuarioDeTelegram
-      elsif cuerpo['details']['field'] == 'calificacion'
+      case cuerpo['details']['field']
+      when 'visualizacion'
+        raise ErrorAlCalificarContenidoNoVistoPorUsuarioDeTelegram
+      when 'calificacion'
         raise ErrorAlInstanciarCalificacionPuntajeInvalido
+      when 'visualizacion_de_capitulo'
+        raise ErrorAlCalificarTemporadaSinSuficientesCapitulosVistosPorUsuarioDeTelegram
       end
     when 404
       raise ErrorContenidoInexistenteEnAPI if cuerpo['details']['field'] == 'contenido'
@@ -142,7 +144,7 @@ end
 # Error calificar
 # ==============================================================================
 
-class ErrorAlPedirCalificacionContenidoNoVistoPorUsuarioDeTelegram < IOError
+class ErrorAlCalificarContenidoNoVistoPorUsuarioDeTelegram < IOError
   MSG_DE_ERROR = 'Error: el usuario de telegram no tiene el contenido visto al calificar el contenido'.freeze
 
   def initialize(msg_de_error = MSG_DE_ERROR)
@@ -152,6 +154,14 @@ end
 
 class ErrorContenidoInexistenteEnAPI < IOError
   MSG_DE_ERROR = 'Error: contenido no existente en la base de datos de la API Rest'.freeze
+
+  def initialize(msg_de_error = MSG_DE_ERROR)
+    super(msg_de_error)
+  end
+end
+
+class ErrorAlCalificarTemporadaSinSuficientesCapitulosVistosPorUsuarioDeTelegram < IOError
+  MSG_DE_ERROR = 'Error: el usuario de telegram no tiene suficientes capitulos vistos al calificar la temporada'.freeze
 
   def initialize(msg_de_error = MSG_DE_ERROR)
     super(msg_de_error)
