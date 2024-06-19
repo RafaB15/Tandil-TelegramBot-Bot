@@ -217,6 +217,22 @@ def stub_post_request_favoritos(id_telegram, id_contenido, estado)
     .to_return(status: estado, body: cuerpo.to_json, headers: {})
 end
 
+def stub_post_request_favoritos_contenido_no_visto(id_telegram, id_contenido, status)
+  cuerpo = { error: 'Entidad no procesable', message: '', details: { field: 'visualizacion' } }
+
+  stub_request(:post, 'http://fake/favoritos')
+    .with(
+      body: "{\"id_telegram\":#{id_telegram},\"id_contenido\":#{id_contenido}}",
+      headers: {
+        'Accept' => '*/*',
+        'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+        'Content-Type' => 'application/json',
+        'User-Agent' => 'Faraday v2.7.4'
+      }
+    )
+    .to_return(status:, body: cuerpo.to_json, headers: {})
+end
+
 def stub_get_request_contenidos_con_ningun_titulo_similar
   response = []
 
@@ -506,6 +522,14 @@ describe 'BotClient' do
     stub_post_request_favoritos(141_733_544, 1, 201)
     when_i_send_text(token, '/marcarfavorito 1')
     then_i_get_text(token, 'Contenido añadido a favoritos')
+    BotClient.new(token).run_once
+  end
+
+  it 'deberia recibir un mensaje /marcarfavorito {id_contenido} y devolver un mensaje de error contenido no visto' do
+    token = 'fake_token'
+    stub_post_request_favoritos_contenido_no_visto(141_733_544, 1, 422)
+    when_i_send_text(token, '/marcarfavorito 1')
+    then_i_get_text(token, '¡Todavía no viste este contenido! ¡Miralo para poder añadirlo como favorito!')
     BotClient.new(token).run_once
   end
 

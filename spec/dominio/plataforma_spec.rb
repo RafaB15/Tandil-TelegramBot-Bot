@@ -154,7 +154,7 @@ describe Plataforma do
     before(:each) { allow(Favorito).to receive(:new).and_return(favorito) }
 
     it 'deberia crear un favorito y enviar una request a la APIRest para persistirla y recibir un estado de exito' do
-      respuesta = instance_double('RespuestaFaraday', status: 201)
+      respuesta = instance_double('RespuestaFaraday', status: 201, body: {}.to_json)
       conector_api = instance_double('ConectorAPI', marcar_contenido_como_favorito: respuesta)
       id_telegram = 123_456_789
       id_contenido = 55
@@ -167,7 +167,7 @@ describe Plataforma do
     end
 
     it 'deberia crear un favorito y enviar una request a la APIRest para persistirla, si hubo un error, deberia devolver un error IO' do
-      respuesta = instance_double('RespuestaFaraday', status: 500)
+      respuesta = instance_double('RespuestaFaraday', status: 500, body: {}.to_json)
       conector_api = instance_double('ConectorAPI', marcar_contenido_como_favorito: respuesta)
       id_telegram = 123_456_789
       id_contenido = 55

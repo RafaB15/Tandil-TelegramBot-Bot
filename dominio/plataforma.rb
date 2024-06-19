@@ -52,8 +52,13 @@ class Plataforma
     respuesta = @conector_api.marcar_contenido_como_favorito(favorito)
 
     estado = respuesta.status
+    cuerpo = JSON.parse(respuesta.body)
 
-    raise IOError if estado != 201
+    return if estado == 201
+
+    raise ErrorAlMarcarComoFavoritoContenidoNoVistoPorUsuarioDeTelegram if estado == 422 && (cuerpo['details']['field'] == 'visualizacion')
+
+    raise IOError
   end
 
   def obtener_favoritos(id_telegram)
@@ -128,7 +133,7 @@ end
 # ==============================================================================
 
 class ErrorAlPedirCalificacionContenidoNoVistoPorUsuarioDeTelegram < IOError
-  MSG_DE_ERROR = 'Error: el usuario de telegram no tiene el contenido visto'.freeze
+  MSG_DE_ERROR = 'Error: el usuario de telegram no tiene el contenido visto al calificar el contenido'.freeze
 
   def initialize(msg_de_error = MSG_DE_ERROR)
     super(msg_de_error)
@@ -137,6 +142,17 @@ end
 
 class ErrorContenidoInexistenteEnAPI < IOError
   MSG_DE_ERROR = 'Error: contenido no existente en la base de datos de la API Rest'.freeze
+
+  def initialize(msg_de_error = MSG_DE_ERROR)
+    super(msg_de_error)
+  end
+end
+
+# Error marcar como favorito
+# ==============================================================================
+
+class ErrorAlMarcarComoFavoritoContenidoNoVistoPorUsuarioDeTelegram < IOError
+  MSG_DE_ERROR = 'Error: el usuario de telegram no tiene el contenido visto al marcar como favorito el contenido'.freeze
 
   def initialize(msg_de_error = MSG_DE_ERROR)
     super(msg_de_error)
