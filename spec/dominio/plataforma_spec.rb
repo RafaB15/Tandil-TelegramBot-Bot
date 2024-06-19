@@ -210,4 +210,19 @@ describe Plataforma do
       expect(favoritos).to eq [favorito]
     end
   end
+
+  describe 'obtener_mas_vistos' do
+    let(:conector_api) { instance_double('ConectorAPI') }
+      it 'deberia pedir los mas vistos y si no hay, arrojar error de IO' do
+        respuesta = instance_double('RespuestaFaraday', body: [].to_json)
+        id_telegram = 141_733_544
+
+        allow(conector_api).to receive(:obtener_sugerencias_contenidos_mas_vistos).and_return(respuesta)
+        expect(conector_api).to receive(:obtener_sugerencias_contenidos_mas_vistos)
+
+        plataforma = described_class.new(conector_api)
+
+        expect { plataforma.obtener_mas_vistos }.to raise_error(IOError)
+      end 
+  end
 end

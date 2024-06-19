@@ -66,6 +66,16 @@ class Plataforma
     favoritos
   end
 
+  def obtener_mas_vistos
+    respuesta = @conector_api.obtener_sugerencias_contenidos_mas_vistos
+
+    sugerencias_mas_vistos = JSON.parse(respuesta.body)
+
+    raise IOError if sugerencias_mas_vistos.empty?
+    
+    sugerencias_mas_vistos
+  end
+  
   private
 
   def manejar_respuesta_calificar_contenido(estado, cuerpo)
