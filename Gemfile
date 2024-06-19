@@ -4,6 +4,9 @@ gem 'dotenv'
 gem 'faraday'
 gem 'rake'
 gem 'semantic_logger'
+gem 'sequel'
+gem 'sinatra'
+gem 'sinatra-contrib'
 gem 'telegram-bot-ruby'
 
 group :development, :test do

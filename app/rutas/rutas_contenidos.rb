@@ -17,10 +17,12 @@ module RutasContenidos
     'ErrorPredeterminado' => 'Error, no se puede pedir mas informacion acerca de un contenido en este momento, intentelo mas tarde'
   }.freeze
 
-  on_message_pattern COMANDO_BUSCAR_TITULO do |bot, message, args|
+  on_message_pattern COMANDO_BUSCAR_TITULO do |bot, message, args, logger|
     titulo = args['titulo']
 
-    conector_api = ConectorApi.new
+    logger.debug "[BOT] /buscartitulo titulo: #{titulo}"
+
+    conector_api = ConectorApi.new(logger)
 
     plataforma = Plataforma.new(conector_api)
 
@@ -32,14 +34,17 @@ module RutasContenidos
       text = manejar_error(MAPA_DE_ERRORES_BUSCAR_TITULO, e)
     end
 
+    logger.debug "[BOT] Respuesta: #{text}"
+
     bot.api.send_message(chat_id: message.chat.id, text:)
   end
 
-  on_message_pattern COMANDO_MAS_INFO do |bot, message, args|
+  on_message_pattern COMANDO_MAS_INFO do |bot, message, args, logger|
     id_contenido = args['id_contenido']
     id_telegram = message.from.id
 
-    conector_api = ConectorApi.new
+    logger.debug "[BOT] /masinfo id_contenido: #{id_contenido}"
+    conector_api = ConectorApi.new(logger)
 
     plataforma = Plataforma.new(conector_api)
 
@@ -50,6 +55,8 @@ module RutasContenidos
     rescue StandardError => e
       text = manejar_error(MAPA_DE_ERRORES_MAS_INFO, e)
     end
+
+    logger.debug "[BOT] Respuesta: #{text}"
 
     bot.api.send_message(chat_id: message.chat.id, text:)
   end

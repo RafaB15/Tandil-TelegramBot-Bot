@@ -16,11 +16,13 @@ module RutasFavoritos
     'ErrorPredeterminado' => 'Error, no se pueden ver tus favoritos en este momento, intentelo mas tarde'
   }.freeze
 
-  on_message_pattern COMANDO_MARCAR_FAVORITO do |bot, message, args|
+  on_message_pattern COMANDO_MARCAR_FAVORITO do |bot, message, args, logger|
     id_contenido = args['id_contenido']
     id_telegram = message.from.id
 
-    conector_api = ConectorApi.new
+    logger.debug "[BOT] /marcarfavorito id_contenido: #{id_contenido}"
+
+    conector_api = ConectorApi.new(logger)
 
     plataforma = Plataforma.new(conector_api)
 
@@ -32,13 +34,17 @@ module RutasFavoritos
       text = MAPA_DE_RESPUESTAS_MARCAR_FAVORITOS['ERROR']
     end
 
+    logger.debug "[BOT] Respuesta: #{text}"
+
     bot.api.send_message(chat_id: message.chat.id, text:)
   end
 
-  on_message COMANDO_MIS_FAVORITOS do |bot, message|
+  on_message COMANDO_MIS_FAVORITOS do |bot, message, _args, logger|
     id_telegram = message.from.id.to_i
 
-    conector_api = ConectorApi.new
+    logger.debug '[BOT] /misfavoritos'
+
+    conector_api = ConectorApi.new(logger)
 
     plataforma = Plataforma.new(conector_api)
 
@@ -49,6 +55,8 @@ module RutasFavoritos
     rescue StandardError => e
       text = manejar_error(MAPA_DE_ERRORES_MIS_FAVORITOS, e)
     end
+
+    logger.debug "[BOT] Respuesta: #{text}"
 
     bot.api.send_message(chat_id: message.chat.id, text:)
   end

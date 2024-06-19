@@ -12,11 +12,13 @@ module RutasUsuarios
     'ErrorPredeterminado' => 'Error de la API'
   }.freeze
 
-  on_message_pattern COMANDO_REGISTRAR_USUARIO do |bot, message, args|
+  on_message_pattern COMANDO_REGISTRAR_USUARIO do |bot, message, args, logger|
     email = args['email']
     id_telegram = message.from.id
 
-    conector_api = ConectorApi.new
+    logger.debug "[BOT] /registrar #{email}"
+
+    conector_api = ConectorApi.new(logger)
 
     plataforma = Plataforma.new(conector_api)
 
@@ -29,6 +31,8 @@ module RutasUsuarios
     rescue StandardError => e
       text = manejar_error(MAPA_DE_ERRORES_REGISTRAR, e)
     end
+
+    logger.debug "[BOT] Respuesta: #{text}"
 
     bot.api.send_message(chat_id: message.chat.id, text:)
   end

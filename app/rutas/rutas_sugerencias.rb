@@ -16,8 +16,10 @@ module RutasSugerencias
     'ErrorPredeterminado' => 'Error, no se pueden ver los contenidos mas nuevos de la plataforma en este momento, intentelo mas tarde'
   }.freeze
 
-  on_message COMANDO_SUGERENCIAS_MAS_VISTOS do |bot, message|
-    conector_api = ConectorApi.new
+  on_message COMANDO_SUGERENCIAS_MAS_VISTOS do |bot, message, _args, logger|
+    logger.debug '[BOT] /sugerenciasmasvistos'
+
+    conector_api = ConectorApi.new(logger)
 
     plataforma = Plataforma.new(conector_api)
 
@@ -29,12 +31,16 @@ module RutasSugerencias
       text = manejar_error(MAPA_DE_ERRORES_MAS_VISTOS, e)
     end
 
+    logger.debug "[BOT] Respuesta: #{text}"
+
     bot.api.send_message(chat_id: message.chat.id, text:)
   end
 
-  on_message COMANDO_SUGERENCIAS_NUEVOS do |bot, message|
+  on_message COMANDO_SUGERENCIAS_NUEVOS do |bot, message, _args, logger|
+    logger.debug '[BOT] /sugerenciasnuevos'
+
     begin
-      conector_api = ConectorApi.new
+      conector_api = ConectorApi.new(logger)
 
       plataforma = Plataforma.new(conector_api)
 
@@ -43,6 +49,8 @@ module RutasSugerencias
     rescue StandardError => e
       text = manejar_error(MAPA_DE_ERRORES_MAS_NUEVOS, e)
     end
+
+    logger.debug "[BOT] Respuesta: #{text}"
 
     bot.api.send_message(chat_id: message.chat.id, text:)
   end

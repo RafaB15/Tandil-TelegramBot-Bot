@@ -35,12 +35,16 @@ class Routes
     bot.api.send_message(chat_id: message.chat.id, text:)
   end
 
-  on_message COMANDO_VERSION do |bot, message|
-    respuesta = ConectorApi.new.obtener_version
+  on_message COMANDO_VERSION do |bot, message, _args, logger|
+    logger.debug '[BOT] /version'
+
+    respuesta = ConectorApi.new(logger).obtener_version
 
     version_api = JSON.parse(respuesta.body)['version']
 
     text = "version bot: #{Version.current}, version api: #{version_api}"
+
+    logger.debug "[BOT] Respuesta: #{text}"
 
     bot.api.send_message(chat_id: message.chat.id, text:)
   end

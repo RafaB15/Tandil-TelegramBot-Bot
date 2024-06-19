@@ -30,14 +30,14 @@ module Routing
     clazz.extend ClazzMethods
   end
 
-  def handle(bot, message)
+  def handle(bot, message, logger)
     handler = find_handler_for(message)
     handler, named_captures = find_regex_handler_for(message) if handler.nil?
 
     if !handler.nil?
-      handler.call(bot, message, named_captures)
+      handler.call(bot, message, named_captures, logger)
     else
-      (handler || default_handler(message)).call(bot, message)
+      (handler || default_handler(message)).call(bot, message, logger)
     end
   end
 

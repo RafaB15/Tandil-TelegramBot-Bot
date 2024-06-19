@@ -46,6 +46,6 @@ class BotClient
   def handle_message(message, bot)
     @logger.debug "From: @#{message.from.username}, message: #{message.inspect}"
 
-    Routes.new.handle(bot, message)
+    Routes.new.handle(bot, message, @logger)
   end
 end
