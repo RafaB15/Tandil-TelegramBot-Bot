@@ -6,7 +6,7 @@ module RutasSugerencias
   COMANDO_SUGERENCIAS_MAS_VISTOS = '/sugerenciasmasvistos'.freeze
   COMANDO_SUGERENCIAS_NUEVOS = '/sugerenciasnuevos'.freeze
 
-  RESPUESTA_LISTA_DE_SUGERENCIAS_MAS_VISTOS_VACIA = 'No hay datos de visualizaciones de películas en el momento'.freeze
+  RESPUESTA_LISTA_DE_SUGERENCIAS_MAS_VISTOS_VACIA = 'No hay datos de visualizaciones de contenidos en este momento'.freeze
   RESPUESTA_LISTA_DE_SUGERENCIAS_NUEVOS_VACIA = '¡No hay nuevos contenidos esta semana, estate atento a las novedades!'.freeze
 
   on_message COMANDO_SUGERENCIAS_MAS_VISTOS do |bot, message|
