@@ -455,7 +455,7 @@ describe 'BotClient' do
     token = 'fake_token'
     stub_get_request_contenidos_top_vacio
     when_i_send_text(token, '/sugerenciasmasvistos')
-    then_i_get_text(token, 'No hay datos de visualizaciones de películas en el momento')
+    then_i_get_text(token, 'No hay datos de visualizaciones de contenidos en este momento')
     BotClient.new(token).run_once
   end
 
