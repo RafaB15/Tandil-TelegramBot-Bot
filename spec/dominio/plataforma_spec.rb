@@ -178,6 +178,20 @@ describe Plataforma do
       plataforma = described_class.new(conector_api)
       expect { plataforma.marcar_contenido_como_favorito(id_telegram, id_contenido) }.to raise_error(IOError)
     end
+
+    it 'deberia crear un favorito y enviar una request a la APIRest, si el usuario no habia visto el contenido, deberia devolver un error al marcar como favorito contenido no visto por el usuario' do
+      cuerpo = { 'details' => { 'field' => 'visualizacion' } }
+      respuesta = instance_double('RespuestaFaraday', status: 422, body: cuerpo.to_json)
+      conector_api = instance_double('ConectorAPI', marcar_contenido_como_favorito: respuesta)
+      id_telegram = 123_456_789
+      id_contenido = 55
+
+      expect(Favorito).to receive(:new).with(id_telegram, id_contenido)
+      expect(conector_api).to receive(:marcar_contenido_como_favorito).with(favorito)
+
+      plataforma = described_class.new(conector_api)
+      expect { plataforma.marcar_contenido_como_favorito(id_telegram, id_contenido) }.to raise_error(ErrorAlMarcarComoFavoritoContenidoNoVistoPorUsuarioDeTelegram)
+    end
   end
 
   describe 'obtener_favoritos' do
