@@ -7,13 +7,9 @@ module RutasFavoritos
   COMANDO_MIS_FAVORITOS = '/misfavoritos'.freeze
 
   RESPUESTA_MARCAR_FAVORITOS_EXITO = 'Contenido añadido a favoritos'.freeze
+  RESPUESTA_MARCAR_FAVORITOS_ERROR = 'Error, no se puede marcar un favorito en este momento, intentelo mas tarde'.freeze
 
   RESPUESTA_LISTA_DE_FAVORITOS_VACIA = 'Parece que no tienes favoritos! Empieza a marcar tus contenidos como favoritos para verlos aquí.'.freeze
-
-  MAPA_DE_ERRORES_MARCAR_FAVORITO = {
-    'ErrorAlMarcarComoFavoritoContenidoNoVistoPorUsuarioDeTelegram' => '¡Todavía no viste este contenido! ¡Miralo para poder añadirlo como favorito!',
-    'ErrorPredeterminado' => 'Error al guardar favorito'
-  }.freeze
 
   on_message_pattern COMANDO_MARCAR_FAVORITO do |bot, message, args|
     id_contenido = args['id_contenido']
@@ -27,8 +23,8 @@ module RutasFavoritos
       plataforma.marcar_contenido_como_favorito(id_telegram, id_contenido)
 
       text = RESPUESTA_MARCAR_FAVORITOS_EXITO
-    rescue StandardError => e
-      text = manejar_error(MAPA_DE_ERRORES_MARCAR_FAVORITO, e)
+    rescue StandardError => _e
+      text = RESPUESTA_MARCAR_FAVORITOS_ERROR
     end
 
     bot.api.send_message(chat_id: message.chat.id, text:)

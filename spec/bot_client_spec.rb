@@ -550,14 +550,6 @@ describe 'BotClient' do
     BotClient.new(token).run_once
   end
 
-  it 'deberia recibir un mensaje /marcarfavorito {id_contenido} y devolver un mensaje de error contenido no visto' do
-    token = 'fake_token'
-    stub_post_request_favoritos_contenido_no_visto(141_733_544, 1, 422)
-    when_i_send_text(token, '/marcarfavorito 1')
-    then_i_get_text(token, '¡Todavía no viste este contenido! ¡Miralo para poder añadirlo como favorito!')
-    BotClient.new(token).run_once
-  end
-
   it 'deberia recibir un mensaje /buscartitulo {titulo} y devolver un mensaje con los resultados de la busqueda cuando no hay coincidencias' do
     token = 'fake_token'
     stub_get_request_contenidos_con_ningun_titulo_similar

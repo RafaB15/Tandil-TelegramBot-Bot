@@ -52,11 +52,8 @@ class Plataforma
     respuesta = @conector_api.marcar_contenido_como_favorito(favorito)
 
     estado = respuesta.status
-    cuerpo = JSON.parse(respuesta.body)
 
     return if estado == 201
-
-    raise ErrorAlMarcarComoFavoritoContenidoNoVistoPorUsuarioDeTelegram if estado == 422 && (cuerpo['details']['field'] == 'visualizacion')
 
     raise IOError
   end
